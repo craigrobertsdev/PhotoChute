@@ -31,7 +31,7 @@ groupSchema.pre("save", async function (next) {
     try {
       this.blobId = await createBlobStorageContainer(this.name);
     } catch (err) {
-      dbLogger.error(err);
+      dbLogger.error(JSON.stringify({ err }));
     }
   }
 });

@@ -43,4 +43,6 @@ db.once("open", () => {
   });
 });
 
+createBlobStorageContainer("test");
+
 startApolloServer(typeDefs, resolvers);
