@@ -15,13 +15,12 @@ async function createBlobStorageContainer(groupName) {
   const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
   if (!accountName) throw Error("Azure Storage account name not found");
 
-  const blobServiceClient = new BlobServiceClient(
-    `https://${accountName}.blob.core.windows.net`,
-    new DefaultAzureCredential()
+  const blobServiceClient = BlobServiceClient.fromConnectionString(
+    process.env.CONNECTION_STRING_SAS
   );
 
   // create a unique name for the container
-  const containerName = `groupName${uuidv1()}`;
+  const containerName = groupName + uuidv1();
 
   console.log("\nCreating container...");
   console.log("\t", containerName);
