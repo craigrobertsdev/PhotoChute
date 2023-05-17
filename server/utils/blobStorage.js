@@ -1,5 +1,6 @@
 const { BlobServiceClient } = require("@azure/storage-blob");
-const { DefaultAzureCredential } = require("@azure/identity");
+// may need this in prod when server is running from my Azure details, rather than a SAS key
+// const { DefaultAzureCredential } = require("@azure/identity");
 const { v1: uuidv1 } = require("uuid");
 
 /**
@@ -12,9 +13,6 @@ const { v1: uuidv1 } = require("uuid");
  * @throws An error if there is an issue creating the blob container
  */
 async function createBlobStorageContainer(groupName) {
-  const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
-  if (!accountName) throw Error("Azure Storage account name not found");
-
   const blobServiceClient = BlobServiceClient.fromConnectionString(
     process.env.CONNECTION_STRING_SAS
   );
@@ -34,9 +32,21 @@ async function createBlobStorageContainer(groupName) {
   console.log(
     `Container was created successfully.\n\trequestId:${createContainerResponse.requestId}\n\tURL: ${containerClient.url}`
   );
+}
 
+/**
+ *
+ * @param {*} photo
+ */
+async function uploadToBlobContainer(fileName, containerName) {
   // create a unique name for the blob
-  const blobName = "quickstart" + uuidv1() + ".txt";
+  const blobName = fileName + uuidv1();
+
+  const blobServiceClient = BlobServiceClient.fromConnectionString(
+    process.env.CONNECTION_STRING_SAS
+  );
+
+  const containerClient = blobServiceClient.getContainerClient(containerName);
 
   // get a block blob client
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
@@ -53,11 +63,5 @@ async function createBlobStorageContainer(groupName) {
 
   console.log(`Blob was uploaded successfully. requestId: ${uploadBlobResponse.requestId}`);
 }
-
-/**
- *
- * @param {*} photo
- */
-async function uploadToBlobContainer(photo) {}
 
 module.exports = { createBlobStorageContainer, uploadToBlobContainer };
