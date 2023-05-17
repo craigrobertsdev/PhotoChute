@@ -1,7 +1,7 @@
 const { Schema, model } = require("mongoose");
 const { ObjectId } = require("mongoose").Types;
 const { dbLogger } = require("../logs/logger");
-const createBlobStorage = require("../utils/createBlobStorage");
+const createBlobStorage = require("../utils/blobStorage");
 
 const groupSchema = new Schema({
   name: {
@@ -15,15 +15,9 @@ const groupSchema = new Schema({
       required: true,
     },
   ],
-  blobId: {
+  containerName: {
     type: String,
   },
-  // unsure about whether this will be needed at this stage
-  /*   password: {
-    type: String,
-    required: true,
-    len: [8, 50],
-  }, */
 });
 
 groupSchema.pre("save", async function (next) {
@@ -36,19 +30,6 @@ groupSchema.pre("save", async function (next) {
   }
 });
 
-/* groupSchema.pre("save", async function (next) {
-  if (this.isNew || this.isModified("password")) {
-    const saltRounds = 10;
-    this.password = await bcrypt.hash(this.password, saltRounds);
-  }
-
-  next();
-});
-
-groupSchema.isCorrectPassword = async function (password) {
-  return bcrypt.compare(password, this.password);
-};
- */
 const Group = model("Group", groupSchema);
 
 module.exports = Group;
