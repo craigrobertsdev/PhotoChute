@@ -6,7 +6,6 @@ const {
   StorageSharedKeyCredential,
   SASProtocol,
 } = require("@azure/storage-blob");
-const { v1: uuidv1 } = require("uuid");
 
 const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
 const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
@@ -20,7 +19,7 @@ const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountK
  *
  * @returns An object containing the storage account name, container name, blob name and the SAS token for the file upload
  */
-async function generateFileUploadUrl(containerName) {
+async function generateFileUploadUrlData(containerName) {
   const sasToken = await createAccountSas();
 
   return { accountName, containerName, sasToken };
@@ -29,8 +28,8 @@ async function generateFileUploadUrl(containerName) {
 // information about sasOptions is located here: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-account-delegation-sas-create-javascript?tabs=blob-service-client
 async function createAccountSas() {
   const sasOptions = {
-    services: AccountSASServices.parse("btqf").toString(), // blobs, tables, queues, files
-    resourceTypes: AccountSASResourceTypes.parse("co").toString(), // service, container, object - options are "sco"
+    services: AccountSASServices.parse("btqf").toString(), // b: blobs, t: tables, q: queues, f: files
+    resourceTypes: AccountSASResourceTypes.parse("co").toString(), // c: container, o: object
     permissions: AccountSASPermissions.parse("rwu"), // permissions - r: read, w: write, u: update
     protocol: SASProtocol.Https,
     startsOn: new Date(),
@@ -39,10 +38,8 @@ async function createAccountSas() {
 
   const sasToken = generateAccountSASQueryParameters(sasOptions, sharedKeyCredential).toString();
 
-  // console.log(`sasToken = '${sasToken}'\n`);
-
   // prepend sasToken with `?`
   return sasToken[0] === "?" ? sasToken : `?${sasToken}`;
 }
 
-module.exports = generateFileUploadUrl;
+module.exports = generateFileUploadUrlData;

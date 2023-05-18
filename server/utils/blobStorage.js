@@ -1,7 +1,7 @@
 const { BlobServiceClient } = require("@azure/storage-blob");
+const { v1: uuidv1 } = require("uuid");
 // may need this in prod when server is running from my Azure details, rather than a SAS key
 // const { DefaultAzureCredential } = require("@azure/identity");
-const { v1: uuidv1 } = require("uuid");
 
 /**
  * Creates a new blob storage container in Azure Storage each time a group model is created in the database.
@@ -12,6 +12,7 @@ const { v1: uuidv1 } = require("uuid");
  *
  * @throws An error if there is an issue creating the blob container
  */
+
 async function createBlobStorageContainer(groupName) {
   const blobServiceClient = BlobServiceClient.fromConnectionString(
     process.env.CONNECTION_STRING_SAS
@@ -19,9 +20,6 @@ async function createBlobStorageContainer(groupName) {
 
   // create a unique name for the container
   const containerName = groupName + uuidv1();
-
-  console.log("\nCreating container...");
-  console.log("\t", containerName);
 
   // get a reference to the container
   const containerClient = blobServiceClient.getContainerClient(containerName);
@@ -34,34 +32,4 @@ async function createBlobStorageContainer(groupName) {
   );
 }
 
-/**
- *
- * @param {*} photo
- */
-async function uploadToBlobContainer(fileName, containerName) {
-  // create a unique name for the blob
-  const blobName = fileName + uuidv1();
-
-  const blobServiceClient = BlobServiceClient.fromConnectionString(
-    process.env.CONNECTION_STRING_SAS
-  );
-
-  const containerClient = blobServiceClient.getContainerClient(containerName);
-
-  // get a block blob client
-  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-
-  // display blobname and url
-  console.log(
-    `\nUploading to Azure storage as blob\n\tname: ${blobName}:\n\tURL: ${blockBlobClient.url}`
-  );
-
-  // upload data to the blob
-  const data = "Hello world!";
-
-  const uploadBlobResponse = await blockBlobClient.upload(data, data.length);
-
-  console.log(`Blob was uploaded successfully. requestId: ${uploadBlobResponse.requestId}`);
-}
-
-module.exports = { createBlobStorageContainer, uploadToBlobContainer };
+module.exports = createBlobStorageContainer;

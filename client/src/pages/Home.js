@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useMutation } from "@apollo/client";
-import uploadFileToBlob from "../utils/uploadFileToBlob";
+import uploadFileToBlob from "../utils/blobStorage";
 import { GET_FILE_UPLOAD_URL } from "../utils/mutations";
 const Home = () => {
   const [fileName, setFileName] = useState("");
@@ -30,7 +30,8 @@ const Home = () => {
         // get url for uploading file to Azure blob storage
 
         // *** UPLOAD TO AZURE STORAGE ***
-        await uploadFileToBlob(fileSelected, accountName, containerName, sasToken);
+        const fileUrl = await uploadFileToBlob(fileSelected, containerName, sasToken);
+        console.log(fileUrl);
         // reset state/form
       } catch (error) {
         console.log(JSON.stringify(error, null, 2));

@@ -1,7 +1,7 @@
 const { User, Photo, Group } = require("../models");
 const { AuthenticationError } = require("apollo-server-express");
 const { signToken } = require("../utils/auth");
-const generateFileUploadUrl = require("../utils/sasTokens");
+const generateFileUploadUrlData = require("../utils/sasTokenGenerator");
 
 const resolvers = {
   Query: {
@@ -49,7 +49,7 @@ const resolvers = {
       if (!groupName) {
         throw new AuthenticationError("A group name needs to be supplied");
       }
-      const uploadUrlData = await generateFileUploadUrl(groupName, fileName);
+      const uploadUrlData = generateFileUploadUrlData(groupName, fileName);
       return uploadUrlData;
     },
     //     singleUploadFile: async (parent, { username }, context) => {},
