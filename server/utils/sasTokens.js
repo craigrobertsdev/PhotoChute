@@ -26,12 +26,13 @@ async function generateFileUploadUrl(containerName) {
   return { accountName, containerName, sasToken };
 }
 
+// information about sasOptions is located here: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-account-delegation-sas-create-javascript?tabs=blob-service-client
 async function createAccountSas() {
   const sasOptions = {
     services: AccountSASServices.parse("btqf").toString(), // blobs, tables, queues, files
     resourceTypes: AccountSASResourceTypes.parse("co").toString(), // service, container, object - options are "sco"
-    permissions: AccountSASPermissions.parse("w"), // permissions - options are "rwdlacupi"
-    protocol: SASProtocol.HttpsAndHttp,
+    permissions: AccountSASPermissions.parse("rwu"), // permissions - r: read, w: write, u: update
+    protocol: SASProtocol.Https,
     startsOn: new Date(),
     expiresOn: new Date(new Date().valueOf() + 5 * 60 * 1000), // 5 minutes
   };
