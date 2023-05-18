@@ -18,14 +18,12 @@ const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountK
  *
  * @param fileName The name of the file being uploaded.
  *
- * @returns A resource URL for uploading an image to. The URL expires 5 minutes after it is requested.
+ * @returns An object containing the storage account name, container name, blob name and the SAS token for the file upload
  */
-async function generateFileUploadUrl(containerName, fileName) {
+async function generateFileUploadUrl(containerName) {
   const sasToken = await createAccountSas();
 
-  const blobName = tokeniseFileName(fileName);
-
-  return `https://${accountName}.blob.core.windows.net/${containerName}/${blobName}?${sasToken}`;
+  return { accountName, containerName, sasToken };
 }
 
 async function createAccountSas() {
@@ -40,15 +38,10 @@ async function createAccountSas() {
 
   const sasToken = generateAccountSASQueryParameters(sasOptions, sharedKeyCredential).toString();
 
-  console.log(`sasToken = '${sasToken}'\n`);
+  // console.log(`sasToken = '${sasToken}'\n`);
 
   // prepend sasToken with `?`
   return sasToken[0] === "?" ? sasToken : `?${sasToken}`;
-}
-
-// creates a unique file name based on the file name parameter
-function tokeniseFileName(fileName) {
-  return fileName + uuidv1();
 }
 
 module.exports = generateFileUploadUrl;

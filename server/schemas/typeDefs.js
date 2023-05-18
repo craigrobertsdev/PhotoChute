@@ -36,6 +36,12 @@ const typeDefs = gql`
     user: User
   }
 
+  type FileUrl {
+    accountName: String!
+    containerName: String!
+    sasToken: String!
+  }
+
   type Query {
     me: User
     photos: [Photo]
@@ -47,7 +53,7 @@ const typeDefs = gql`
     savePhoto(fileName: String!, url: String!, fileSize: Int!, owner: ID!): User
     addPhotoToGroup(photoId: ID!, groupId: ID!): Group
     removePhoto(photoId: ID!): User
-    getFileUploadUrl(groupName: String!, fileName: String!): String
+    getFileUploadUrl(groupName: String!): FileUrl
 
     #singleUploadFile(user: User!): Photo
     #singleUploadStream(file: Upload!): File!
