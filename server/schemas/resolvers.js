@@ -42,15 +42,15 @@ const resolvers = {
 
     getFileUploadUrl: async (parent, { groupName, fileName }, context) => {
       // if user exists on context, they are assumed to be logged in
-      if (!context.user) {
-        throw new AuthenticationError("You need to be signed in to upload images");
-      }
+      // if (!context.user) {
+      //   throw new AuthenticationError("You need to be signed in to upload images");
+      // }
 
       if (!groupName) {
         throw new AuthenticationError("A group name needs to be supplied");
       }
-
-      return generateFileUploadUrl(groupName, fileName);
+      const uploadUrlData = await generateFileUploadUrl(groupName, fileName);
+      return uploadUrlData;
     },
     //     singleUploadFile: async (parent, { username }, context) => {},
     //     saveBook: async (parent, { bookId, authors, description, title, image, link }, context) => {

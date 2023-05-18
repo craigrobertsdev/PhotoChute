@@ -64,10 +64,12 @@ export const REMOVE_BOOK = gql`
   }
 `;
 
-export const GENERATE_FILE_UPLOAD_URL = gql`
-  mutation generateFileUploadUrl($groupName: String!, $fileName: String!) {
-    fileUploadUrl(groupName: $groupName, fileName: $fileName) {
-      fileUploadUrl
+export const GET_FILE_UPLOAD_URL = gql`
+  mutation getFileUploadUrl($groupName: String!) {
+    getFileUploadUrl(groupName: $groupName) {
+      accountName
+      containerName
+      sasToken
     }
   }
 `;

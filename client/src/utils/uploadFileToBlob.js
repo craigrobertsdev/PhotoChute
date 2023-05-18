@@ -1,73 +1,53 @@
 // <snippet_package>
 // THIS IS SAMPLE CODE ONLY - NOT MEANT FOR PRODUCTION USE
 import { BlobServiceClient } from "@azure/storage-blob";
+const { v1: uuidv1 } = require("uuid");
 
-const containerName = `uploaded`;
-const sasToken = process.env.REACT_APP_AZURE_STORAGE_SAS_TOKEN;
-const storageAccountName = process.env.REACT_APP_AZURE_STORAGE_RESOURCE_NAME;
-// </snippet_package>
+/**
+ * @param {File} file
+ * @param {string} uploadUrl
+ * @param {string} groupName
+ * @param {string} containerName
+ */
+const uploadFileToBlob = async (file, accountName, containerName, sasToken) => {
+  console.log(sasToken);
+  // create a new BlobServiceClient with the Blob service URL and SAS token
+  const blobServiceClient = new BlobServiceClient(
+    `https://${accountName}.blob.core.windows.net/${sasToken}`
+  );
 
-// <snippet_get_client>
-const uploadUrl = `https://${storageAccountName}.blob.core.windows.net/?${sasToken}`;
-console.log(uploadUrl);
+  // Get a reference to a container
+  const containerClient = blobServiceClient.getContainerClient("photos");
 
-// get BlobService = notice `?` is pulled out of sasToken - if created in Azure portal
-const blobService = new BlobServiceClient(uploadUrl);
-
-// get Container - full public read access
-const containerClient = blobService.getContainerClient(containerName);
-// </snippet_get_client>
-
-// <snippet_isStorageConfigured>
-// Feature flag - disable storage feature to app if not configured
-export const isStorageConfigured = () => {
-  return !storageAccountName || !sasToken ? false : true;
-};
-// </snippet_isStorageConfigured>
-
-// <snippet_getBlobsInContainer>
-// return list of blobs in container to display
-export const getBlobsInContainer = async () => {
-  const returnedBlobUrls = [];
-
-  // get list of blobs in container
-  // eslint-disable-next-line
-  for await (const blob of containerClient.listBlobsFlat()) {
-    console.log(`${blob.name}`);
-
-    const blobItem = {
-      url: `https://${storageAccountName}.blob.core.windows.net/${containerName}/${blob.name}?${sasToken}`,
-      name: blob.name,
-    };
-
-    // if image is public, just construct URL
-    returnedBlobUrls.push(blobItem);
+  const containerExists = await containerClient.exists();
+  if (!containerExists) {
+    throw new Error(
+      "The storage container for this group does not exist. Likely cause is the group has been deleted."
+    );
   }
 
-  return returnedBlobUrls;
+  const blobName = tokeniseFileName(file.name);
+
+  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+  console.log(
+    `\nUploading to Azure storage as blob\n\tname: ${blobName}:\n\tURL: ${blockBlobClient.url}`
+  );
+
+  const uploadBlobResponse = await blockBlobClient.uploadData(file, {
+    blobHTTPHeaders: {
+      blobContentType: file.type,
+    },
+  });
+  console.log(uploadBlobResponse);
 };
-// </snippet_getBlobsInContainer>
 
-// <snippet_createBlobInContainer>
-const createBlobInContainer = async (file) => {
-  // create blobClient for container
-  const blobClient = containerClient.getBlockBlobClient(file.name);
-
-  // set mimetype as determined from browser with file upload control
-  const options = { blobHTTPHeaders: { blobContentType: file.type } };
-
-  // upload file
-  await blobClient.uploadData(file, options);
-};
-// </snippet_createBlobInContainer>
-
-// <snippet_uploadFileToBlob>
-const uploadFileToBlob = async (file) => {
-  if (!file) return;
-
-  // upload file
-  await createBlobInContainer(file);
-};
-// </snippet_uploadFileToBlob>
+/**
+ * @description Creates a unique file name based on the file name parameter and current timestamp.
+ * @param {string} fileName
+ */
+function tokeniseFileName(fileName) {
+  return fileName.toLowerCase() + uuidv1();
+}
 
 export default uploadFileToBlob;
