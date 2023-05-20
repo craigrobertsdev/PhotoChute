@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useMutation } from "@apollo/client";
 import uploadFileToBlob from "../utils/blobStorage";
 import { GET_FILE_UPLOAD_URL } from "../utils/mutations";
@@ -7,11 +7,17 @@ const Home = () => {
   const [fileSelected, setFileSelected] = useState();
   const [uploading, setUploading] = useState(false);
   const [getFileUploadUrl, { error }] = useMutation(GET_FILE_UPLOAD_URL);
+  const [fileTypeValidationError, setFileTypeValidationError] = useState(false);
 
   const onFileChange = (event) => {
     // capture file into state
     setFileSelected(event.target.files[0]);
+    // validateFileType(fileSelected.type);
   };
+
+  useEffect(() => {
+    validateFileType(fileSelected?.type);
+  }, [fileSelected]);
 
   const onFileUpload = async () => {
     if (fileSelected && fileSelected?.name) {
@@ -24,7 +30,6 @@ const Home = () => {
             groupName,
           },
         });
-        console.log(urlData.data.getFileUploadUrl);
 
         const { accountName, containerName, sasToken } = urlData.data.getFileUploadUrl;
         // get url for uploading file to Azure blob storage
@@ -42,11 +47,27 @@ const Home = () => {
     }
   };
 
+  /**
+   * @description Checks whether the file is of type jpg, jpeg or png
+   *
+   * @param {string} fileType The type of file to check against
+   */
+  function validateFileType(fileType) {
+    console.log(fileType);
+    if (!(fileType === "image/png" || fileType === "image/jpeg" || fileType === "image/jpg")) {
+      setFileTypeValidationError(true);
+    }
+  }
+
   // display form
   const DisplayForm = () => (
     <div>
       <input type="file" onChange={onFileChange} />
-      <button type="submit" onClick={onFileUpload}>
+      <button
+        type="submit"
+        onClick={onFileUpload}
+        // disabled={fileTypeValidationError}
+      >
         Upload!
       </button>
     </div>
@@ -57,6 +78,7 @@ const Home = () => {
       <h1>Upload file to Azure Blob Storage</h1>
       {!uploading && DisplayForm()}
       {uploading && <div>Uploading</div>}
+      {fileTypeValidationError && <div>File must be of type jpg, jpeg or png</div>}
       <hr />
     </div>
   );
