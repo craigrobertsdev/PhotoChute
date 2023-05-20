@@ -13,7 +13,7 @@ const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
 const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
 
 /**
- * @param containerName The name of the container that the blob will be uploaded to. This is the name of the group the user wants to upload to.
+ * @param {String} containerName The name of the container that the blob will be uploaded to. This is the name of the group the user wants to upload to.
  *
  * @param fileName The name of the file being uploaded.
  *
