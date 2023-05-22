@@ -12,6 +12,7 @@ const Home = () => {
   const onFileChange = (event) => {
     // capture file into state
     setFileSelected(event.target.files[0]);
+
     // validateFileType(fileSelected.type);
   };
 
@@ -35,7 +36,7 @@ const Home = () => {
         // get url for uploading file to Azure blob storage
 
         // *** UPLOAD TO AZURE STORAGE ***
-        const fileUrl = await uploadFileToBlob(fileSelected, containerName, sasToken);
+        const fileUrl = await uploadFileToBlob(fileSelected, "images", sasToken);
         console.log(fileUrl);
         // reset state/form
       } catch (error) {
@@ -53,7 +54,6 @@ const Home = () => {
    * @param {string} fileType The type of file to check against
    */
   function validateFileType(fileType) {
-    console.log(fileType);
     if (!(fileType === "image/png" || fileType === "image/jpeg" || fileType === "image/jpg")) {
       setFileTypeValidationError(true);
     }

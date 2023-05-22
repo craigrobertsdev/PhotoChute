@@ -15,7 +15,7 @@ const uploadFileToBlob = async (file, containerName, sasToken) => {
 
   // Get a reference to a container
   // const containerClient = blobServiceClient.getContainerClient(containerName.toLowerCase());
-  const containerClient = blobServiceClient.getContainerClient("container");
+  const containerClient = blobServiceClient.getContainerClient("images");
 
   const containerExists = await containerClient.exists();
 
@@ -27,15 +27,15 @@ const uploadFileToBlob = async (file, containerName, sasToken) => {
 
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
-  // upload the file to blob storage
   try {
+    // upload the file to Azure blob storage. Doing so will trigger an automatic function to create a thumbnail
     await blockBlobClient.uploadData(file, {
       blobHTTPHeaders: {
         blobContentType: file.type,
       },
     });
 
-    return `https://photochute.blob.core.windows.net/${containerName}/${blobName}/?${sasToken}`;
+    return blobName;
   } catch (err) {
     console.log(JSON.stringify(err, null, 2));
   }
