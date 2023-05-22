@@ -7,6 +7,12 @@ const typeDefs = gql`
     encoding: String!
   }
 
+  type File {
+    filename: String!
+    mimetype: String!
+    encoding: String!
+  }
+
   type User {
     _id: ID
     username: String

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 const { BlobServiceClient, BlockBlobClient } = require("@azure/storage-blob");
+=======
+const { BlobServiceClient } = require("@azure/storage-blob");
+>>>>>>> 6846a704efd4d8c005c9549aedae3c2b138f569e
 const { v1: uuidv1 } = require("uuid");
 // may need this in prod when server is running from my Azure details, rather than a SAS key
 // const { DefaultAzureCredential } = require("@azure/identity");
@@ -13,7 +17,10 @@ const { v1: uuidv1 } = require("uuid");
  * @throws An error if there is an issue creating the blob container
  */
 
+<<<<<<< HEAD
 // not currently being used as all images are stored in the "images" container
+=======
+>>>>>>> 6846a704efd4d8c005c9549aedae3c2b138f569e
 async function createBlobStorageContainer(groupName) {
   const blobServiceClient = BlobServiceClient.fromConnectionString(
     process.env.CONNECTION_STRING_SAS
@@ -33,6 +40,7 @@ async function createBlobStorageContainer(groupName) {
   );
 }
 
+<<<<<<< HEAD
 /**
  *
  * @param {string} fileUrl the url of the file to be deleted
@@ -97,3 +105,6 @@ module.exports = {
   getSingleBlob,
   getManyBlobs,
 };
+=======
+module.exports = createBlobStorageContainer;
+>>>>>>> 6846a704efd4d8c005c9549aedae3c2b138f569e

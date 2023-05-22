@@ -2,6 +2,7 @@ const { User, Photo, Group } = require("../models");
 const { AuthenticationError } = require("apollo-server-express");
 const { signToken } = require("../utils/auth");
 const generateFileUploadUrlData = require("../utils/sasTokenGenerator");
+const generateFileUploadUrlData = require("../utils/sasTokenGenerator");
 
 const resolvers = {
   Query: {
