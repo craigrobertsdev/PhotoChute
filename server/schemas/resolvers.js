@@ -7,7 +7,13 @@ const resolvers = {
   Query: {
     me: async (parent, args, context) => {},
     photos: async (parent, args, context) => {},
-
+    getFileUploadUrl: async (parent, args, context) => {
+      // if user exists on context, they are assumed to be logged in
+      // if (!context.user) {
+      //   throw new AuthenticationError("You need to be signed in to upload images");
+      // }
+      return await generateFileUploadUrlData();
+    },
     //     // finds the logged in user based on the passed token's user _id if it exists
     //     me: async (parent, args, context) => {
     //       if (context.user) {
@@ -40,18 +46,6 @@ const resolvers = {
 
     removePhoto: async (parent, { photoId }) => {},
 
-    getFileUploadUrl: async (parent, { groupName, fileName }, context) => {
-      // if user exists on context, they are assumed to be logged in
-      // if (!context.user) {
-      //   throw new AuthenticationError("You need to be signed in to upload images");
-      // }
-
-      if (!groupName) {
-        throw new AuthenticationError("A group name needs to be supplied");
-      }
-      const uploadUrlData = generateFileUploadUrlData(groupName, fileName);
-      return uploadUrlData;
-    },
     //     singleUploadFile: async (parent, { username }, context) => {},
     //     saveBook: async (parent, { bookId, authors, description, title, image, link }, context) => {
     //       // if there is a user attached to context, we know they have already been authenticated via the authMiddleware function

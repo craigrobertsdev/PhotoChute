@@ -17,3 +17,11 @@ export const GET_ME = gql`
     }
   }
 `;
+
+export const GET_FILE_UPLOAD_URL = gql`
+  query getFileUploadUrl {
+    getFileUploadUrl {
+      sasToken
+    }
+  }
+`;

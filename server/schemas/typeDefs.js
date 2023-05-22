@@ -37,14 +37,13 @@ const typeDefs = gql`
   }
 
   type FileUrl {
-    accountName: String!
-    containerName: String!
     sasToken: String!
   }
 
   type Query {
     me: User
     photos: [Photo]
+    getFileUploadUrl: FileUrl
   }
 
   type Mutation {
@@ -53,7 +52,6 @@ const typeDefs = gql`
     savePhoto(fileName: String!, url: String!, fileSize: Int!, owner: ID!): User
     addPhotoToGroup(photoId: ID!, groupId: ID!): Group
     removePhoto(photoId: ID!): User
-    getFileUploadUrl(groupName: String!): FileUrl
 
     #singleUploadFile(user: User!): Photo
     #singleUploadStream(file: Upload!): File!

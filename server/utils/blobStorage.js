@@ -1,4 +1,4 @@
-const { BlobServiceClient } = require("@azure/storage-blob");
+const { BlobServiceClient, BlockBlobClient } = require("@azure/storage-blob");
 const { v1: uuidv1 } = require("uuid");
 // may need this in prod when server is running from my Azure details, rather than a SAS key
 // const { DefaultAzureCredential } = require("@azure/identity");
@@ -13,6 +13,7 @@ const { v1: uuidv1 } = require("uuid");
  * @throws An error if there is an issue creating the blob container
  */
 
+// not currently being used as all images are stored in the "images" container
 async function createBlobStorageContainer(groupName) {
   const blobServiceClient = BlobServiceClient.fromConnectionString(
     process.env.CONNECTION_STRING_SAS
@@ -32,4 +33,67 @@ async function createBlobStorageContainer(groupName) {
   );
 }
 
-module.exports = createBlobStorageContainer;
+/**
+ *
+ * @param {string} fileUrl the url of the file to be deleted
+ * @returns a promise that resolves when the file is deleted
+ */
+async function deleteBlob(fileName) {
+  const blockBlobClient = new BlockBlobClient(
+    process.env.CONNECTION_STRING_SAS,
+    "images",
+    fileName
+  );
+
+  try {
+    blockBlobClient.delete({
+      deleteSnapshots: "include",
+    });
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+/**
+ *
+ * @param {[string]} fileNames the names of the blobs to be deleted
+ */
+async function deleteManyBlobs(fileNames) {
+  try {
+    const promises = [];
+    for (const fileName of fileNames) {
+      const blockBlobClient = new BlockBlobClient(process.env.CONNECTION_STRING_SAS, "images", fileName);
+      promises.push(blockBlobClient.delete({
+        deleteSnapshots: "include"
+      }))
+    }
+  }
+}
+
+/**
+ *
+ * @param {string} blobName the name of the blob to be deleted
+ */
+async function getSingleBlob(blobName) {
+  const blobServiceClient = BlobServiceClient.fromConnectionString(
+    process.env.CONNECTION_STRING_SAS
+  );
+
+  const containerClient = blobServiceClient.getContainerClient("images");
+}
+
+/**
+ *
+ * @param {[string]} blobName an array of blob names for deletion
+ */
+async function getManyBlobs(blobName) {
+  const containerClient = BlobServiceClient.fromConnectionString(process.env.CONNECTION_STRING_SAS);
+}
+
+module.exports = {
+  createBlobStorageContainer,
+  deleteBlob,
+  deleteManyBlobs,
+  getSingleBlob,
+  getManyBlobs,
+};

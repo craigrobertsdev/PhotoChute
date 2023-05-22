@@ -13,16 +13,13 @@ const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
 const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
 
 /**
- * @param {String} containerName The name of the container that the blob will be uploaded to. This is the name of the group the user wants to upload to.
- *
- * @param fileName The name of the file being uploaded.
  *
  * @returns An object containing the storage account name, container name, blob name and the SAS token for the file upload
  */
-async function generateFileUploadUrlData(containerName) {
+async function generateFileUploadUrlData() {
   const sasToken = await createAccountSas();
 
-  return { accountName, containerName, sasToken };
+  return { sasToken };
 }
 
 // information about sasOptions is located here: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-account-delegation-sas-create-javascript?tabs=blob-service-client

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useMutation } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import uploadFileToBlob from "../utils/blobStorage";
-import { GET_FILE_UPLOAD_URL } from "../utils/mutations";
+import { GET_FILE_UPLOAD_URL } from "../utils/queries";
 const Home = () => {
   const [fileName, setFileName] = useState("");
   const [fileSelected, setFileSelected] = useState();
   const [uploading, setUploading] = useState(false);
-  const [getFileUploadUrl, { error }] = useMutation(GET_FILE_UPLOAD_URL);
+  const [getFileUploadUrl] = useLazyQuery(GET_FILE_UPLOAD_URL);
   const [fileTypeValidationError, setFileTypeValidationError] = useState(false);
 
   const onFileChange = (event) => {
@@ -32,7 +32,8 @@ const Home = () => {
           },
         });
 
-        const { accountName, containerName, sasToken } = urlData.data.getFileUploadUrl;
+        const { sasToken } = urlData.data.getFileUploadUrl;
+        console.log(sasToken);
         // get url for uploading file to Azure blob storage
 
         // *** UPLOAD TO AZURE STORAGE ***
