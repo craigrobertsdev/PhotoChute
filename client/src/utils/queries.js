@@ -6,6 +6,7 @@ export const GET_ME = gql`
       _id
       username
       email
+      phone
       groups {
         _id
         name
@@ -20,7 +21,7 @@ export const GET_ME = gql`
         url
         uploadDate
         fileSize
-        groups: {
+        groups {
           _id
           name
         }
@@ -38,7 +39,7 @@ export const GET_PHOTOS = gql`
         url
         uploadDate
         fileSize
-        groups: {
+        groups {
           _id
           name
         }
