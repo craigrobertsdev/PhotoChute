@@ -1,52 +1,44 @@
 import { gql } from "@apollo/client";
 
 export const GET_ME = gql`
-  query me {
-    me {
-      _id
+  query Me {
+  me {
+    _id
+    email
+    friends {
       username
-      email
-      phone
-      groups {
-        _id
-        name
-        members {
-          _id
-          username
-        }
-      }
-      photos {
-        _id
-        fileName
-        url
-        uploadDate
-        fileSize
-        groups {
-          _id
-          name
-        }
-        owner
-      }
+      _id
+    }
+    groups {
+      _id
+    }
+    phone
+    photos {
+      _id
+    }
+    username
     }
   }
 `;
 
 export const GET_PHOTOS = gql`
-  query photos {
-      photos {
-        _id
-        fileName
-        url
-        uploadDate
-        fileSize
-        groups {
-          _id
-          name
-        }
-        owner
-      }
+  query Photos {
+  photos {
+    _id
+    fileName
+    fileSize
+    groups {
+      _id
+      name
     }
+    owner {
+      _id
+      username
+    }
+    uploadDate
+    url
   }
+}
 `;
 
 export const GET_FILE_UPLOAD_URL = gql`

@@ -26,59 +26,30 @@ export const ADD_USER = gql`
 `;
 
 export const SAVE_PHOTO = gql`
-  mutation savePhoto(
-    $fileName: String!
-    $url: String!
-    $fileSize: Int!
-    $owner: ID!
-  ) {
-    savePhoto(
-      fileName: $fileName
-      url: $url
-      fileSize: $fileSize
-      owner: $owner
-    ) {
-      _id
-      username
-    }
+  mutation SavePhoto($fileName: String!, $url: String!, $fileSize: Int!, $owner: ID!) {
+  savePhoto(fileName: $fileName, url: $url, fileSize: $fileSize, owner: $owner) {
+    _id
+    username
   }
+}
 `;
 
 export const ADD_PHOTO = gql`
-  mutation addPhotoToGroup(
-    $photoId: ID!
-    $groupId: ID!
-  ) {
-    addPhotoToGroup(
-      photoId: $photoId
-      groupId: $groupId
-    ) {
-      _id
-      name
-    }
+  mutation AddPhotoToGroup($photoId: ID!, $groupId: ID!) {
+  addPhotoToGroup(photoId: $photoId, groupId: $groupId) {
+    _id
+    name
   }
+}
 `;
 
 export const REMOVE_PHOTO = gql`
-  mutation removePhoto(
-    $photoId: String!
-  ) {
-    removePhoto(
-      photoId: $photoId
-    ) {
-      _id
-      username
-      photos {
-        _id
-        fileName
-        url
-        uploadDate
-        fileSize
-        group
-        owner
-      }
-    }
+  mutation RemovePhoto($photoId: ID!) {
+  removePhoto(photoId: $photoId) {
+    _id
+    username
   }
+}
 `;
 
 export const GET_FILE_UPLOAD_URL = gql`
