@@ -34,6 +34,7 @@ export const SAVE_PHOTO = gql`
 }
 `;
 
+<<<<<<< HEAD
 export const ADD_PHOTO = gql`
   mutation AddPhotoToGroup($photoId: ID!, $groupId: ID!) {
   addPhotoToGroup(photoId: $photoId, groupId: $groupId) {
@@ -52,6 +53,8 @@ export const REMOVE_PHOTO = gql`
 }
 `;
 
+=======
+>>>>>>> 701bfd2 (create group working, begin adding ability to get download link for files)
 export const GET_FILE_UPLOAD_URL = gql`
   mutation getFileUploadUrl($groupName: String!) {
     getFileUploadUrl(groupName: $groupName) {
@@ -88,7 +91,7 @@ export const DELETE_SINGLE_PHOTO = gql`
 `;
 
 export const DELETE_MANY_PHOTOS = gql`
-  mutation deleteManyPhotos(photoIds: [ID]!) {
+  mutation deleteManyPhotos($photoIds: [ID]!) {
     deleteManyPhotos(photoIds: $photoIds) {
       _id
     }

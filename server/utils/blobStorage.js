@@ -27,9 +27,13 @@ async function createBlobStorageContainer(groupName) {
   // get a reference to the container
   const containerClient = blobServiceClient.getContainerClient(containerName);
   // create the container
+<<<<<<< HEAD
   /* const createContainerResponse = await containerClient.create();
 <<<<<<< HEAD
 =======
+=======
+  const createContainerResponse = await containerClient.create();
+>>>>>>> 701bfd2 (create group working, begin adding ability to get download link for files)
 
 >>>>>>> 6f45c52 (added functions to handle container creation and photo deletion in blob storage)
   console.log(
@@ -39,9 +43,6 @@ async function createBlobStorageContainer(groupName) {
   console.log(containerClient.url.split("?")[0]);
 
   return containerClient.url.split("?")[0];
-  */
-
-  return "test.url";
 }
 
 /**
@@ -102,7 +103,7 @@ async function deleteManyBlobs(containerName, blobNames) {
 
 /**
  *
- * @param {string} blobName the name of the blob to be deleted
+ * @param {string} blobName the name of the blob requested
  * @returns {string} A signed URL to the blob to enable viewing or downloading of the file
  */
 async function getSingleBlob(containerName, blobName) {
@@ -120,8 +121,8 @@ async function getSingleBlob(containerName, blobName) {
 }
 
 /**
- * @param {string} containerName The name of the container in which the blobs to be deleted are located
- * @param {[string]} blobNames an array of blob names for deletion
+ * @param {string} containerName The name of the container in which the blobs to be obtained are located
+ * @param {[string]} blobNames an array of requested blob names
  * @returns {[{blobName: string, url: string}]} an array of objects containing the blob name and signed url for each files in the request
  */
 async function getManyBlobs(containerName, blobNames) {

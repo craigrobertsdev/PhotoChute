@@ -35,7 +35,8 @@ const typeDefs = gql`
   }
 
   type FileUrl {
-    sasToken: String!
+    sasToken: String
+    fileUrl: String
   }
 
   type Query {
@@ -43,6 +44,7 @@ const typeDefs = gql`
     photos: [Photo]
     getFileUploadUrl: FileUrl
     getPhotosForGroup(groupName: String!): Group
+    getSignedUrl(groupName: String!, blobName: String!): FileUrl
   }
 
   type Mutation {
