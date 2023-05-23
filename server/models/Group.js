@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose");
 const { ObjectId } = require("mongoose").Types;
-const { dbLogger } = require("../logs/logger");
+const { dbLogger } = require("../logging/logger");
 const createBlobStorage = require("../utils/blobStorage");
 
 const groupSchema = new Schema({

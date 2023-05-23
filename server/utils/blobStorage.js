@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-const { BlobServiceClient, BlockBlobClient } = require("@azure/storage-blob");
-=======
 const { BlobServiceClient } = require("@azure/storage-blob");
->>>>>>> 6846a704efd4d8c005c9549aedae3c2b138f569e
 const { v1: uuidv1 } = require("uuid");
 // may need this in prod when server is running from my Azure details, rather than a SAS key
 // const { DefaultAzureCredential } = require("@azure/identity");
@@ -17,94 +13,23 @@ const { v1: uuidv1 } = require("uuid");
  * @throws An error if there is an issue creating the blob container
  */
 
-<<<<<<< HEAD
-// not currently being used as all images are stored in the "images" container
-=======
->>>>>>> 6846a704efd4d8c005c9549aedae3c2b138f569e
 async function createBlobStorageContainer(groupName) {
   const blobServiceClient = BlobServiceClient.fromConnectionString(
     process.env.CONNECTION_STRING_SAS
   );
-
   // create a unique name for the container
-  const containerName = groupName + uuidv1();
-
+  const containerName = serialiseGroupName(groupName);
   // get a reference to the container
   const containerClient = blobServiceClient.getContainerClient(containerName);
-
   // create the container
-  const createContainerResponse = await containerClient.create();
-
+  /* const createContainerResponse = await containerClient.create();
   console.log(
     `Container was created successfully.\n\trequestId:${createContainerResponse.requestId}\n\tURL: ${containerClient.url}`
   );
+  console.log(containerClient.url.split("?")[0]);
+  return containerClient.url.split("?")[0];
+  */
+  return "test.url";
 }
 
-<<<<<<< HEAD
-/**
- *
- * @param {string} fileUrl the url of the file to be deleted
- * @returns a promise that resolves when the file is deleted
- */
-async function deleteBlob(fileName) {
-  const blockBlobClient = new BlockBlobClient(
-    process.env.CONNECTION_STRING_SAS,
-    "images",
-    fileName
-  );
-
-  try {
-    blockBlobClient.delete({
-      deleteSnapshots: "include",
-    });
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-/**
- *
- * @param {[string]} fileNames the names of the blobs to be deleted
- */
-async function deleteManyBlobs(fileNames) {
-  try {
-    const promises = [];
-    for (const fileName of fileNames) {
-      const blockBlobClient = new BlockBlobClient(process.env.CONNECTION_STRING_SAS, "images", fileName);
-      promises.push(blockBlobClient.delete({
-        deleteSnapshots: "include"
-      }))
-    }
-  }
-}
-
-/**
- *
- * @param {string} blobName the name of the blob to be deleted
- */
-async function getSingleBlob(blobName) {
-  const blobServiceClient = BlobServiceClient.fromConnectionString(
-    process.env.CONNECTION_STRING_SAS
-  );
-
-  const containerClient = blobServiceClient.getContainerClient("images");
-}
-
-/**
- *
- * @param {[string]} blobName an array of blob names for deletion
- */
-async function getManyBlobs(blobName) {
-  const containerClient = BlobServiceClient.fromConnectionString(process.env.CONNECTION_STRING_SAS);
-}
-
-module.exports = {
-  createBlobStorageContainer,
-  deleteBlob,
-  deleteManyBlobs,
-  getSingleBlob,
-  getManyBlobs,
-};
-=======
 module.exports = createBlobStorageContainer;
->>>>>>> 6846a704efd4d8c005c9549aedae3c2b138f569e

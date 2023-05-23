@@ -17,6 +17,8 @@ const typeDefs = gql`
     _id: ID
     username: String
     email: String
+    phone: String
+    friends: [User]
     groups: [Group]
     photos: [Photo]
   }
@@ -55,6 +57,7 @@ const typeDefs = gql`
   type Mutation {
     login(email: String!, password: String!): Auth
     addUser(username: String!, email: String!, password: String!): Auth
+    addFriend(username: String, phone: String): User
     savePhoto(fileName: String!, url: String!, fileSize: Int!, owner: ID!): User
     addPhotoToGroup(photoId: ID!, groupId: ID!): Group
     removePhoto(photoId: ID!): User
