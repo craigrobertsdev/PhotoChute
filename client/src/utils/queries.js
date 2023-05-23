@@ -48,3 +48,11 @@ export const GET_PHOTOS = gql`
     }
   }
 `;
+
+export const GET_FILE_UPLOAD_URL = gql`
+  query getFileUploadUrl {
+    getFileUploadUrl {
+      sasToken
+    }
+  }
+`;

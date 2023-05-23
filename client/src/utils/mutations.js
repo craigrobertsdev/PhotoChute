@@ -80,3 +80,13 @@ export const REMOVE_PHOTO = gql`
     }
   }
 `;
+
+export const GET_FILE_UPLOAD_URL = gql`
+  mutation getFileUploadUrl($groupName: String!) {
+    getFileUploadUrl(groupName: $groupName) {
+      accountName
+      containerName
+      sasToken
+    }
+  }
+`;
