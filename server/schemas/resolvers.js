@@ -2,7 +2,7 @@ const { User, Photo, Group } = require("../models");
 const { AuthenticationError } = require("apollo-server-express");
 const { signToken } = require("../utils/auth");
 const generateFileUploadUrlData = require("../utils/sasTokenGenerator");
-const { ObjectId } = require("mongoose").Types;
+const { getSingleBlob } = require("../utils/blobStorage");
 
 const resolvers = {
   Query: {
@@ -16,6 +16,8 @@ const resolvers = {
       return await generateFileUploadUrlData();
     },
     getPhotosForGroup: async (parent, { group }, context) => {},
+    // gets a signed url for the specified photoId
+    getSignedUrl: async (parent, { groupName, blobName }, context) => {},
   },
   Mutation: {
     login: async (parent, { email, password }) => {
@@ -36,19 +38,12 @@ const resolvers = {
       return { token, user };
     },
     createGroup: async (parent, { groupName, userId }, context) => {
-      const user = await User.findById(new ObjectId(userId));
+      const user = await User.findById(userId);
 
-      const newGroup = await Group.create({ name: groupName });
+      const newGroup = await (
+        await Group.create({ name: groupName, members: [userId] })
+      ).populate("members");
 
-      const group = await Group.findOneAndUpdate(
-        { _id: newGroup._id },
-        {
-          $addToSet: { members: { _id: new ObjectId(userId) } },
-        },
-        { new: true }
-      );
-
-      console.log(group);
       const { name, members, photos, containerUrl } = newGroup;
 
       return { name, members, photos, containerUrl };

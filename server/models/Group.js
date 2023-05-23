@@ -1,36 +1,44 @@
 const { Schema, model } = require("mongoose");
-const { ObjectId } = require("mongoose").Types;
 const { dbLogger } = require("../logging/logger");
 const { createBlobStorageContainer } = require("../utils/blobStorage");
 
-const groupSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
-    validate: {
-      validator: validateGroupName,
-      message:
-        "Group name must be no more than 30 characters long and not include consecutive '-' characters",
+const groupSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      validate: {
+        validator: validateGroupName,
+        message:
+          "Group name must be no more than 30 characters long and not include consecutive '-' characters",
+      },
     },
-  },
-  members: [
-    {
-      type: [ObjectId],
+    members: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    groupOwner: {
+      type: Schema.Types.ObjectId,
       ref: "User",
-      default: [],
     },
-  ],
-  photos: [
-    {
-      type: [ObjectId],
-      ref: "Photo",
-      default: [],
+    photos: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Photo",
+      },
+    ],
+    containerUrl: {
+      type: String,
     },
-  ],
-  containerUrl: {
-    type: String,
-  },
-});
+  }, // set this to use virtual below
+  {
+    toJSON: {
+      virtuals: true,
+    },
+  }
+);
 
 groupSchema.pre("save", async function (next) {
   if (this.isNew) {

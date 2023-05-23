@@ -47,23 +47,6 @@ export const SAVE_BOOK = gql`
   }
 `;
 
-export const REMOVE_BOOK = gql`
-  mutation removeBook($bookId: String!) {
-    removeBook(bookId: $bookId) {
-      _id
-      username
-      savedBooks {
-        bookId
-        authors
-        title
-        description
-        image
-        link
-      }
-    }
-  }
-`;
-
 export const GET_FILE_UPLOAD_URL = gql`
   mutation getFileUploadUrl($groupName: String!) {
     getFileUploadUrl(groupName: $groupName) {
@@ -100,7 +83,7 @@ export const DELETE_SINGLE_PHOTO = gql`
 `;
 
 export const DELETE_MANY_PHOTOS = gql`
-  mutation deleteManyPhotos(photoIds: [ID]!) {
+  mutation deleteManyPhotos($photoIds: [ID]!) {
     deleteManyPhotos(photoIds: $photoIds) {
       _id
     }

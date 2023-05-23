@@ -2,12 +2,12 @@ import { BlobServiceClient } from "@azure/storage-blob";
 const { v1: uuidv1 } = require("uuid");
 
 /**
- * @description This function
+ * @description Uploads the provided file to the blob storage account via a temporarily signed URL
  * @param {File} file The actual file or Stream to be uploaded
  * @param {string} containerName The name of the container for files to be uploaded to
  * @param {string} sasToken The Secure Access Signature token for uploading files to blob storage
  */
-const uploadFileToBlob = async (file, containerName, sasToken) => {
+async function uploadFileToBlob(file, containerName, sasToken) {
   // create a new BlobServiceClient with the Blob service URL and SAS token
   const blobServiceClient = new BlobServiceClient(
     `https://photochute.blob.core.windows.net/${sasToken}`
@@ -38,7 +38,7 @@ const uploadFileToBlob = async (file, containerName, sasToken) => {
   } catch (err) {
     console.log(JSON.stringify(err, null, 2));
   }
-};
+}
 
 /**
  * @description Creates a unique file name based on the file name parameter and current timestamp.
@@ -46,9 +46,9 @@ const uploadFileToBlob = async (file, containerName, sasToken) => {
  */
 function tokeniseFileName(fileName) {
   const name = fileName.slice(0, fileName.lastIndexOf("."));
-  const extension = fileName.slice(fileName.lastIndexOf("."));
+  const fileExtension = fileName.slice(fileName.lastIndexOf("."));
 
-  return `${name.toLowerCase()}-${uuidv1()}${extension}`;
+  return `${name.toLowerCase()}-${uuidv1()}${fileExtension}`;
 }
 
 export default uploadFileToBlob;
