@@ -6,6 +6,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from "@ap
 import { setContext } from "@apollo/client/link/context";
 import Home from "./pages/Home";
 import CreateGroupForm from "./pages/CreateGroupForm";
+import Group from "./pages/Group";
 
 // construct the GraphQL endpoint
 const httpLink = createHttpLink({
@@ -39,6 +40,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/saved" element={<SavedBooks />} />
             <Route path="/create-group" element={<CreateGroupForm />} />
+            <Route path="/group" element={<Group />} />
             <Route path="*" element={<h1 className="display-2">Wrong page!</h1>} />
           </Routes>
         </>

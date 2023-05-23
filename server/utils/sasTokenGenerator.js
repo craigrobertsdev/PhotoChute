@@ -5,6 +5,9 @@ const {
   AccountSASResourceTypes,
   StorageSharedKeyCredential,
   SASProtocol,
+  BlobSASPermissions,
+  generateBlobSASQueryParameters,
+  BlobServiceClient,
 } = require("@azure/storage-blob");
 
 const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
@@ -16,10 +19,11 @@ const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountK
  *
  * @returns An object containing the storage account name, container name, blob name and the SAS token for the file upload
  */
-async function generateFileUploadUrlData(permissions) {
-  const sasToken = await createAccountSas(permissions);
+async function generateFileUploadUrlData(containerName, blobName, permissions) {
+  // const sasToken = await createAccountSas(permissions);
+  const fileUrl = await getBlobSasUri(containerName, blobName, sharedKeyCredential, permissions);
 
-  return { sasToken };
+  return { fileUrl };
 }
 
 // information about sasOptions is located here: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-account-delegation-sas-create-javascript?tabs=blob-service-client
@@ -45,4 +49,36 @@ async function createAccountSas(permissions) {
   return sasToken[0] === "?" ? sasToken : `?${sasToken}`;
 }
 
-module.exports = generateFileUploadUrlData;
+/**
+ *
+ * @param {string} containerName The name of the container for the stored photo
+ * @param {string} blobName The file name as stored in the storage container
+ * @param {StorageSharedKeyCredential} sharedKeyCredential
+ * @param {string} permissions a string cotaining any combination of "r" = read, "w" = write
+ * @returns A signed URL with temporary access to the given resource
+ */
+async function getBlobSasUri(containerName, blobName, sharedKeyCredential, permissions) {
+  let tokenDuration;
+
+  // if the token grants write access, give it a duration of 1 minute, otherwise it will have 10 minutes for
+  if (permissions.includes("w")) {
+    tokenDuration = 1 * 60 * 1000; // 1 minute
+  } else {
+    tokenDuration = 10 * 60 * 1000; // 10 minutes
+  }
+
+  const sasOptions = {
+    containerName,
+    blobName: blobName,
+    startsOn: new Date(),
+    expiresOn: new Date(new Date().valueOf() + tokenDuration),
+    permissions: BlobSASPermissions.parse(permissions),
+  };
+
+  const sasToken = generateBlobSASQueryParameters(sasOptions, sharedKeyCredential).toString();
+  console.log(`SAS token for blob is: ${sasToken}`);
+
+  return `https://photochute.blob.core.windows.net/${containerName}/${blobName}?${sasToken}`;
+}
+
+module.exports = { generateFileUploadUrlData, getBlobSasUri };

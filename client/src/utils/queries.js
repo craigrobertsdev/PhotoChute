@@ -19,9 +19,9 @@ export const GET_ME = gql`
 `;
 
 export const GET_FILE_UPLOAD_URL = gql`
-  query getFileUploadUrl {
-    getFileUploadUrl {
-      sasToken
+  query getFileUploadUrl($groupName: String!, $blobName: String!) {
+    getFileUploadUrl(groupName: $groupName, blobName: $blobName) {
+      fileUrl
     }
   }
 `;

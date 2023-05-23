@@ -1,19 +1,19 @@
 const { User, Photo, Group } = require("../models");
 const { AuthenticationError } = require("apollo-server-express");
 const { signToken } = require("../utils/auth");
-const generateFileUploadUrlData = require("../utils/sasTokenGenerator");
+const { generateFileUploadUrlData, getBlobSasUri } = require("../utils/sasTokenGenerator");
 const { getSingleBlob } = require("../utils/blobStorage");
 
 const resolvers = {
   Query: {
     me: async (parent, args, context) => {},
     photos: async (parent, args, context) => {},
-    getFileUploadUrl: async (parent, args, context) => {
+    getFileUploadUrl: async (parent, { groupName, blobName }, context) => {
       // if user exists on context, they are assumed to be logged in
       // if (!context.user) {
       //   throw new AuthenticationError("You need to be signed in to upload images");
       // }
-      return await generateFileUploadUrlData();
+      return await generateFileUploadUrlData(groupName, blobName, "rw");
     },
     getPhotosForGroup: async (parent, { group }, context) => {},
     // gets a signed url for the specified photoId

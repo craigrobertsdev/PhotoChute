@@ -33,14 +33,13 @@ const typeDefs = gql`
   }
 
   type FileUrl {
-    sasToken: String
     fileUrl: String
   }
 
   type Query {
     me: User
     photos: [Photo]
-    getFileUploadUrl: FileUrl
+    getFileUploadUrl(groupName: String!, blobName: String!): FileUrl
     getPhotosForGroup(groupName: String!): Group
     getSignedUrl(groupName: String!, blobName: String!): FileUrl
   }

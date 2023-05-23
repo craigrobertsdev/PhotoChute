@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { DELETE_SINGLE_PHOTO, DELETE_MANY_PHOTOS } from "../utils/mutations";
 import { GET_PHOTOS_FOR_GROUP, GET_SIGNED_URL } from "../utils/queries";
 import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col, Button, ToggleButton } from "react-bootstrap";
 
 const Group = (groupName) => {
   const {
@@ -47,10 +47,10 @@ const Group = (groupName) => {
   const loadPhoto = async (event, photoId) => {
     event.preventDefault();
 
-    const signedUrl = await getSignedUrl(photoId);
-    console.log(signedUrl);
+    //const signedUrl = await getSignedUrl(photoId);
+    // console.log(signedUrl);
 
-    window.location.assign(signedUrl);
+    // window.location.assign(signedUrl);
   };
 
   return (
@@ -66,6 +66,7 @@ const Group = (groupName) => {
                   <Button onClick={(event) => loadPhoto(event, photo._id)}>
                     <img src={photo.thumbnailUrl} alt="thumbnail" />
                   </Button>
+                  <ToggleButton>Text here</ToggleButton>
                 </Col>
               ))}
             </Row>
