@@ -14,8 +14,7 @@ const uploadFileToBlob = async (file, containerName, sasToken) => {
   );
 
   // Get a reference to a container
-  // const containerClient = blobServiceClient.getContainerClient(containerName.toLowerCase());
-  const containerClient = blobServiceClient.getContainerClient("images");
+  const containerClient = blobServiceClient.getContainerClient(containerName.toLowerCase());
 
   const containerExists = await containerClient.exists();
 
@@ -46,7 +45,10 @@ const uploadFileToBlob = async (file, containerName, sasToken) => {
  * @param {string} fileName
  */
 function tokeniseFileName(fileName) {
-  return fileName.toLowerCase() + uuidv1();
+  const name = fileName.slice(0, fileName.lastIndexOf("."));
+  const extension = fileName.slice(fileName.lastIndexOf("."));
+
+  return `${name.toLowerCase()}-${uuidv1()}${extension}`;
 }
 
 export default uploadFileToBlob;

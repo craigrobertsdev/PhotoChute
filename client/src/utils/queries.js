@@ -25,3 +25,21 @@ export const GET_FILE_UPLOAD_URL = gql`
     }
   }
 `;
+
+export const GET_PHOTOS_FOR_GROUP = gql`
+  query getPhotosForGroup($groupName: String!) {
+    getPhotosForGroup(groupName: $groupName) {
+      group {
+        name
+        members {
+          username
+          photos {
+            fileName
+            url
+            uploadDatefileSize
+          }
+        }
+      }
+    }
+  }
+`
