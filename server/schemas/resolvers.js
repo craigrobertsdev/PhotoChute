@@ -2,6 +2,10 @@ const { User, Photo, Group } = require("../models");
 const { AuthenticationError } = require("apollo-server-express");
 const { signToken } = require("../utils/auth");
 const generateFileUploadUrlData = require("../utils/sasTokenGenerator");
+<<<<<<< HEAD
+=======
+const { ObjectId } = require("mongoose").Types;
+>>>>>>> 6f45c52 (added functions to handle container creation and photo deletion in blob storage)
 
 const resolvers = {
   Query: {
@@ -25,12 +29,7 @@ const resolvers = {
       // }
       return await generateFileUploadUrlData();
     },
-    //     // finds the logged in user based on the passed token's user _id if it exists
-    //     me: async (parent, args, context) => {
-    //       if (context.user) {
-    //         return await User.findOne({ _id: context.user._id }).populate("savedBooks");
-    //       }
-    //     },
+    getPhotosForGroup: async (parent, { group }, context) => {},
   },
   Mutation: {
     login: async (parent, { email, password }) => {
@@ -50,6 +49,24 @@ const resolvers = {
       const token = signToken(user);
       return { token, user };
     },
+    createGroup: async (parent, { groupName, userId }, context) => {
+      const user = await User.findById(new ObjectId(userId));
+
+      const newGroup = await Group.create({ name: groupName });
+
+      const group = await Group.findOneAndUpdate(
+        { _id: newGroup._id },
+        {
+          $addToSet: { members: { _id: new ObjectId(userId) } },
+        },
+        { new: true }
+      );
+
+      console.log(group);
+      const { name, members, photos, containerUrl } = newGroup;
+
+      return { name, members, photos, containerUrl };
+    },
 
     savePhoto: async (parent, { fileName, url, fileSize, owner }, context) => {
       return await User.findOneAndUpdate(
@@ -65,14 +82,18 @@ const resolvers = {
 
     addPhotoToGroup: async (parent, { photoId, groupId }) => {},
 
-    removePhoto: async (parent, { photoId }) => {},
+    deleteSinglePhoto: async (parent, { photoId }, context) => {},
 
+<<<<<<< HEAD
     addFriend: async (parent, { username, email, password }) => {
       const user = await User.create({ username, phone });
       const token = signToken(user);
       return { token, user };
     },
 
+=======
+    deleteManyPhotos: async (parent, { photoIds }, context) => {},
+>>>>>>> 6f45c52 (added functions to handle container creation and photo deletion in blob storage)
     //     singleUploadFile: async (parent, { username }, context) => {},
     //     saveBook: async (parent, { bookId, authors, description, title, image, link }, context) => {
     //       // if there is a user attached to context, we know they have already been authenticated via the authMiddleware function

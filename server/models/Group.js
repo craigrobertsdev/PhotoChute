@@ -1,7 +1,11 @@
 const { Schema, model } = require("mongoose");
 const { ObjectId } = require("mongoose").Types;
 const { dbLogger } = require("../logging/logger");
+<<<<<<< HEAD
 const createBlobStorage = require("../utils/blobStorage");
+=======
+const { createBlobStorageContainer } = require("../utils/blobStorage");
+>>>>>>> 6f45c52 (added functions to handle container creation and photo deletion in blob storage)
 
 const groupSchema = new Schema({
   name: {
@@ -15,12 +19,19 @@ const groupSchema = new Schema({
   },
   members: [
     {
-      type: ObjectId,
+      type: [ObjectId],
       ref: "User",
-      required: true,
+      default: [],
     },
   ],
-  containerName: {
+  photos: [
+    {
+      type: [ObjectId],
+      ref: "Photo",
+      default: [],
+    },
+  ],
+  containerUrl: {
     type: String,
   },
 });
@@ -28,10 +39,19 @@ const groupSchema = new Schema({
 groupSchema.pre("save", async function (next) {
   if (this.isNew) {
     try {
-      this.blobId = await createBlobStorageContainer(this.name);
+      this.containerUrl = await createBlobStorageContainer(this.name);
     } catch (err) {
-      dbLogger.error(JSON.stringify({ err }));
+      console.error(JSON.stringify(err, null, 2));
+      dbLogger.error(JSON.stringify(err, null, 2));
     }
+  }
+  next();
+});
+
+groupSchema.pre("deleteOne", async function (next) {
+  try {
+  } catch (err) {
+    dbLogger.error(JSON.stringify({ err }));
   }
 });
 
