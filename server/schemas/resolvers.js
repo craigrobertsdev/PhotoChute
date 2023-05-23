@@ -1,6 +1,7 @@
 const { User, Photo, Group } = require("../models");
 const { AuthenticationError } = require("apollo-server-express");
 const { signToken } = require("../utils/auth");
+<<<<<<< HEAD
 const generateFileUploadUrlData = require("../utils/sasTokenGenerator");
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -8,11 +9,15 @@ const generateFileUploadUrlData = require("../utils/sasTokenGenerator");
 const { ObjectId } = require("mongoose").Types;
 >>>>>>> 6f45c52 (added functions to handle container creation and photo deletion in blob storage)
 =======
+=======
+const { generateFileUploadUrlData, getBlobSasUri } = require("../utils/sasTokenGenerator");
+>>>>>>> 83af74d (refactored creation of fileUploadUrl to only grant access to specific resource)
 const { getSingleBlob } = require("../utils/blobStorage");
 >>>>>>> 701bfd2 (create group working, begin adding ability to get download link for files)
 
 const resolvers = {
   Query: {
+<<<<<<< HEAD
     me: async (parent, args, context) => {
       if (context.user) {
         return User.findOne({ _id: context.user._id }).populate('friends', 'groups', 'photos');
@@ -27,11 +32,16 @@ const resolvers = {
     },
 
     getFileUploadUrl: async (parent, args, context) => {
+=======
+    me: async (parent, args, context) => {},
+    photos: async (parent, args, context) => {},
+    getFileUploadUrl: async (parent, { groupName, blobName }, context) => {
+>>>>>>> 83af74d (refactored creation of fileUploadUrl to only grant access to specific resource)
       // if user exists on context, they are assumed to be logged in
       // if (!context.user) {
       //   throw new AuthenticationError("You need to be signed in to upload images");
       // }
-      return await generateFileUploadUrlData();
+      return await generateFileUploadUrlData(groupName, blobName, "rw");
     },
     getPhotosForGroup: async (parent, { group }, context) => {},
     // gets a signed url for the specified photoId
