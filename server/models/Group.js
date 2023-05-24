@@ -1,17 +1,7 @@
 const { Schema, model } = require("mongoose");
 const { dbLogger } = require("../logging/logger");
-<<<<<<< HEAD
-<<<<<<< HEAD
-const createBlobStorage = require("../utils/blobStorage");
-=======
-const { createBlobStorageContainer } = require("../utils/blobStorage");
->>>>>>> 6f45c52 (added functions to handle container creation and photo deletion in blob storage)
-
-=======
 const { createBlobStorageContainer } = require("../utils/blobStorage");
 
-
->>>>>>> 519fb029f4193fdc36ca43c3222ebfa8aa643bcd
 const groupSchema = new Schema(
   {
     name: {
