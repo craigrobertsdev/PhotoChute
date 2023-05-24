@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLazyQuery } from "@apollo/client";
 import uploadFileToBlob from "../utils/blobStorage";
 import { GET_FILE_UPLOAD_URL } from "../utils/queries";
-const Home = () => {
+const Azure = () => {
   const [fileName, setFileName] = useState("");
   const [fileSelected, setFileSelected] = useState();
   const [uploading, setUploading] = useState(false);
@@ -85,7 +85,7 @@ const Home = () => {
       <p>Post your photos and connect with friends through your favourite memories!</p>
       <img></img>
     </div>
-  )
+  );
 };
 
-export default Home;
+export default Azure;
