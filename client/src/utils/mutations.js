@@ -13,7 +13,8 @@ export const LOGIN_USER = gql`
 `;
 
 export const ADD_USER = gql`
-  mutation addUser($username: String!, $email: String!, $password: String!) {
+  mutation addUser(
+  $username: String!, $email: String!, $password: String!) {
     addUser(username: $username, email: $email, password: $password) {
       token
       user {
@@ -24,44 +25,31 @@ export const ADD_USER = gql`
   }
 `;
 
-export const SAVE_BOOK = gql`
-  mutation saveBook(
-    $bookId: String
-    $authors: [String]
-    $description: String
-    $title: String
-    $image: String
-    $link: String
-  ) {
-    saveBook(
-      bookId: $bookId
-      authors: $authors
-      description: $description
-      title: $title
-      image: $image
-      link: $link
-    ) {
-      _id
-      username
-    }
+export const SAVE_PHOTO = gql`
+  mutation SavePhoto($fileName: String!, $url: String!, $fileSize: Int!, $owner: ID!) {
+  savePhoto(fileName: $fileName, url: $url, fileSize: $fileSize, owner: $owner) {
+    _id
+    username
   }
+}
 `;
 
-export const REMOVE_BOOK = gql`
-  mutation removeBook($bookId: String!) {
-    removeBook(bookId: $bookId) {
-      _id
-      username
-      savedBooks {
-        bookId
-        authors
-        title
-        description
-        image
-        link
-      }
-    }
+export const ADD_PHOTO = gql`
+  mutation AddPhotoToGroup($photoId: ID!, $groupId: ID!) {
+  addPhotoToGroup(photoId: $photoId, groupId: $groupId) {
+    _id
+    name
   }
+}
+`;
+
+export const REMOVE_PHOTO = gql`
+  mutation RemovePhoto($photoId: ID!) {
+  removePhoto(photoId: $photoId) {
+    _id
+    username
+  }
+}
 `;
 
 export const GET_FILE_UPLOAD_URL = gql`
