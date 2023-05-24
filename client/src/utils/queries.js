@@ -43,11 +43,3 @@ export const GET_PHOTOS_FOR_GROUP = gql`
     }
   }
 `;
-
-export const GET_SIGNED_URL = gql`
-  query getSignedUrl($groupName: String!, $blobName: String!) {
-    getSignedUrl(groupName: $groupName, blobName: $blobName) {
-      fileUrl
-    }
-  }
-`;

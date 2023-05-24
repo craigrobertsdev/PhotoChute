@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { DELETE_SINGLE_PHOTO, DELETE_MANY_PHOTOS } from "../utils/mutations";
-import { GET_PHOTOS_FOR_GROUP, GET_SIGNED_URL } from "../utils/queries";
+import { GET_PHOTOS_FOR_GROUP, GET_FILE_UPLOAD_URL } from "../utils/queries";
 import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
 import { Container, Row, Col, Button, ToggleButton } from "react-bootstrap";
 
@@ -9,7 +9,9 @@ const Group = (groupName) => {
     loading: loadingPhotos,
     error: errorLoadingPhotos,
     data: photos,
-  } = useQuery(GET_PHOTOS_FOR_GROUP);
+  } = useQuery(GET_PHOTOS_FOR_GROUP, {
+    variables: { groupName: "the-walruses" },
+  });
   const [selectedPhotos, setSelectedPhotos] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
 
