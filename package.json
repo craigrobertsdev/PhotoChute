@@ -21,10 +21,7 @@
     "node": "16.x"
   },
   "dependencies": {
-<<<<<<< HEAD
-<<<<<<< HEAD
-    "mongodb": "^5.5.0"
-=======
+
     "mongodb": "^5.5.0",
     "@apollo/client": "^3.5.8",
     "@testing-library/jest-dom": "^5.11.4",
@@ -38,9 +35,5 @@
     "react-router-dom": "^6.2.1",
     "react-scripts": "5.0.1",
     "web-vitals": "^0.2.4"
->>>>>>> main
-=======
-    "mongodb": "^5.5.0"
->>>>>>> 519fb029f4193fdc36ca43c3222ebfa8aa643bcd
   }
 }
