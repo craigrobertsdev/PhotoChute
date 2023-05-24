@@ -25,6 +25,7 @@ export const ADD_USER = gql`
   }
 `;
 
+<<<<<<< HEAD
 export const SAVE_PHOTO = gql`
   mutation SavePhoto($fileName: String!, $url: String!, $fileSize: Int!, $owner: ID!) {
   savePhoto(fileName: $fileName, url: $url, fileSize: $fileSize, owner: $owner) {
@@ -65,6 +66,8 @@ export const GET_FILE_UPLOAD_URL = gql`
   }
 `;
 
+=======
+>>>>>>> 8de28c3 (removed unneeded queries/mutations)
 export const CREATE_GROUP = gql`
   mutation createGroup($groupName: String!, $userId: ID!) {
     createGroup(groupName: $groupName, userId: $userId) {
