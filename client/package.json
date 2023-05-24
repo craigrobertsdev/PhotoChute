@@ -22,7 +22,6 @@
     "react-router-dom": "^6.2.1",
     "react-scripts": "^5.0.1",
     "uuid": "9.0.0"
-    "uuid": "9.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
