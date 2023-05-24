@@ -1,37 +1,61 @@
 const { Schema, model } = require("mongoose");
-const { ObjectId } = require("mongoose").Types;
 const { dbLogger } = require("../logging/logger");
-const createBlobStorage = require("../utils/blobStorage");
+const { createBlobStorageContainer } = require("../utils/blobStorage");
 
-const groupSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
-    validate: {
-      validator: validateGroupName,
-      message:
-        "Group name must be no more than 30 characters long and not include consecutive '-' characters",
-    },
-  },
-  members: [
-    {
-      type: ObjectId,
-      ref: "User",
+const groupSchema = new Schema(
+  {
+    name: {
+      type: String,
       required: true,
+      validate: {
+        validator: validateGroupName,
+        message:
+          "Group name must be no more than 30 characters long and not include consecutive '-' characters",
+      },
     },
-  ],
-  containerName: {
-    type: String,
-  },
-});
+    members: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    groupOwner: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+    photos: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Photo",
+      },
+    ],
+    containerUrl: {
+      type: String,
+    },
+  }, // set this to use virtual below
+  {
+    toJSON: {
+      virtuals: true,
+    },
+  }
+);
 
 groupSchema.pre("save", async function (next) {
   if (this.isNew) {
     try {
-      this.blobId = await createBlobStorageContainer(this.name);
+      this.containerUrl = await createBlobStorageContainer(this.name);
     } catch (err) {
-      dbLogger.error(JSON.stringify({ err }));
+      console.error(JSON.stringify(err, null, 2));
+      dbLogger.error(JSON.stringify(err, null, 2));
     }
+  }
+  next();
+});
+
+groupSchema.pre("deleteOne", async function (next) {
+  try {
+  } catch (err) {
+    dbLogger.error(JSON.stringify({ err }));
   }
 });
 

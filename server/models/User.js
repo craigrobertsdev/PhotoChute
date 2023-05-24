@@ -1,5 +1,4 @@
 const { Schema, model } = require("mongoose");
-const { ObjectId } = require("mongoose").Types;
 const bcrypt = require("bcrypt");
 
 const userSchema = new Schema(
@@ -21,13 +20,13 @@ const userSchema = new Schema(
     },
     photos: [
       {
-        type: ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Photo",
       },
     ],
     groups: [
       {
-        type: ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Group",
       },
     ],

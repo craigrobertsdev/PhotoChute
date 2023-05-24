@@ -1,18 +1,6 @@
 const { gql } = require("apollo-server-express");
 
 const typeDefs = gql`
-  type File {
-    filename: String!
-    mimetype: String!
-    encoding: String!
-  }
-
-  type File {
-    filename: String!
-    mimetype: String!
-    encoding: String!
-  }
-
   type User {
     _id: ID
     username: String
@@ -37,6 +25,8 @@ const typeDefs = gql`
     _id: ID
     name: String
     members: [User]
+    photos: [Photo]
+    containerUrl: String
   }
 
   type Auth {
@@ -45,13 +35,15 @@ const typeDefs = gql`
   }
 
   type FileUrl {
-    sasToken: String!
+    fileUrl: String
   }
 
   type Query {
     me: User
     photos: [Photo]
-    getFileUploadUrl: FileUrl
+    getFileUploadUrl(groupName: String!, blobName: String!): FileUrl
+    getPhotosForGroup(groupName: String!): Group
+    getSignedUrl(groupName: String!, blobName: String!): FileUrl
   }
 
   type Mutation {
@@ -60,10 +52,9 @@ const typeDefs = gql`
     addFriend(username: String, phone: String): User
     savePhoto(fileName: String!, url: String!, fileSize: Int!, owner: ID!): User
     addPhotoToGroup(photoId: ID!, groupId: ID!): Group
-    removePhoto(photoId: ID!): User
-
-    #singleUploadFile(user: User!): Photo
-    #singleUploadStream(file: Upload!): File!
+    createGroup(groupName: String!, userId: ID!): Group
+    deleteSinglePhoto(photoId: ID!): ID
+    deleteManyPhotos(photoIds: [ID]!): [ID]
   }
 `;
 
