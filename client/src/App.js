@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
+import { PhotoChuteProvider } from "./utils/globalState";
 import Home from "./pages/Home";
 import Azure from "./pages/azure";
 import CreateGroupForm from "./pages/CreateGroupForm";
@@ -35,17 +36,19 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <Router>
-        <div className="flex-column justify-flex-start min-100-vh bg">
-          <Header />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/azure" element={<Azure />} />
-            <Route path="/create-group" element={<CreateGroupForm />} />
-            <Route path="/group" element={<UserGroup />} />
-            <Route path="*" element={<h1 className="display-2">Wrong page!</h1>} />
-          </Routes>
-          <Footer />
-        </div>
+        <PhotoChuteProvider>
+          <div className="flex-column justify-flex-start min-100-vh bg">
+            <Header />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/azure" element={<Azure />} />
+              <Route path="/create-group" element={<CreateGroupForm />} />
+              <Route path="/group" element={<UserGroup />} />
+              <Route path="*" element={<h1 className="display-2">Wrong page!</h1>} />
+            </Routes>
+            <Footer />
+          </div>
+        </PhotoChuteProvider>
       </Router>
     </ApolloProvider>
   );

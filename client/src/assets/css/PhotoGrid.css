@@ -7,6 +7,10 @@
   column-gap: 2rem;
 }
 
+.thumbnail-container {
+  max-width: 200px;
+}
+
 .thumbnail {
   max-width: 100%;
 }

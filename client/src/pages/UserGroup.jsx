@@ -5,8 +5,15 @@ import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
 import { Container, Row, Col, Button, ToggleButton } from "react-bootstrap";
 import PhotoGrid from "../components/PhotoGrid";
 import "../assets/css/UserGroup.css";
-
-const Group = ({ groupName }) => {
+/** @typedef Group {
+ *  name: String
+ * } */
+/**
+ *
+ * @param {{group: Group}}
+ * @returns
+ */
+const Group = ({ group }) => {
   const {
     loading: loadingPhotos,
     error: errorLoadingPhotos,
@@ -46,7 +53,7 @@ const Group = ({ groupName }) => {
 
   return (
     <div>
-      <h1>Name of Group</h1>
+      <h1>{group.name}</h1>
       <div>List of all images 5x3 with scroll maybe??</div>
       <div className="grid-container">
         <PhotoGrid
@@ -55,6 +62,9 @@ const Group = ({ groupName }) => {
             url: "https://picsum.photos/200",
             uploadDate: new Date(),
             fileSize: 4.3,
+            owner: {
+              username: "robbo",
+            },
           })}
         />
       </div>

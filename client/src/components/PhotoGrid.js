@@ -1,6 +1,7 @@
 import React from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import "../assets/css/PhotoGrid.css";
+import { formatDate } from "../utils/helpers";
 
 /**
  * @description When called, gets a signed URL to view the requested photo
@@ -20,7 +21,18 @@ const PhotoGrid = ({ thumbnails }) => {
   return (
     <div className="photo-row">
       {thumbnails.map((thumbnail) => (
-        <img src={thumbnail.url} /*{thumbnail.url}*/ alt="thumbnail" />
+        <div className="thumbnail-container">
+          <img src={thumbnail.url} /*{thumbnail.url}*/ alt="thumbnail" />
+          <div>
+            <p>
+              Uploaded on {formatDate(thumbnail.uploadDate)} by {thumbnail.owner.username}
+            </p>
+            <div className="">
+              <button className="btn">Download</button>
+              <button className="btn">Delete</button>
+            </div>
+          </div>
+        </div>
       ))}
     </div>
   );

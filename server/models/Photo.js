@@ -1,6 +1,5 @@
 const { Schema, model } = require("mongoose");
 const { ObjectId } = require("mongoose").Types;
-const bcrypt = require("bcrypt");
 
 const photoSchema = new Schema({
   fileName: {
