@@ -18,21 +18,18 @@ async function createBlobStorageContainer(groupName) {
   const blobServiceClient = BlobServiceClient.fromConnectionString(
     process.env.CONNECTION_STRING_SAS
   );
-
   // create a unique name for the container
   const containerName = serialiseGroupName(groupName);
 
   // get a reference to the container
   const containerClient = blobServiceClient.getContainerClient(containerName);
-
   // create the container
-  const createContainerResponse = await containerClient.create();
-
+  /* const createContainerResponse = await containerClient.create();
   console.log(
     `Container was created successfully.\n\trequestId:${createContainerResponse.requestId}\n\tURL: ${containerClient.url}`
   );
 
-  console.log(containerClient.url.split("?")[0]);
+console.log(containerClient.url.split("?")[0]);
 
   return containerClient.url.split("?")[0];
 }
@@ -137,3 +134,4 @@ module.exports = {
   getSingleBlob,
   getManyBlobs,
 };
+

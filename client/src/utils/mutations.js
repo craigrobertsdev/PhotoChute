@@ -13,7 +13,8 @@ export const LOGIN_USER = gql`
 `;
 
 export const ADD_USER = gql`
-  mutation addUser($username: String!, $email: String!, $password: String!) {
+  mutation addUser(
+  $username: String!, $email: String!, $password: String!) {
     addUser(username: $username, email: $email, password: $password) {
       token
       user {
@@ -23,6 +24,7 @@ export const ADD_USER = gql`
     }
   }
 `;
+
 
 export const CREATE_GROUP = gql`
   mutation createGroup($groupName: String!, $userId: ID!) {
@@ -38,7 +40,15 @@ export const CREATE_GROUP = gql`
       }
       containerUrl
     }
+`;
+
+export const SAVE_PHOTO = gql`
+  mutation SavePhoto($fileName: String!, $url: String!, $fileSize: Int!, $owner: ID!) {
+  savePhoto(fileName: $fileName, url: $url, fileSize: $fileSize, owner: $owner) {
+    _id
+    username
   }
+}
 `;
 
 export const DELETE_SINGLE_PHOTO = gql`
@@ -47,6 +57,15 @@ export const DELETE_SINGLE_PHOTO = gql`
       _id
     }
   }
+`;
+
+export const ADD_PHOTO = gql`
+  mutation AddPhotoToGroup($photoId: ID!, $groupId: ID!) {
+  addPhotoToGroup(photoId: $photoId, groupId: $groupId) {
+    _id
+    name
+  }
+}
 `;
 
 export const DELETE_MANY_PHOTOS = gql`

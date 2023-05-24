@@ -2,6 +2,7 @@ const { Schema, model } = require("mongoose");
 const { dbLogger } = require("../logging/logger");
 const { createBlobStorageContainer } = require("../utils/blobStorage");
 
+
 const groupSchema = new Schema(
   {
     name: {
