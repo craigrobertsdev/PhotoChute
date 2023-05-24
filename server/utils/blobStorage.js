@@ -24,7 +24,6 @@ async function createBlobStorageContainer(groupName) {
   const containerClient = blobServiceClient.getContainerClient(containerName);
   // create the container
   const createContainerResponse = await containerClient.create();
-  const createContainerResponse = await containerClient.create();
 
   console.log(
     `Container was created successfully.\n\trequestId:${createContainerResponse.requestId}\n\tURL: ${containerClient.url}`

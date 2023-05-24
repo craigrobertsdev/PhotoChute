@@ -3,8 +3,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import Home from "./pages/Home";
+import Azure from "./pages/azure";
 import CreateGroupForm from "./pages/CreateGroupForm";
-import Group from "./pages/Group";
+import UserGroup from "./pages/UserGroup";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
@@ -38,8 +39,9 @@ function App() {
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/azure" element={<Azure />} />
             <Route path="/create-group" element={<CreateGroupForm />} />
-            <Route path="/group" element={<Group />} />
+            <Route path="/group" element={<UserGroup />} />
             <Route path="*" element={<h1 className="display-2">Wrong page!</h1>} />
           </Routes>
           <Footer />
