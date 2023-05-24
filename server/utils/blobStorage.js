@@ -21,9 +21,13 @@ async function createBlobStorageContainer(groupName) {
   // create a unique name for the container
   const containerName = serialiseGroupName(groupName);
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> 6f45c52 (added functions to handle container creation and photo deletion in blob storage)
+=======
+
+>>>>>>> 519fb029f4193fdc36ca43c3222ebfa8aa643bcd
   // get a reference to the container
   const containerClient = blobServiceClient.getContainerClient(containerName);
   // create the container
@@ -40,7 +44,11 @@ async function createBlobStorageContainer(groupName) {
     `Container was created successfully.\n\trequestId:${createContainerResponse.requestId}\n\tURL: ${containerClient.url}`
   );
 
+<<<<<<< HEAD
   console.log(containerClient.url.split("?")[0]);
+=======
+console.log(containerClient.url.split("?")[0]);
+>>>>>>> 519fb029f4193fdc36ca43c3222ebfa8aa643bcd
 
   return containerClient.url.split("?")[0];
 }
@@ -145,3 +153,7 @@ module.exports = {
   getSingleBlob,
   getManyBlobs,
 };
+<<<<<<< HEAD
+=======
+
+>>>>>>> 519fb029f4193fdc36ca43c3222ebfa8aa643bcd

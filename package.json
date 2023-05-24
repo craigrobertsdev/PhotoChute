@@ -22,6 +22,7 @@
   },
   "dependencies": {
 <<<<<<< HEAD
+<<<<<<< HEAD
     "mongodb": "^5.5.0"
 =======
     "mongodb": "^5.5.0",
@@ -38,5 +39,8 @@
     "react-scripts": "5.0.1",
     "web-vitals": "^0.2.4"
 >>>>>>> main
+=======
+    "mongodb": "^5.5.0"
+>>>>>>> 519fb029f4193fdc36ca43c3222ebfa8aa643bcd
   }
 }

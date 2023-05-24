@@ -26,6 +26,26 @@ export const ADD_USER = gql`
 `;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+export const CREATE_GROUP = gql`
+  mutation createGroup($groupName: String!, $userId: ID!) {
+    createGroup(groupName: $groupName, userId: $userId) {
+      name
+      members {
+        _id
+        username
+        email
+      }
+      photos {
+        _id
+      }
+      containerUrl
+    }
+`;
+
+>>>>>>> 519fb029f4193fdc36ca43c3222ebfa8aa643bcd
 export const SAVE_PHOTO = gql`
   mutation SavePhoto($fileName: String!, $url: String!, $fileSize: Int!, $owner: ID!) {
   savePhoto(fileName: $fileName, url: $url, fileSize: $fileSize, owner: $owner) {
@@ -36,6 +56,17 @@ export const SAVE_PHOTO = gql`
 `;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+export const DELETE_SINGLE_PHOTO = gql`
+  mutation deleteSinglePhoto($photoId: ID!) {
+    deleteSinglePhoto(photoId: $photoId) {
+      _id
+    }
+  }
+`;
+
+>>>>>>> 519fb029f4193fdc36ca43c3222ebfa8aa643bcd
 export const ADD_PHOTO = gql`
   mutation AddPhotoToGroup($photoId: ID!, $groupId: ID!) {
   addPhotoToGroup(photoId: $photoId, groupId: $groupId) {
@@ -45,6 +76,7 @@ export const ADD_PHOTO = gql`
 }
 `;
 
+<<<<<<< HEAD
 export const REMOVE_PHOTO = gql`
   mutation RemovePhoto($photoId: ID!) {
   removePhoto(photoId: $photoId) {
@@ -62,6 +94,12 @@ export const GET_FILE_UPLOAD_URL = gql`
       accountName
       containerName
       sasToken
+=======
+export const DELETE_MANY_PHOTOS = gql`
+  mutation deleteManyPhotos($photoIds: [ID]!) {
+    deleteManyPhotos(photoIds: $photoIds) {
+      _id
+>>>>>>> 519fb029f4193fdc36ca43c3222ebfa8aa643bcd
     }
   }
 `;

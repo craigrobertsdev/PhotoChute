@@ -2,6 +2,12 @@ const { User, Photo, Group } = require("../models");
 const { AuthenticationError } = require("apollo-server-express");
 const { signToken } = require("../utils/auth");
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+const { generateFileUploadUrlData, getBlobSasUri } = require("../utils/sasTokenGenerator");
+const { getSingleBlob } = require("../utils/blobStorage");
+
+>>>>>>> 519fb029f4193fdc36ca43c3222ebfa8aa643bcd
 const generateFileUploadUrlData = require("../utils/sasTokenGenerator");
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -92,6 +98,11 @@ const resolvers = {
     addPhotoToGroup: async (parent, { photoId, groupId }) => {},
 
     deleteSinglePhoto: async (parent, { photoId }, context) => {},
+<<<<<<< HEAD
+=======
+
+    deleteManyPhotos: async (parent, { photoIds }, context) => {},
+>>>>>>> 519fb029f4193fdc36ca43c3222ebfa8aa643bcd
 
 <<<<<<< HEAD
     addFriend: async (parent, { username, email, password }) => {

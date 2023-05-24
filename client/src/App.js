@@ -5,12 +5,17 @@ import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from "@ap
 import { setContext } from "@apollo/client/link/context";
 import Home from "./pages/Home";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import CreateGroupForm from "./pages/CreateGroupForm";
 import Group from "./pages/Group";
 =======
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 >>>>>>> main
+=======
+import CreateGroupForm from "./pages/CreateGroupForm";
+import Group from "./pages/Group";
+>>>>>>> 519fb029f4193fdc36ca43c3222ebfa8aa643bcd
 
 // construct the GraphQL endpoint
 const httpLink = createHttpLink({
