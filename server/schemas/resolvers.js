@@ -1,11 +1,30 @@
 const { User, Photo, Group } = require("../models");
 const { AuthenticationError } = require("apollo-server-express");
 const { signToken } = require("../utils/auth");
+const generateFileUploadUrlData = require("../utils/sasTokenGenerator");
 
 const resolvers = {
   Query: {
-    me: async (parent, args, context) => {},
-    photos: async (parent, args, context) => {},
+    me: async (parent, args, context) => {
+      if (context.user) {
+        return User.findOne({ _id: context.user._id }).populate('friends', 'groups', 'photos');
+      }
+      throw new AuthenticationError('Please log in');
+    },
+
+    photos: async (parent, args, context) => {
+      if (context.user) {
+        return Photo.find().populate('groups');
+      }
+    },
+
+    getFileUploadUrl: async (parent, args, context) => {
+      // if user exists on context, they are assumed to be logged in
+      // if (!context.user) {
+      //   throw new AuthenticationError("You need to be signed in to upload images");
+      // }
+      return await generateFileUploadUrlData();
+    },
     //     // finds the logged in user based on the passed token's user _id if it exists
     //     me: async (parent, args, context) => {
     //       if (context.user) {
@@ -32,9 +51,29 @@ const resolvers = {
       return { token, user };
     },
 
-    savePhoto: async (parent, { fileName, url, fileSize, owner }) => {},
+    savePhoto: async (parent, { fileName, url, fileSize, owner }, context) => {
+      return await User.findOneAndUpdate(
+        { _id: context.user._id },
+        {
+          $addToSet: {
+            photos: { fileName, url, uploadDate, fileSize, groups, owner },
+          },
+        },
+        { new: true }
+      );
+    },
+
     addPhotoToGroup: async (parent, { photoId, groupId }) => {},
+
     removePhoto: async (parent, { photoId }) => {},
+
+    addFriend: async (parent, { username, email, password }) => {
+      const user = await User.create({ username, phone });
+      const token = signToken(user);
+      return { token, user };
+    },
+
+    //     singleUploadFile: async (parent, { username }, context) => {},
     //     saveBook: async (parent, { bookId, authors, description, title, image, link }, context) => {
     //       // if there is a user attached to context, we know they have already been authenticated via the authMiddleware function
     //       if (!context.user) {
