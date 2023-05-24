@@ -81,8 +81,11 @@ const Home = () => {
       {uploading && <div>Uploading</div>}
       {fileTypeValidationError && <div>File must be of type jpg, jpeg or png</div>}
       <hr />
+      <h1>Upload and Share</h1>
+      <p>Post your photos and connect with friends through your favourite memories!</p>
+      <img></img>
     </div>
-  );
+  )
 };
 
 export default Home;
