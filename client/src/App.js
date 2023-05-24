@@ -7,6 +7,7 @@ import { setContext } from "@apollo/client/link/context";
 import Home from "./pages/Home";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 // construct the GraphQL endpoint
 const httpLink = createHttpLink({
