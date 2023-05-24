@@ -25,7 +25,7 @@ const Home = () => {
       // prepare UI
       setUploading(true);
       try {
-        const groupName = "the walruses";
+        const groupName = "the-walruses";
         const urlData = await getFileUploadUrl({
           variables: {
             groupName,
@@ -37,7 +37,7 @@ const Home = () => {
         // get url for uploading file to Azure blob storage
 
         // *** UPLOAD TO AZURE STORAGE ***
-        const fileUrl = await uploadFileToBlob(fileSelected, "images", sasToken);
+        const fileUrl = await uploadFileToBlob(fileSelected, groupName, sasToken);
         console.log(fileUrl);
         // reset state/form
       } catch (error) {

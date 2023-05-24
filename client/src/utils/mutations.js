@@ -61,3 +61,36 @@ export const GET_FILE_UPLOAD_URL = gql`
     }
   }
 `;
+
+export const CREATE_GROUP = gql`
+  mutation createGroup($groupName: String!, $userId: ID!) {
+    createGroup(groupName: $groupName, userId: $userId) {
+      name
+      members {
+        _id
+        username
+        email
+      }
+      photos {
+        _id
+      }
+      containerUrl
+    }
+  }
+`;
+
+export const DELETE_SINGLE_PHOTO = gql`
+  mutation deleteSinglePhoto($photoId: ID!) {
+    deleteSinglePhoto(photoId: $photoId) {
+      _id
+    }
+  }
+`;
+
+export const DELETE_MANY_PHOTOS = gql`
+  mutation deleteManyPhotos(photoIds: [ID]!) {
+    deleteManyPhotos(photoIds: $photoIds) {
+      _id
+    }
+  }
+`;
