@@ -40,62 +40,97 @@ const Signup = () => {
 
   return (
     <main className="flex-row justify-center mb-4">
-      <div className="col-5 offset-6">
-        <div className="card">
-          <h4 className="card-header p-2">Sign Up</h4>
-          <div className="card-body">
-            {data ? (
-              <p>
-                Success! You may now head <Link to="/">back to the homepage.</Link>
-              </p>
-            ) : (
-              <form onSubmit={handleFormSubmit}>
+      <div className="col-8">
+        <div>
+          {data ? (
+            <p>
+              Success! You may now head <Link to="/">back to the homepage.</Link>
+            </p>
+          ) : (
+            <form onSubmit={handleFormSubmit}>
+              <div>
+                <label for="firstName">First Name:</label>
                 <input
                   className="form-input"
-                  placeholder="Your username"
+                  // placeholder="Username"
+                  name="firstName"
+                  type="text"
+                  value={formState.firstName}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <label for="lastName">Last Name:</label>
+                <input
+                  className="form-input"
+                  // placeholder="Username"
+                  name="lastName"
+                  type="text"
+                  value={formState.lastName}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <label for="username">Username:</label>
+                <input
+                  className="form-input"
+                  // placeholder="Username"
                   name="username"
                   type="text"
                   value={formState.name}
                   onChange={handleChange}
                 />
+              </div>
+              <div>
+                <label for="email">Email:</label>
                 <input
                   className="form-input"
-                  placeholder="Your email"
+                  // placeholder="email"
                   name="email"
                   type="email"
                   value={formState.email}
                   onChange={handleChange}
                 />
+              </div>
+              <div>
+                <label for="phoneNumber">Phone Number:</label>
                 <input
                   className="form-input"
-                  placeholder="Your phone number"
+                  // placeholder="phone number"
                   name="phoneNumber"
                   type="number"
                   value={formState.phoneNumber}
                   onChange={handleChange}
                 />
+              </div>
+              <div>
+                <label for="password">Password:</label>
                 <input
                   className="form-input"
-                  placeholder="Password"
+                  // placeholder="********"
                   name="password"
                   type="password"
                   value={formState.password}
                   onChange={handleChange}
                 />
+              </div>
+              <div className="submitBtn">
                 <button className="btn" style={{ cursor: "pointer" }} type="submit">
                   Submit
                 </button>
+              </div>
+              <div className="loginLink">
                 <p>
                   Already have an account?
                   <Link className="m-2" to="/login">
                     Login Here!
                   </Link>
                 </p>
-              </form>
-            )}
+              </div>
+            </form>
+          )}
 
-            {error && <div className="my-3 p-3 bg-danger text-white">{error.message}</div>}
-          </div>
+          {error && <div className="my-3 p-3 bg-danger text-white">{error.message}</div>}
         </div>
       </div>
     </main>
