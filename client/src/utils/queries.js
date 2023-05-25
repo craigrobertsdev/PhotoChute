@@ -46,7 +46,6 @@ export const GET_FILE_UPLOAD_URL = gql`
     getFileUploadUrl(groupName: $groupName, blobName: $blobName) {
       fileUrl
       serialisedFileName
-      ownerId
     }
   }
 `;

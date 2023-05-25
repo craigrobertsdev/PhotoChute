@@ -87,9 +87,10 @@ const Group = () => {
         });
 
         const { fileUrl, serialisedFileName } = urlData.data.getFileUploadUrl;
-
+        console.log(serialisedFileName);
         // *** UPLOAD TO AZURE STORAGE ***
-        const fileUploadUrl = await uploadFileToBlob(selectedFile, fileUrl);
+        //const fileUploadUrl = await uploadFileToBlob(selectedFile, fileUrl);
+        const fileUploadUrl = "https://test.com/photo";
         console.log(fileUploadUrl);
 
         const response = await savePhoto({
@@ -98,11 +99,11 @@ const Group = () => {
             url: fileUrl,
             fileSize: sizeInMb(selectedFile.size),
             ownerId: userId,
-            group: groupId,
+            groupId,
           },
         });
 
-        // console.log(response);
+        console.log(response);
         // reset state/form
       } catch (error) {
         console.log(JSON.stringify(error, null, 2));

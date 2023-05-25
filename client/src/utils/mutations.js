@@ -45,13 +45,19 @@ export const SAVE_PHOTO = gql`
     $url: String!
     $fileSize: Int!
     $ownerId: ID!
-    $group: ID!
+    $groupId: ID!
   ) {
-    savePhoto(fileName: $fileName, url: $url, fileSize: $fileSize, owner: $owner, group: $group) {
+    savePhoto(
+      fileName: $fileName
+      url: $url
+      fileSize: $fileSize
+      ownerId: $ownerId
+      groupId: $groupId
+    ) {
       _id
       fileName
       url
-      owner
+      ownerId
     }
   }
 `;

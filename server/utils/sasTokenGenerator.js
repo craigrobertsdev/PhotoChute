@@ -24,9 +24,14 @@ const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountK
  */
 async function generateFileUploadUrlData(containerName, blobName, permissions) {
   // const sasToken = await createAccountSas(permissions);
-  const fileUrl = await getBlobSasUri(containerName, blobName, sharedKeyCredential, permissions);
-
-  return { fileUrl };
+  const fileUrlData = await getBlobSasUri(
+    containerName,
+    blobName,
+    sharedKeyCredential,
+    permissions
+  );
+  console.log(fileUrlData);
+  return fileUrlData;
 }
 
 // information about sasOptions is located here: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-account-delegation-sas-create-javascript?tabs=blob-service-client
@@ -82,7 +87,10 @@ async function getBlobSasUri(containerName, blobName, sharedKeyCredential, permi
   const sasToken = generateBlobSASQueryParameters(sasOptions, sharedKeyCredential).toString();
   console.log(`SAS token for blob is: ${sasToken}`);
 
-  return `https://photochute.blob.core.windows.net/${containerName}/${serialisedBlobName}?${sasToken}`;
+  return {
+    fileUrl: `https://photochute.blob.core.windows.net/${containerName}/${serialisedBlobName}?${sasToken}`,
+    serialisedFileName: serialisedBlobName,
+  };
 }
 
 function serialiseBlobName(fileName) {
