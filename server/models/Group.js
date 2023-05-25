@@ -10,7 +10,7 @@ const groupSchema = new Schema(
       validate: {
         validator: validateGroupName,
         message:
-          "Group name must be no more than 30 characters long and not include consecutive '-' characters",
+          "Group name must be between 3 and 30 characters long and not include consecutive '-' characters",
       },
     },
     members: [
@@ -73,11 +73,11 @@ groupSchema.pre("deleteOne", async function (next) {
  * @returns true if input conforms to the required naming convention, false if not
  */
 function validateGroupName(name) {
-  if (name.length > 30) return false;
+  if (name.length < 3 || name.length > 30) return false;
   // TODO
   // implement regex to determine 2 consecutive '-' characters.
 
-  return !name.match(/[-]{2}/);
+  return !name.match(/--/);
 }
 
 const Group = model("Group", groupSchema);

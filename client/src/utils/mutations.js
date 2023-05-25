@@ -25,21 +25,13 @@ export const ADD_USER = gql`
 `;
 
 export const CREATE_GROUP = gql`
-  mutation createGroup($groupName: String!, $userId: ID!) {
-    createGroup(groupName: $groupName, userId: $userId) {
+  mutation createGroup($groupName: String!) {
+    createGroup(groupName: $groupName) {
       name
-      members {
-        _id
-        username
-        email
-      }
       groupOwner {
         _id
         username
         email
-      }
-      photos {
-        _id
       }
       containerUrl
       serialisedGroupName

@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 const CreateGroupForm = (groupName) => {
   const [searchInput, setSearchInput] = useState("");
   const [groupDetails, setGroupDetails] = useState();
+  const [validationError, setValidationError] = useState(false);
   const [createGroup] = useMutation(CREATE_GROUP);
   const navigate = useNavigate();
   const handleFormSubmit = async (event) => {
@@ -14,13 +15,14 @@ const CreateGroupForm = (groupName) => {
     try {
       console.log(searchInput);
       const response = await createGroup({
-        variables: { groupName: searchInput, userId: "646ec6c4196b0ea8624a6ead" },
+        variables: { groupName: searchInput.trim() },
       });
 
       console.log(response.data);
       navigate("/group", {
         state: {
-          ...response,
+          name: response.createGroup.name,
+          groupOwner: response.createGroup.groupOwner,
         },
       });
       //setGroupDetails(response.data.createGroup);
@@ -28,6 +30,17 @@ const CreateGroupForm = (groupName) => {
       console.error(JSON.stringify(err, null, 2));
     }
     setSearchInput("");
+  };
+
+  const validateGroupName = (event) => {
+    const value = event.target.value;
+
+    // regex is due to limitations of azure container naming requirements
+    if (!value || value.length < 3 || value.length > 30 || value.match(/--/)) {
+      setValidationError(true);
+    } else {
+      setValidationError(false);
+    }
   };
 
   return (
@@ -43,15 +56,22 @@ const CreateGroupForm = (groupName) => {
                 onChange={(e) => setSearchInput(e.target.value)}
                 type="text"
                 size="lg"
+                onBlur={validateGroupName}
                 placeholder="Enter group name"
               />
             </Col>
             <Col xs={12} md={4}>
-              <Button type="submit" variant="success" size="lg">
+              <Button type="submit" variant="success" size="lg" disabled={validationError}>
                 Create Group
               </Button>
             </Col>
           </Row>
+          {validationError && (
+            <p className="text-red">
+              Group name must be between 3 and 30 characters long and not include consecutive '-'
+              characters
+            </p>
+          )}
         </Form>
       </Container>
 

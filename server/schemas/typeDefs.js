@@ -54,7 +54,7 @@ const typeDefs = gql`
     addFriend(username: String, phone: String): User
     savePhoto(fileName: String!, url: String!, fileSize: Int!, ownerId: ID!, groupId: ID!): Photo
     addPhotoToGroup(photoId: ID!, groupId: ID!): Group
-    createGroup(groupName: String!, userId: ID!): Group
+    createGroup(groupName: String!): Group
     deleteSinglePhoto(photoId: ID!): ID
     deleteManyPhotos(photoIds: [ID]!): [ID]
   }

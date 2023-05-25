@@ -6,13 +6,13 @@ import { usePhotochuteContext } from "../utils/globalState";
 import PhotoGrid from "../components/PhotoGrid";
 import "../assets/css/UserGroup.css";
 
-const Group = ({ groupName = "The Walruses" }) => {
+const Group = ({ name = "The Walruses", groupOwner, members }) => {
   const {
     loading: loadingPhotos,
     error: errorLoadingPhotos,
     data: photos,
   } = useQuery(GET_PHOTOS_FOR_GROUP, {
-    variables: { groupName },
+    variables: { groupName: name },
   });
 
   const [selectedPhotos, setSelectedPhotos] = useState([]);
@@ -24,6 +24,8 @@ const Group = ({ groupName = "The Walruses" }) => {
 
   // TODO - fetches the list of thumbnails for photos attached to this group.
   useEffect(() => {}, []);
+
+  console.log(name, groupOwner, members);
 
   /**
    * Deletes a photo from the group's container. Only available if the user has permission to perform this action
@@ -46,7 +48,7 @@ const Group = ({ groupName = "The Walruses" }) => {
 
   return (
     <div>
-      <h1 className="text-center">{groupName}</h1>
+      <h1 className="text-center">{name}</h1>
       <div className="group-container">
         <div className="members-container">
           <h3>Members</h3>
