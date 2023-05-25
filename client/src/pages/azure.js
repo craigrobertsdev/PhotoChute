@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLazyQuery } from "@apollo/client";
 import uploadFileToBlob from "../utils/blobStorage";
 import { GET_FILE_UPLOAD_URL } from "../utils/queries";
-const Home = () => {
+const Azure = () => {
   const [fileName, setFileName] = useState("");
   const [fileSelected, setFileSelected] = useState();
   const [uploading, setUploading] = useState(false);
@@ -25,19 +25,22 @@ const Home = () => {
       // prepare UI
       setUploading(true);
       try {
-        const groupName = "the walruses";
+        // TODO - find a way to get the current group's containerName instead of hard coded value
+        const groupName = "images";
         const urlData = await getFileUploadUrl({
           variables: {
             groupName,
+            blobName: fileSelected.name,
           },
         });
 
-        const { sasToken } = urlData.data.getFileUploadUrl;
-        console.log(sasToken);
+        const { fileUrl } = urlData.data.getFileUploadUrl;
+        console.log(urlData);
+        console.log(fileUrl);
         // get url for uploading file to Azure blob storage
 
         // *** UPLOAD TO AZURE STORAGE ***
-        const fileUrl = await uploadFileToBlob(fileSelected, "images", sasToken);
+        const fileUploadUrl = await uploadFileToBlob(fileSelected, fileUrl);
         console.log(fileUrl);
         // reset state/form
       } catch (error) {
@@ -85,7 +88,7 @@ const Home = () => {
       <p>Post your photos and connect with friends through your favourite memories!</p>
       <img></img>
     </div>
-  )
+  );
 };
 
-export default Home;
+export default Azure;

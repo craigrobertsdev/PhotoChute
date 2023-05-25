@@ -24,42 +24,37 @@ export const ADD_USER = gql`
   }
 `;
 
-export const SAVE_BOOK = gql`
-  mutation saveBook(
-    $bookId: String
-    $authors: [String]
-    $description: String
-    $title: String
-    $image: String
-    $link: String
-  ) {
-    saveBook(
-      bookId: $bookId
-      authors: $authors
-      description: $description
-      title: $title
-      image: $image
-      link: $link
-    ) {
+export const CREATE_GROUP = gql`
+  mutation createGroup($groupName: String!, $userId: ID!) {
+    createGroup(groupName: $groupName, userId: $userId) {
+      name
+      members {
+        _id
+        username
+        email
+      }
+      photos {
+        _id
+      }
+      containerUrl
+    }
+  }
+`;
+
+export const SAVE_PHOTO = gql`
+  mutation SavePhoto($fileName: String!, $url: String!, $fileSize: Int!, $owner: ID!) {
+    savePhoto(fileName: $fileName, url: $url, fileSize: $fileSize, owner: $owner) {
       _id
       username
     }
   }
 `;
 
-export const REMOVE_BOOK = gql`
-  mutation removeBook($bookId: String!) {
-    removeBook(bookId: $bookId) {
+export const ADD_PHOTO = gql`
+  mutation AddPhotoToGroup($photoId: ID!, $groupId: ID!) {
+    addPhotoToGroup(photoId: $photoId, groupId: $groupId) {
       _id
-      username
-      savedBooks {
-        bookId
-        authors
-        title
-        description
-        image
-        link
-      }
+      name
     }
   }
 `;
@@ -70,6 +65,22 @@ export const GET_FILE_UPLOAD_URL = gql`
       accountName
       containerName
       sasToken
+    }
+  }
+`;
+
+export const DELETE_SINGLE_PHOTO = gql`
+  mutation deleteSinglePhoto($photoId: ID!) {
+    deleteSinglePhoto(photoId: $photoId) {
+      _id
+    }
+  }
+`;
+
+export const DELETE_MANY_PHOTOS = gql`
+  mutation deleteManyPhotos($photoIds: [ID]!) {
+    deleteManyPhotos(photoIds: $photoIds) {
+      _id
     }
   }
 `;
