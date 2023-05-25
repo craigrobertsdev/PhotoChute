@@ -6,10 +6,13 @@ const { getSingleBlob } = require("../utils/blobStorage");
 
 const resolvers = {
   Query: {
-    me: async (parent, args, context) => {
+    me: async (parent, { email }, context) => {
       if (context.user) {
         return User.findOne({ _id: context.user._id }).populate("friends", "groups", "photos");
+      } else if (email) {
+        return User.findOne({ email }).populate("friends groups photos");
       }
+
       throw new AuthenticationError("Please log in");
     },
 

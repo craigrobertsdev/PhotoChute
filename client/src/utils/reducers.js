@@ -1,5 +1,5 @@
 import { useReducer } from "react";
-import { UPDATE_GROUP } from "./actions";
+import { SET_CURRENT_USER, UPDATE_GROUP } from "./actions";
 
 export const reducer = (state, action) => {
   switch (action.type) {
@@ -7,6 +7,11 @@ export const reducer = (state, action) => {
       return {
         ...state,
         group: action.group,
+      };
+    case SET_CURRENT_USER:
+      return {
+        ...state,
+        currentUser: action.currentUser,
       };
     default:
       return state;

@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_ME = gql`
-  query Me {
-    me {
+  query Me($email: String) {
+    me(email: $email) {
       _id
       email
       friends {
@@ -45,6 +45,8 @@ export const GET_FILE_UPLOAD_URL = gql`
   query getFileUploadUrl($groupName: String!, $blobName: String!) {
     getFileUploadUrl(groupName: $groupName, blobName: $blobName) {
       fileUrl
+      serialisedFileName
+      ownerId
     }
   }
 `;

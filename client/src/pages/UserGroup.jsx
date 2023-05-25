@@ -3,22 +3,22 @@ import Modal from "react-bootstrap/Modal";
 import { DELETE_SINGLE_PHOTO, DELETE_MANY_PHOTOS, SAVE_PHOTO } from "../utils/mutations";
 import { GET_PHOTOS_FOR_GROUP, GET_FILE_UPLOAD_URL } from "../utils/queries";
 import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
-import { usePhotochuteContext } from "../utils/globalState";
+import { sizeInMb } from "../utils/helpers";
 import uploadFileToBlob from "../utils/blobStorage";
-import { useLocation } from "react-router-dom";
 import PhotoGrid from "../components/PhotoGrid";
 import "../assets/css/UserGroup.css";
+import auth from "../utils/auth";
 
 const Group = () => {
-  const location = useLocation();
-  // const { name, groupOwner, members } = location.state;
   const name = "The Walruses";
   const [showModal, setShowModal] = useState(false);
-  const [fileSelected, setFileSelected] = useState();
+  const [selectedFile, setSelectedFile] = useState();
   const [uploading, setUploading] = useState(false);
   const [getFileUploadUrl] = useLazyQuery(GET_FILE_UPLOAD_URL);
   const [fileTypeValidationError, setFileTypeValidationError] = useState(false);
   const [savePhoto] = useMutation(SAVE_PHOTO);
+
+  const userId = auth.getProfile().data._id;
 
   /* THIS IS UNTIL THE USER PROFILE PAGE IS COMPLETE */
   const groupId = "646ec77bcc84812aacaccd3e";
@@ -67,13 +67,13 @@ const Group = () => {
 
   const onFileChange = (event) => {
     // capture file into state
-    setFileSelected(event.target.files[0]);
+    setSelectedFile(event.target.files[0]);
 
     // validateFileType(fileSelected.type);
   };
 
   const onFileUpload = async () => {
-    if (fileSelected && fileSelected?.name) {
+    if (selectedFile && selectedFile?.name) {
       // prepare UI
       setUploading(true);
       try {
@@ -82,21 +82,32 @@ const Group = () => {
         const urlData = await getFileUploadUrl({
           variables: {
             groupName,
-            blobName: fileSelected.name,
+            blobName: selectedFile.name,
           },
         });
 
-        const { fileUrl } = urlData.data.getFileUploadUrl;
+        const { fileUrl, serialisedFileName } = urlData.data.getFileUploadUrl;
 
         // *** UPLOAD TO AZURE STORAGE ***
-        const fileUploadUrl = await uploadFileToBlob(fileSelected, fileUrl);
+        const fileUploadUrl = await uploadFileToBlob(selectedFile, fileUrl);
         console.log(fileUploadUrl);
 
+        const response = await savePhoto({
+          variables: {
+            fileName: serialisedFileName,
+            url: fileUrl,
+            fileSize: sizeInMb(selectedFile.size),
+            ownerId: userId,
+            group: groupId,
+          },
+        });
+
+        // console.log(response);
         // reset state/form
       } catch (error) {
         console.log(JSON.stringify(error, null, 2));
       }
-      setFileSelected(null);
+      setSelectedFile(null);
       setUploading(false);
     }
   };

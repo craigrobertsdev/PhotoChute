@@ -38,10 +38,11 @@ const typeDefs = gql`
 
   type FileUrl {
     fileUrl: String
+    serialisedFileName: String
   }
 
   type Query {
-    me: User
+    me(email: String): User
     photos: [Photo]
     getFileUploadUrl(groupName: String!, blobName: String!): FileUrl
     getPhotosForGroup(groupName: String!): Group
