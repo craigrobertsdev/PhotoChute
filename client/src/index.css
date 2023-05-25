@@ -123,6 +123,33 @@ top: 0%;
   text-decoration: none;
 }
 
+label {
+  display: inline-block;
+  padding: 10px;
+  width: 30%;
+  text-align: left;
+  color: white;
+}
+
+.submitBtn {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.loginLink {
+  display: flex;
+  justify-content: center;
+}
+
+Link {
+  color: #47294c;
+}
+
+Link:hover {
+  color: #47294c;
+}
+
 /* Copies */
 */
 *,
@@ -193,10 +220,6 @@ dl {
   margin-bottom: 1rem;
 }
 
-label {
-  display: inline-block;
-}
-
 input,
 select,
 textarea,
@@ -206,10 +229,12 @@ button {
 
 a {
   text-decoration: none;
+  color: #47294c;
 }
 
 a:hover {
   text-decoration: none;
+  color: inherit;
 }
 
 /* HEIGHT / WIDTH UTILS */
@@ -788,10 +813,7 @@ input:focus {
   border-color: #816f7d;
 }
 
-form .form-input,
-form .form-textarea {
-  display: block;
-}
+
 
 form select {
   -webkit-appearance: none;
@@ -802,22 +824,17 @@ form select {
   background-position-y: 50%;
 }
 
-form label,
-form .form-label {
-  display: inline-block;
-  font-size: 1.2rem;
-  margin: 0.625rem 0 0.25rem 0.3rem;
-}
-
 form .form-input {
-  width: 100%;
-  padding: 0.75rem;
-  color: #1a1a1a;
-  background-color: #ffffff;
+  width: 60%;
+  padding: 0.3rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  color: #faf4fc;
+  background-color: #816F7D;
   margin: 0.625rem 0;
   font-size: 1.2rem;
-  border: 1px solid #faf4fc;
-  border-radius: 0.3rem;
+  border: 1px solid #816F7D;
+  border-radius: 20px;
 }
 
 form .form-input.form-input-squared {
@@ -826,11 +843,6 @@ form .form-input.form-input-squared {
 
 form [type='checkbox'],
 form [type='radio'] {
-  display: inline-block;
-}
-
-label form [type='checkbox'],
-label form [type='radio'] {
   display: inline-block;
 }
 
