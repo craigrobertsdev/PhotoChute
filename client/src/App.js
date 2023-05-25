@@ -2,8 +2,9 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
-import { PhotoChuteProvider } from "./utils/globalState";
+import { PhotoChuteProvider, usePhotochuteContext } from "./utils/globalState";
 import Home from "./pages/Home";
+import Login from "./pages/Login";
 import Azure from "./pages/azure";
 import CreateGroupForm from "./pages/CreateGroupForm";
 import UserGroup from "./pages/UserGroup";
@@ -41,6 +42,7 @@ function App() {
             <Header />
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
               <Route path="/azure" element={<Azure />} />
               <Route path="/create-group" element={<CreateGroupForm />} />
               <Route path="/group" element={<UserGroup />} />

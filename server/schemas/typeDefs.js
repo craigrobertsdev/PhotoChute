@@ -11,22 +11,24 @@ const typeDefs = gql`
     photos: [Photo]
   }
 
-  type Photo {
-    _id: ID
-    fileName: String!
-    url: String!
-    uploadDate: String
-    fileSize: Int
-    groups: [Group]
-    owner: User!
-  }
-
   type Group {
     _id: ID
     name: String
     members: [User]
+    groupOwner: User
     photos: [Photo]
     containerUrl: String
+    serialisedGroupName: String
+  }
+
+  type Photo {
+    _id: ID
+    fileName: String!
+    url: String!
+    uploadDate: String!
+    fileSize: Int!
+    groupId: ID!
+    ownerId: ID!
   }
 
   type Auth {
@@ -50,7 +52,7 @@ const typeDefs = gql`
     login(email: String!, password: String!): Auth
     addUser(username: String!, email: String!, password: String!): Auth
     addFriend(username: String, phone: String): User
-    savePhoto(fileName: String!, url: String!, fileSize: Int!, owner: ID!): User
+    savePhoto(fileName: String!, url: String!, fileSize: Int!, ownerId: ID!, groupId: ID!): Photo
     addPhotoToGroup(photoId: ID!, groupId: ID!): Group
     createGroup(groupName: String!, userId: ID!): Group
     deleteSinglePhoto(photoId: ID!): ID

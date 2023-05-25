@@ -32,6 +32,10 @@ const groupSchema = new Schema(
     containerUrl: {
       type: String,
     },
+    maxPhotos: {
+      type: Number,
+      default: 15,
+    },
   }, // set this to use virtual below
   {
     toJSON: {
@@ -39,6 +43,10 @@ const groupSchema = new Schema(
     },
   }
 );
+
+groupSchema.virtual("serialisedGroupName").get(function () {
+  return this.containerUrl.slice(this.containerUrl.lastIndexOf("/") + 1);
+});
 
 groupSchema.pre("save", async function (next) {
   if (this.isNew) {

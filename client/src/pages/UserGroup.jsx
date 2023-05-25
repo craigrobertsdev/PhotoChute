@@ -2,24 +2,17 @@ import React, { useState, useEffect } from "react";
 import { DELETE_SINGLE_PHOTO, DELETE_MANY_PHOTOS } from "../utils/mutations";
 import { GET_PHOTOS_FOR_GROUP, GET_FILE_UPLOAD_URL } from "../utils/queries";
 import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
-import { Container, Row, Col, Button, ToggleButton } from "react-bootstrap";
+import { usePhotochuteContext } from "../utils/globalState";
 import PhotoGrid from "../components/PhotoGrid";
 import "../assets/css/UserGroup.css";
-/** @typedef Group {
- *  name: String
- * } */
-/**
- *
- * @param {{group: Group}}
- * @returns
- */
-const Group = ({ group }) => {
+
+const Group = ({ groupName = "The Walruses" }) => {
   const {
     loading: loadingPhotos,
     error: errorLoadingPhotos,
     data: photos,
   } = useQuery(GET_PHOTOS_FOR_GROUP, {
-    variables: { groupName: "the-walruses" },
+    variables: { groupName },
   });
 
   const [selectedPhotos, setSelectedPhotos] = useState([]);
@@ -33,10 +26,10 @@ const Group = ({ group }) => {
   useEffect(() => {}, []);
 
   /**
-   *
-   * @param {Event} event the incoming event
+   * Deletes a photo from the group's container. Only available if the user has permission to perform this action
+   * @param {Event} event
    */
-  const deletePhotos = async (event) => {
+  const deletePhoto = async (event) => {
     event.preventDefault();
 
     if (!selectedPhotos.length) {
@@ -53,9 +46,14 @@ const Group = ({ group }) => {
 
   return (
     <div>
-      <h1>{group.name}</h1>
-      <div>List of all images 5x3 with scroll maybe??</div>
-      <div className="grid-container">
+      <h1 className="text-center">{groupName}</h1>
+      <div className="group-container">
+        <div className="members-container">
+          <h3>Members</h3>
+          <p>Shae</p>
+          <p>Lucien</p>
+          <p>Craig</p>
+        </div>
         <PhotoGrid
           thumbnails={new Array(30).fill({
             fileName: "test-thumbnail.jpg",
@@ -63,7 +61,7 @@ const Group = ({ group }) => {
             uploadDate: new Date(),
             fileSize: 4.3,
             owner: {
-              username: "robbo",
+              username: "Craig",
             },
           })}
         />

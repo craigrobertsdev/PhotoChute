@@ -19,13 +19,13 @@ const loadPhoto = async (event, photoId) => {
 
 const PhotoGrid = ({ thumbnails }) => {
   return (
-    <div className="photo-row">
+    <div className="photo-grid">
       {thumbnails.map((thumbnail) => (
         <div className="thumbnail-container">
-          <img src={thumbnail.url} /*{thumbnail.url}*/ alt="thumbnail" />
+          <img className="thumbnail" src={thumbnail.url} /*{thumbnail.url}*/ alt="thumbnail" />
           <div>
-            <p>
-              Uploaded on {formatDate(thumbnail.uploadDate)} by {thumbnail.owner.username}
+            <p className="text-center">
+              Uploaded by {thumbnail.owner.username} on {formatDate(thumbnail.uploadDate)}
             </p>
             <div className="">
               <button className="btn">Download</button>

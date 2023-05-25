@@ -8,14 +8,14 @@ const resolvers = {
   Query: {
     me: async (parent, args, context) => {
       if (context.user) {
-        return User.findOne({ _id: context.user._id }).populate('friends', 'groups', 'photos');
+        return User.findOne({ _id: context.user._id }).populate("friends", "groups", "photos");
       }
-      throw new AuthenticationError('Please log in');
+      throw new AuthenticationError("Please log in");
     },
 
     photos: async (parent, args, context) => {
       if (context.user) {
-        return Photo.find().populate('groups');
+        return Photo.find().populate("groups");
       }
     },
 
@@ -49,33 +49,62 @@ const resolvers = {
       return { token, user };
     },
     createGroup: async (parent, { groupName, userId }, context) => {
-      const user = await User.findById(userId);
+      if (!context.user) {
+        return new AuthenticationError("You must be signed in to create a group");
+      }
+
+      const user = await User.findById(context.user._id);
 
       const newGroup = await (
-        await Group.create({ name: groupName, members: [userId] })
-      ).populate("members");
+        await Group.create({ name: groupName, groupOwner: user })
+      ).populate("groupOwner");
 
-      const { name, members, photos, containerUrl } = newGroup;
+      const { name, groupOwner, photos, containerUrl, serialisedGroupName } = newGroup;
 
-      return { name, members, photos, containerUrl };
+      return { name, groupOwner, photos, containerUrl, serialisedGroupName };
     },
 
-    savePhoto: async (parent, { fileName, url, fileSize, owner }, context) => {
-      return await User.findOneAndUpdate(
+    savePhoto: async (parent, { fileName, url, fileSize, ownerId, groupId }, context) => {
+      if (!context.user) {
+        return new AuthenticationError("You must be signed in to create a group");
+      }
+
+      const newPhoto = await Photo.create({
+        fileName,
+        url,
+        fileSize,
+        uploadDate: Date.now(),
+        ownerId,
+        groupId,
+      });
+
+      console.log(newPhoto.toJSON());
+
+      await User.findOneAndUpdate(
         { _id: context.user._id },
         {
           $addToSet: {
-            photos: { fileName, url, uploadDate, fileSize, groups, owner },
+            photos: newPhoto,
           },
         },
         { new: true }
       );
-    },
 
+      await Group.findOneAndUpdate(
+        { _id: groupId },
+        {
+          $addToSet: {
+            photos: newPhoto,
+          },
+        },
+        { new: true }
+      );
+
+      return newPhoto;
+    },
     addPhotoToGroup: async (parent, { photoId, groupId }) => {},
 
     deleteSinglePhoto: async (parent, { photoId }, context) => {},
-
 
     deleteManyPhotos: async (parent, { photoIds }, context) => {},
 

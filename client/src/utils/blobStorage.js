@@ -13,11 +13,13 @@ async function uploadFileToBlob(file, signedUrl) {
 
   try {
     // upload the file to Azure blob storage. Doing so will trigger an automatic function to create a thumbnail
-    await blockBlobClient.uploadData(file, {
+    const response = await blockBlobClient.uploadData(file, {
       blobHTTPHeaders: {
         blobContentType: file.type,
       },
     });
+
+    const data = await response.json();
 
     return blobName;
   } catch (err) {

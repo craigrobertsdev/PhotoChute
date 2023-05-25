@@ -17,12 +17,10 @@ const photoSchema = new Schema({
   fileSize: {
     type: Number,
   },
-  groups: [
-    {
-      type: ObjectId,
-      ref: "Group",
-    },
-  ],
+  groupId: {
+    type: ObjectId,
+    ref: "Group",
+  },
   ownerId: {
     type: ObjectId,
     ref: "User",

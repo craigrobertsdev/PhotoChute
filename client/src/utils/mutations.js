@@ -33,19 +33,33 @@ export const CREATE_GROUP = gql`
         username
         email
       }
+      groupOwner {
+        _id
+        username
+        email
+      }
       photos {
         _id
       }
       containerUrl
+      serialisedGroupName
     }
   }
 `;
 
 export const SAVE_PHOTO = gql`
-  mutation SavePhoto($fileName: String!, $url: String!, $fileSize: Int!, $owner: ID!) {
-    savePhoto(fileName: $fileName, url: $url, fileSize: $fileSize, owner: $owner) {
+  mutation SavePhoto(
+    $fileName: String!
+    $url: String!
+    $fileSize: Int!
+    $ownerId: ID!
+    $group: ID!
+  ) {
+    savePhoto(fileName: $fileName, url: $url, fileSize: $fileSize, owner: $owner, group: $group) {
       _id
-      username
+      fileName
+      url
+      owner
     }
   }
 `;

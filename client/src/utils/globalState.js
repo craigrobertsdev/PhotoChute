@@ -6,7 +6,7 @@ const { Provider } = PhotoChuteContext;
 
 const PhotoChuteProvider = ({ value = [], ...props }) => {
   const [state, dispatch] = usePhotochuteReducer({
-    group: null,
+    group: "The Walruses",
   });
 
   return <Provider value={[state, dispatch]} {...props} />;

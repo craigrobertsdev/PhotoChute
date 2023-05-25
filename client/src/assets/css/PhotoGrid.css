@@ -1,6 +1,7 @@
-.photo-row {
+.photo-grid {
   margin: auto;
   width: max-content;
+  flex: 2 1 auto;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   row-gap: 2rem;
@@ -8,7 +9,7 @@
 }
 
 .thumbnail-container {
-  max-width: 200px;
+  width: 200px;
 }
 
 .thumbnail {
@@ -16,25 +17,35 @@
 }
 
 @media screen and (max-width: 1200px) {
-  .photo-row {
+  .photo-grid {
     grid-template-columns: repeat(4, 1fr);
+  }
+
+  .thumbnail-container {
+    width: 175px;
+    height: 175px;
+  }
+
+  .thumbnail {
+    max-width: 100%;
+    max-height: 100%;
   }
 }
 
 @media screen and (max-width: 960px) {
-  .photo-row {
+  .photo-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media screen and (max-width: 700px) {
-  .photo-row {
+  .photo-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media screen and (max-width: 500px) {
-  .photo-row {
+  .photo-grid {
     grid-template-columns: repeat(1, 1fr);
   }
 }

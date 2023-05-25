@@ -2,23 +2,28 @@ import React, { useState } from "react";
 import { Button, Form, Container, Row, Col } from "react-bootstrap";
 import { CREATE_GROUP } from "../utils/mutations";
 import { useMutation } from "@apollo/client";
+import { useNavigate } from "react-router-dom";
 
 const CreateGroupForm = (groupName) => {
   const [searchInput, setSearchInput] = useState("");
   const [groupDetails, setGroupDetails] = useState();
   const [createGroup] = useMutation(CREATE_GROUP);
-
+  const navigate = useNavigate();
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     try {
       console.log(searchInput);
       const response = await createGroup({
-        variables: { groupName: searchInput, userId: "64643d485dae24e94331f29d" },
+        variables: { groupName: searchInput, userId: "646ec6c4196b0ea8624a6ead" },
       });
 
       console.log(response.data);
-
-      setGroupDetails(response.data.createGroup);
+      navigate("/group", {
+        state: {
+          ...response,
+        },
+      });
+      //setGroupDetails(response.data.createGroup);
     } catch (err) {
       console.error(JSON.stringify(err, null, 2));
     }
@@ -54,7 +59,7 @@ const CreateGroupForm = (groupName) => {
         <Row>
           <p>{groupDetails && groupDetails.name}</p>
         </Row>
-        <Row>{groupDetails && groupDetails.members.map((member) => <p>{member.name}</p>)}</Row>
+        <Row>{groupDetails && groupDetails.members?.map((member) => <p>{member.name}</p>)}</Row>
         <Row>
           <p>{groupDetails && groupDetails.photos}</p>
         </Row>

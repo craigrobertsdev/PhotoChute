@@ -9,11 +9,12 @@ const {
   generateBlobSASQueryParameters,
   BlobServiceClient,
 } = require("@azure/storage-blob");
+const { v1: uuidv1 } = require("uuid");
 
 const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
 const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
 
-console.log(accountName, accountKey)
+console.log(accountName, accountKey);
 
 const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
 
@@ -61,6 +62,7 @@ async function createAccountSas(permissions) {
  */
 async function getBlobSasUri(containerName, blobName, sharedKeyCredential, permissions) {
   let tokenDuration;
+  const serialisedBlobName = serialiseBlobName(blobName);
 
   // if the token grants write access, give it a duration of 1 minute, otherwise it will have 10 minutes for
   if (permissions.includes("w")) {
@@ -71,7 +73,7 @@ async function getBlobSasUri(containerName, blobName, sharedKeyCredential, permi
 
   const sasOptions = {
     containerName,
-    blobName: blobName,
+    blobName: serialisedBlobName,
     startsOn: new Date(),
     expiresOn: new Date(new Date().valueOf() + tokenDuration),
     permissions: BlobSASPermissions.parse(permissions),
@@ -80,7 +82,11 @@ async function getBlobSasUri(containerName, blobName, sharedKeyCredential, permi
   const sasToken = generateBlobSASQueryParameters(sasOptions, sharedKeyCredential).toString();
   console.log(`SAS token for blob is: ${sasToken}`);
 
-  return `https://photochute.blob.core.windows.net/${containerName}/${blobName}?${sasToken}`;
+  return `https://photochute.blob.core.windows.net/${containerName}/${serialisedBlobName}?${sasToken}`;
+}
+
+function serialiseBlobName(fileName) {
+  return `${fileName}-${uuidv1()}`;
 }
 
 module.exports = { generateFileUploadUrlData, getBlobSasUri };
