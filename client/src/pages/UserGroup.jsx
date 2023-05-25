@@ -78,7 +78,7 @@ const Group = () => {
       setUploading(true);
       try {
         // TODO - find a way to get the current group's containerName instead of hard coded value
-        const groupName = "the-walruses-a4e50880-faa3-11ed-a777-394dc37315ec";
+        const groupName = "the-walruses-ac8ed510-fae5-11ed-a462-fdca9decadc8";
         const urlData = await getFileUploadUrl({
           variables: {
             groupName,
@@ -90,7 +90,7 @@ const Group = () => {
 
         // *** UPLOAD TO AZURE STORAGE ***
         const fileUploadUrl = await uploadFileToBlob(fileSelected, fileUrl);
-        console.log(fileUrl);
+        console.log(fileUploadUrl);
 
         // reset state/form
       } catch (error) {
@@ -106,7 +106,12 @@ const Group = () => {
 
   return (
     <div>
-      <h1 className="text-center">{name}</h1>
+      <div className="header-container">
+        <h1 className="text-center">{name}</h1>
+        <button className="btn" onClick={openModal}>
+          Add Photos
+        </button>
+      </div>
       <div className="group-container">
         <div className="members-container">
           <h3>Owner</h3>
@@ -114,11 +119,8 @@ const Group = () => {
           <h3>Members</h3>
           <p>Shae</p>
           <p>Lucien</p>
-          <button className="btn" onClick={openModal}>
-            Add Photos
-          </button>
         </div>
-        <Modal show={showModal} onHide={closeModal}>
+        <Modal show={showModal} onHide={closeModal} dialogClassName="upload-modal">
           <Modal.Header closeButton>Choose a photo to upload</Modal.Header>
           <Modal.Body>
             <div>

@@ -32,6 +32,9 @@ const groupSchema = new Schema(
     containerUrl: {
       type: String,
     },
+    serialisedGroupName: {
+      type: String,
+    },
     maxPhotos: {
       type: Number,
       default: 15,
@@ -44,14 +47,11 @@ const groupSchema = new Schema(
   }
 );
 
-groupSchema.virtual("serialisedGroupName").get(function () {
-  return this.containerUrl.slice(this.containerUrl.lastIndexOf("/") + 1);
-});
-
 groupSchema.pre("save", async function (next) {
   if (this.isNew) {
     try {
       this.containerUrl = await createBlobStorageContainer(this.name);
+      this.serialisedGroupName = this.containerUrl.slice(this.containerUrl.lastIndexOf("/") + 1);
     } catch (err) {
       console.error(JSON.stringify(err, null, 2));
       dbLogger.error(JSON.stringify(err, null, 2));

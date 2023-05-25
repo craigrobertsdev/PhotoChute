@@ -26,7 +26,28 @@ const resolvers = {
       // }
       return await generateFileUploadUrlData(groupName, blobName, "rw");
     },
-    getPhotosForGroup: async (parent, { group }, context) => {},
+    getPhotosForGroup: async (parent, { groupName }, context) => {
+      if (!context.user) {
+        return new AuthenticationError("You must be signed in to access a group's photos");
+      }
+
+      const userGroup = await (
+        await Group.findOne({ serialisedGroupName: groupName })
+      ).populate("photos groupOwner");
+
+      if (!userGroup) {
+        return new Error("No group could be found with that name");
+      }
+
+      if (
+        !userGroup.members?.includes(context.user._id) &&
+        !userGroup.groupOwner._id.equals(context.user._id)
+      ) {
+        return new AuthenticationError("You are not a member of this group");
+      }
+
+      return userGroup;
+    },
     // gets a signed url for the specified photoId
     getSignedUrl: async (parent, { groupName, blobName }, context) => {},
   },

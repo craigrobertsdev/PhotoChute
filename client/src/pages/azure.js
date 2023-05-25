@@ -30,6 +30,7 @@ const Azure = () => {
       try {
         // TODO - find a way to get the current group's containerName instead of hard coded value
         const groupName = "the-walruses-a4e50880-faa3-11ed-a777-394dc37315ec";
+
         const urlData = await getFileUploadUrl({
           variables: {
             groupName,
@@ -41,7 +42,6 @@ const Azure = () => {
 
         // *** UPLOAD TO AZURE STORAGE ***
         const fileUploadUrl = await uploadFileToBlob(fileSelected, fileUrl);
-        console.log(fileUrl);
 
         // reset state/form
       } catch (error) {

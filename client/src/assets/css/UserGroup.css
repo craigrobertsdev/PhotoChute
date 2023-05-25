@@ -1,3 +1,10 @@
+.header-container {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
 .grid-container {
   max-height: calc(200px * 3 + 5rem);
   overflow-y: auto;
@@ -12,4 +19,8 @@
 .members-container {
   flex-grow: 1;
   text-align: center;
+}
+
+.upload-modal {
+  background: white;
 }
