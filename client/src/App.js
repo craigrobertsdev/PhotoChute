@@ -3,10 +3,13 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import CreateGroupForm from "./pages/CreateGroupForm";
 import Group from "./pages/Group";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 // construct the GraphQL endpoint
 const httpLink = createHttpLink({
@@ -38,6 +41,8 @@ function App() {
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
             <Route path="/create-group" element={<CreateGroupForm />} />
             <Route path="/group" element={<Group />} />
             <Route path="*" element={<h1 className="display-2">Wrong page!</h1>} />
