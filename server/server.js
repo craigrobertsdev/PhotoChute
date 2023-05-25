@@ -5,6 +5,7 @@ const db = require("./config/connection");
 const { ApolloServer } = require("apollo-server-express");
 const { typeDefs, resolvers } = require("./schemas/index");
 const { authMiddleware } = require("./utils/auth");
+const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY)
 
 const app = express();
 const PORT = process.env.PORT || 3001;
