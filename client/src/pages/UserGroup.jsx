@@ -93,9 +93,16 @@ const Group = () => {
   const onFileChange = (event) => {
     // capture file into state
     setSelectedFile(event.target.files[0]);
-
-    // validateFileType(fileSelected.type);
+    validateFileType(event.target.files[0].type);
   };
+
+  function validateFileType(fileType) {
+    if (fileType === "image/jpeg" || fileType === "image/jpg" || fileType === "image/png") {
+      setFileTypeValidationError(false);
+    } else {
+      setFileTypeValidationError(true);
+    }
+  }
 
   const onFileUpload = async () => {
     if (selectedFile && selectedFile?.name) {
@@ -156,19 +163,20 @@ const Group = () => {
       </div>
       <div className="group-container">
         <div className={`upload-pane ${uploadPaneOpen ? "" : "hidden"}`}>
-          <div>
-            <input type="file" onChange={onFileChange} />
+          <form className="upload-form">
+            <input type="file" onChange={onFileChange} className=" upload-input" />
             <button
               className="btn"
+              disabled={!selectedFile || photoCount > maxPhotos || fileTypeValidationError}
               type="submit"
-              onClick={onFileUpload}
-              // disabled={fileTypeValidationError}
-            >
+              onClick={onFileUpload}>
               Upload!
             </button>
+          </form>
+          <div>
+            {uploading && <div>Uploading</div>}
+            {fileTypeValidationError && <div>File must be of type jpg, jpeg or png</div>}
           </div>
-          {uploading && <div>Uploading</div>}
-          {fileTypeValidationError && <div>File must be of type jpg, jpeg or png</div>}
         </div>
         <div className="members-container">
           <h3>Owner</h3>
