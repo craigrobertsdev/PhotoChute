@@ -1,5 +1,4 @@
 const {
-  generateAccountSASQueryParameters,
   AccountSASPermissions,
   AccountSASServices,
   AccountSASResourceTypes,
@@ -7,6 +6,7 @@ const {
   SASProtocol,
   BlobSASPermissions,
   generateBlobSASQueryParameters,
+  generateAccountSASQueryParameters,
   BlobServiceClient,
 } = require("@azure/storage-blob");
 const { v1: uuidv1 } = require("uuid");
@@ -30,7 +30,7 @@ async function generateFileUploadUrlData(containerName, blobName, permissions) {
     sharedKeyCredential,
     permissions
   );
-  console.log(fileUrlData);
+
   return fileUrlData;
 }
 
@@ -41,20 +41,32 @@ async function generateFileUploadUrlData(containerName, blobName, permissions) {
  * @param {String} permissions A string with the necessary permissions for the action the token is being generated for. For example, "rwu" = read, write and update permissions
  * @returns
  */
-async function createAccountSas(permissions) {
+async function createContainerSAS(containerName) {
+  const TEN_MINUTES = 10 * 60 * 1000;
+  const NOW = new Date();
+
+  // set start time a little before current time to make sure any clock issues are avoided
+  const TEN_MINUTES_BEFORE_NOW = new Date(NOW.valueOf() - TEN_MINUTES);
+  const TEN_MINUTES_AFTER_NOW = new Date(NOW.valueOf() + TEN_MINUTES);
+
+  const blobServiceClient = BlobServiceClient.fromConnectionString(
+    process.env.CONNECTION_STRING_SAS
+  );
+
   const sasOptions = {
-    services: AccountSASServices.parse("btqf").toString(), // b: blobs, t: tables, q: queues, f: files
-    resourceTypes: AccountSASResourceTypes.parse("co").toString(), // c: container, o: object
-    permissions: AccountSASPermissions.parse(permissions), // permissions - r: read, w: write, u: update
+    containerName,
+    services: AccountSASServices.parse("b").toString(),
+    resourceTypes: AccountSASResourceTypes.parse("co").toString(), // container, object
+    permissions: AccountSASPermissions.parse("r"), // this is only for viewing photos in the account. other permissions are granted as needed
     protocol: SASProtocol.Https,
-    startsOn: new Date(),
-    expiresOn: new Date(new Date().valueOf() + 3 * 60 * 1000), // 3 minutes
+    startsOn: TEN_MINUTES_BEFORE_NOW,
+    expiresOn: TEN_MINUTES_AFTER_NOW,
   };
 
   const sasToken = generateAccountSASQueryParameters(sasOptions, sharedKeyCredential).toString();
 
   // prepend sasToken with `?`
-  return sasToken[0] === "?" ? sasToken : `?${sasToken}`;
+  return { sasToken: sasToken[0] === "?" ? sasToken : `?${sasToken}` };
 }
 
 /**
@@ -85,7 +97,6 @@ async function getBlobSasUri(containerName, blobName, sharedKeyCredential, permi
   };
 
   const sasToken = generateBlobSASQueryParameters(sasOptions, sharedKeyCredential).toString();
-  console.log(`SAS token for blob is: ${sasToken}`);
 
   return {
     fileUrl: `https://photochute.blob.core.windows.net/${containerName}/${serialisedBlobName}?${sasToken}`,
@@ -100,4 +111,4 @@ function serialiseBlobName(fileName) {
   return `${name.toLowerCase()}-${uuidv1()}${fileExtension}`;
 }
 
-module.exports = { generateFileUploadUrlData, getBlobSasUri };
+module.exports = { generateFileUploadUrlData, getBlobSasUri, createContainerSAS };

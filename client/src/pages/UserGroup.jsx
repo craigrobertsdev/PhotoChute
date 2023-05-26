@@ -25,6 +25,7 @@ const Group = () => {
   const userId = auth.getProfile().data._id;
   const [photoCount, setPhotoCount] = useState();
   const [maxPhotos, setMaxPhotos] = useState();
+  const [uploadPaneOpen, setUploadPaneOpen] = useState(false);
 
   /* THIS IS UNTIL THE USER PROFILE PAGE IS COMPLETE */
   const groupId = "64708396753160dc9cd92c1e";
@@ -127,7 +128,7 @@ const Group = () => {
         // reset state/form
         setSelectedFile(null);
         setUploading(false);
-        closeModal();
+        setUploadPaneOpen(false);
         window.location.reload();
       } catch (error) {
         console.log(JSON.stringify(error, null, 2));
@@ -135,8 +136,7 @@ const Group = () => {
     }
   };
 
-  const openModal = () => setShowModal(true);
-  const closeModal = () => setShowModal(false);
+  const toggleUploadPane = () => setUploadPaneOpen(!uploadPaneOpen);
 
   if (loadingPhotos) {
     return "Loading...";
@@ -146,7 +146,7 @@ const Group = () => {
     <div>
       <div className="header-container">
         <h1 className="text-center">{name}</h1>
-        <button className="btn" onClick={openModal}>
+        <button className="btn" onClick={toggleUploadPane}>
           Add Photos
         </button>
       </div>
@@ -155,6 +155,21 @@ const Group = () => {
         <ProgressBar now={photoCount} max={maxPhotos} label={`${photoCount}/${maxPhotos}`} />
       </div>
       <div className="group-container">
+        <div className={`upload-pane ${uploadPaneOpen ? "" : "hidden"}`}>
+          <div>
+            <input type="file" onChange={onFileChange} />
+            <button
+              className="btn"
+              type="submit"
+              onClick={onFileUpload}
+              // disabled={fileTypeValidationError}
+            >
+              Upload!
+            </button>
+          </div>
+          {uploading && <div>Uploading</div>}
+          {fileTypeValidationError && <div>File must be of type jpg, jpeg or png</div>}
+        </div>
         <div className="members-container">
           <h3>Owner</h3>
           <p>Craig</p>
@@ -162,23 +177,7 @@ const Group = () => {
           <p>Shae</p>
           <p>Lucien</p>
         </div>
-        <Modal show={showModal} onHide={closeModal} dialogClassName="upload-modal">
-          <Modal.Header closeButton>Choose a photo to upload</Modal.Header>
-          <Modal.Body>
-            <div>
-              <input type="file" onChange={onFileChange} />
-              <button
-                type="submit"
-                onClick={onFileUpload}
-                // disabled={fileTypeValidationError}
-              >
-                Upload!
-              </button>
-            </div>
-            {uploading && <div>Uploading</div>}
-            {fileTypeValidationError && <div>File must be of type jpg, jpeg or png</div>}
-          </Modal.Body>
-        </Modal>
+
         <PhotoGrid
           thumbnails={photos.getPhotosForGroup.photos}
           sasToken={sasTokenData.getAuthenticationToken.sasToken}

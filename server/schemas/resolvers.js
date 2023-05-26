@@ -1,7 +1,11 @@
 const { User, Photo, Group } = require("../models");
 const { AuthenticationError } = require("apollo-server-express");
 const { signToken } = require("../utils/auth");
-const { generateFileUploadUrlData, getBlobSasUri } = require("../utils/sasTokenGenerator");
+const {
+  generateFileUploadUrlData,
+  getBlobSasUri,
+  createContainerSAS,
+} = require("../utils/sasTokenGenerator");
 
 const resolvers = {
   Query: {
@@ -55,8 +59,22 @@ const resolvers = {
 
       return userGroup;
     },
-    // gets a signed url for the specified photoId
-    getSignedUrl: async (parent, { groupName, blobName }, context) => {},
+    getAuthenticationToken: async (parent, { groupName }, context) => {
+      if (!context.user) {
+        return new AuthenticationError("You must be signed in to access a group's photos");
+      }
+
+      const group = await Group.findOne({ serialisedGroupName: groupName });
+
+      if (
+        !group.members?.includes(context.user._id) &&
+        !group.groupOwner._id.equals(context.user._id)
+      ) {
+        return new AuthenticationError("You are not a member of this group");
+      }
+
+      return await createContainerSAS(groupName);
+    },
   },
   Mutation: {
     login: async (parent, { email, password }) => {

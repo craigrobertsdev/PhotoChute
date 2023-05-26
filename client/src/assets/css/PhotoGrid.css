@@ -1,9 +1,8 @@
 .photo-grid {
   margin: auto;
-  width: max-content;
   flex: 2 1 auto;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   row-gap: 2rem;
   column-gap: 2rem;
 }

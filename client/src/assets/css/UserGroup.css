@@ -11,14 +11,16 @@
 }
 
 .group-container {
+  position: relative;
   padding: 0 2rem;
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: 1fr 4fr;
 }
 
 .members-container {
   flex-grow: 1;
   text-align: center;
+  padding: 2rem 0;
 }
 
 .upload-modal {
@@ -29,4 +31,22 @@
   width: 50%;
   margin: 1rem auto;
   text-align: center;
+}
+
+.upload-pane {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  background-color: #a0908d;
+  list-style: none;
+  padding: 2rem 1rem;
+}
+
+.hidden {
+  display: none;
 }

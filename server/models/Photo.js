@@ -39,7 +39,9 @@ const photoSchema = new Schema(
 );
 
 photoSchema.virtual("thumbnailUrl").get(function () {
-  const urlSegments = this.url.split("/");
+  const urlWithoutQueryString = this.url.slice(0, this.url.lastIndexOf("?"));
+
+  const urlSegments = urlWithoutQueryString.split("/");
   urlSegments[3] = "thumbnails";
 
   return urlSegments.join("/");
