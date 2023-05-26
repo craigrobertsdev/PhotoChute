@@ -9,8 +9,6 @@ const { v1: uuidv1 } = require("uuid");
 async function uploadFileToBlob(file, signedUrl) {
   const blockBlobClient = new BlockBlobClient(signedUrl);
 
-  const blobName = tokeniseFileName(file.name);
-
   try {
     // upload the file to Azure blob storage. Doing so will trigger an automatic function to create a thumbnail
     const response = await blockBlobClient.uploadData(file, {
@@ -19,9 +17,7 @@ async function uploadFileToBlob(file, signedUrl) {
       },
     });
 
-    const data = await response.json();
-
-    return blobName;
+    return response.json();
   } catch (err) {
     console.log(JSON.stringify(err, null, 2));
   }

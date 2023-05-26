@@ -10,6 +10,8 @@ const CreateGroupForm = (groupName) => {
   const [validationError, setValidationError] = useState(false);
   const [createGroup] = useMutation(CREATE_GROUP);
   const navigate = useNavigate();
+  const groupNameRegex = /^[a-zA-Z0-9]+{3-20}$/; // can only contain letters or numbers and must be between 3 and 20 characters long
+
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     try {

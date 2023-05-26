@@ -8,6 +8,7 @@ import uploadFileToBlob from "../utils/blobStorage";
 import PhotoGrid from "../components/PhotoGrid";
 import "../assets/css/UserGroup.css";
 import auth from "../utils/auth";
+import { ProgressBar } from "react-bootstrap";
 
 const Group = () => {
   const name = "The Walruses";
@@ -17,34 +18,35 @@ const Group = () => {
   const [getFileUploadUrl] = useLazyQuery(GET_FILE_UPLOAD_URL);
   const [fileTypeValidationError, setFileTypeValidationError] = useState(false);
   const [savePhoto] = useMutation(SAVE_PHOTO);
-
   const userId = auth.getProfile().data._id;
 
   /* THIS IS UNTIL THE USER PROFILE PAGE IS COMPLETE */
-  const groupId = "646ec77bcc84812aacaccd3e";
-  const serialisedGroupName = "the-walruses-a4e50880-faa3-11ed-a777-394dc37315ec";
-  const groupOwner = "";
-  const members = [];
+  const groupId = "646f36429cdd2c258261c1e8";
+  const groupName = "the-walruses-ac8ed510-fae5-11ed-a462-fdca9decadc8";
+  /* THIS IS UNTIL THE USER PROFILE PAGE IS COMPLETE */
+
+  let now, maxPhotos;
+  const [selectedPhotos, setSelectedPhotos] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const [deleteSinglePhoto] = useMutation(DELETE_SINGLE_PHOTO);
+  const [deleteManyPhotos] = useMutation(DELETE_MANY_PHOTOS);
 
   const {
     loading: loadingPhotos,
     error: errorLoadingPhotos,
     data: photos,
   } = useQuery(GET_PHOTOS_FOR_GROUP, {
-    variables: { groupName: serialisedGroupName },
+    variables: { groupName },
   });
 
-  const [selectedPhotos, setSelectedPhotos] = useState([]);
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const [deleteSinglePhoto] = useMutation(DELETE_SINGLE_PHOTO);
-  const [deleteManyPhotos] = useMutation(DELETE_MANY_PHOTOS);
-  const groupNameRegex = /^[a-zA-Z0-9]+{3-20}$/; // can only contain letters or numbers and must be between 3 and 20 characters long
-
   // TODO - fetches the list of thumbnails for photos attached to this group.
-  useEffect(() => {}, []);
-
-  console.log(name, groupOwner, members);
+  useEffect(() => {
+    if (photos?.getPhotosForGroup) {
+      now = photos.getPhotosForGroup.photos.length;
+      maxPhotos = photos.getPhotosForGroup.maxPhotos;
+    }
+  }, [photos]);
 
   /**
    * Deletes a photo from the group's container. Only available if the user has permission to perform this action
@@ -78,7 +80,6 @@ const Group = () => {
       setUploading(true);
       try {
         // TODO - find a way to get the current group's containerName instead of hard coded value
-        const groupName = "the-walruses-ac8ed510-fae5-11ed-a462-fdca9decadc8";
         const urlData = await getFileUploadUrl({
           variables: {
             groupName,
@@ -89,9 +90,7 @@ const Group = () => {
         const { fileUrl, serialisedFileName } = urlData.data.getFileUploadUrl;
         console.log(serialisedFileName);
         // *** UPLOAD TO AZURE STORAGE ***
-        //const fileUploadUrl = await uploadFileToBlob(selectedFile, fileUrl);
-        const fileUploadUrl = "https://test.com/photo";
-        console.log(fileUploadUrl);
+        await uploadFileToBlob(selectedFile, fileUrl);
 
         const response = await savePhoto({
           variables: {
@@ -103,13 +102,13 @@ const Group = () => {
           },
         });
 
-        console.log(response);
         // reset state/form
+        setSelectedFile(null);
+        setUploading(false);
+        closeModal();
       } catch (error) {
         console.log(JSON.stringify(error, null, 2));
       }
-      setSelectedFile(null);
-      setUploading(false);
     }
   };
 
@@ -124,6 +123,7 @@ const Group = () => {
           Add Photos
         </button>
       </div>
+      <ProgressBar now={now} label={`${now}/${maxPhotos}`} />
       <div className="group-container">
         <div className="members-container">
           <h3>Owner</h3>
