@@ -43,9 +43,10 @@ export const SAVE_PHOTO = gql`
   mutation SavePhoto(
     $fileName: String!
     $url: String!
-    $fileSize: Int!
+    $fileSize: Float!
     $ownerId: ID!
     $groupId: ID!
+    $serialisedFileName: String!
   ) {
     savePhoto(
       fileName: $fileName
@@ -53,11 +54,11 @@ export const SAVE_PHOTO = gql`
       fileSize: $fileSize
       ownerId: $ownerId
       groupId: $groupId
+      serialisedFileName: $serialisedFileName
     ) {
       _id
       fileName
       url
-      ownerId
     }
   }
 `;

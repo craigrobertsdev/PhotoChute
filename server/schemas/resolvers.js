@@ -2,7 +2,6 @@ const { User, Photo, Group } = require("../models");
 const { AuthenticationError } = require("apollo-server-express");
 const { signToken } = require("../utils/auth");
 const { generateFileUploadUrlData, getBlobSasUri } = require("../utils/sasTokenGenerator");
-const { getSingleBlob } = require("../utils/blobStorage");
 
 const resolvers = {
   Query: {
@@ -22,21 +21,26 @@ const resolvers = {
       }
     },
 
-    getFileUploadUrl: async (parent, { groupName, blobName }, context) => {
+    getFileUploadUrl: async (parent, { serialisedGroupName, blobName }, context) => {
       // if user exists on context, they are assumed to be logged in
       // if (!context.user) {
       //   throw new AuthenticationError("You need to be signed in to upload images");
       // }
-      return await generateFileUploadUrlData(groupName, blobName, "rw");
+      return await generateFileUploadUrlData(serialisedGroupName, blobName, "rw");
     },
-    getPhotosForGroup: async (parent, { groupName }, context) => {
+    getPhotosForGroup: async (parent, { serialisedGroupName }, context) => {
       if (!context.user) {
         return new AuthenticationError("You must be signed in to access a group's photos");
       }
 
       const userGroup = await (
-        await Group.findOne({ serialisedGroupName: groupName })
-      ).populate("photos groupOwner");
+        await Group.findOne({ serialisedGroupName })
+      ).populate({
+        path: "photos",
+        populate: {
+          path: "owner",
+        },
+      });
 
       if (!userGroup) {
         return new Error("No group could be found with that name");
@@ -88,7 +92,11 @@ const resolvers = {
       return { name, groupOwner, photos, containerUrl, serialisedGroupName };
     },
 
-    savePhoto: async (parent, { fileName, url, fileSize, ownerId, groupId }, context) => {
+    savePhoto: async (
+      parent,
+      { fileName, url, fileSize, ownerId, groupId, serialisedFileName },
+      context
+    ) => {
       if (!context.user) {
         return new AuthenticationError("You must be signed in to create a group");
       }
@@ -98,8 +106,9 @@ const resolvers = {
         url,
         fileSize,
         uploadDate: Date.now(),
-        ownerId,
-        groupId,
+        owner: ownerId,
+        group: groupId,
+        serialisedFileName,
       });
 
       console.log(newPhoto.toJSON());

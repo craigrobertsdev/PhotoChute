@@ -19,13 +19,14 @@ const Group = () => {
   const [fileTypeValidationError, setFileTypeValidationError] = useState(false);
   const [savePhoto] = useMutation(SAVE_PHOTO);
   const userId = auth.getProfile().data._id;
+  const [photoCount, setPhotoCount] = useState();
+  const [maxPhotos, setMaxPhotos] = useState();
 
   /* THIS IS UNTIL THE USER PROFILE PAGE IS COMPLETE */
-  const groupId = "646f36429cdd2c258261c1e8";
-  const groupName = "the-walruses-ac8ed510-fae5-11ed-a462-fdca9decadc8";
+  const groupId = "64708396753160dc9cd92c1e";
+  const serialisedGroupName = "the-walruses-5a8118b0-fbac-11ed-aaed-4bd91ebe2c21";
   /* THIS IS UNTIL THE USER PROFILE PAGE IS COMPLETE */
 
-  let now, maxPhotos;
   const [selectedPhotos, setSelectedPhotos] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -37,14 +38,18 @@ const Group = () => {
     error: errorLoadingPhotos,
     data: photos,
   } = useQuery(GET_PHOTOS_FOR_GROUP, {
-    variables: { groupName },
+    variables: { serialisedGroupName },
   });
+
+  if (photos) {
+    console.log(photos);
+  }
 
   // TODO - fetches the list of thumbnails for photos attached to this group.
   useEffect(() => {
     if (photos?.getPhotosForGroup) {
-      now = photos.getPhotosForGroup.photos.length;
-      maxPhotos = photos.getPhotosForGroup.maxPhotos;
+      setPhotoCount(photos.getPhotosForGroup.photos.length);
+      setMaxPhotos(photos.getPhotosForGroup.maxPhotos);
     }
   }, [photos]);
 
@@ -82,23 +87,23 @@ const Group = () => {
         // TODO - find a way to get the current group's containerName instead of hard coded value
         const urlData = await getFileUploadUrl({
           variables: {
-            groupName,
+            serialisedGroupName,
             blobName: selectedFile.name,
           },
         });
 
-        const { fileUrl, serialisedFileName } = urlData.data.getFileUploadUrl;
-        console.log(serialisedFileName);
+        let { fileUrl, serialisedFileName } = urlData.data.getFileUploadUrl;
         // *** UPLOAD TO AZURE STORAGE ***
         await uploadFileToBlob(selectedFile, fileUrl);
 
-        const response = await savePhoto({
+        await savePhoto({
           variables: {
-            fileName: serialisedFileName,
+            fileName: selectedFile.name,
             url: fileUrl,
             fileSize: sizeInMb(selectedFile.size),
             ownerId: userId,
             groupId,
+            serialisedFileName,
           },
         });
 
@@ -106,6 +111,7 @@ const Group = () => {
         setSelectedFile(null);
         setUploading(false);
         closeModal();
+        window.location.reload();
       } catch (error) {
         console.log(JSON.stringify(error, null, 2));
       }
@@ -123,7 +129,10 @@ const Group = () => {
           Add Photos
         </button>
       </div>
-      <ProgressBar now={now} label={`${now}/${maxPhotos}`} />
+      <div className="progress-container">
+        <h4>Total Photos Uploaded</h4>
+        <ProgressBar now={photoCount} max={maxPhotos} label={`${photoCount}/${maxPhotos}`} />
+      </div>
       <div className="group-container">
         <div className="members-container">
           <h3>Owner</h3>

@@ -42,8 +42,8 @@ export const GET_PHOTOS = gql`
 `;
 
 export const GET_FILE_UPLOAD_URL = gql`
-  query getFileUploadUrl($groupName: String!, $blobName: String!) {
-    getFileUploadUrl(groupName: $groupName, blobName: $blobName) {
+  query getFileUploadUrl($serialisedGroupName: String!, $blobName: String!) {
+    getFileUploadUrl(serialisedGroupName: $serialisedGroupName, blobName: $blobName) {
       fileUrl
       serialisedFileName
     }
@@ -51,19 +51,32 @@ export const GET_FILE_UPLOAD_URL = gql`
 `;
 
 export const GET_PHOTOS_FOR_GROUP = gql`
-  query getPhotosForGroup($groupName: String!) {
-    getPhotosForGroup(groupName: $groupName) {
-      group {
-        name
-        members {
+  query getPhotosForGroup($serialisedGroupName: String!) {
+    getPhotosForGroup(serialisedGroupName: $serialisedGroupName) {
+      _id
+      name
+      members {
+        username
+      }
+      groupOwner {
+        _id
+        username
+      }
+      photos {
+        fileName
+        url
+        uploadDate
+        fileSize
+        owner {
           username
         }
-        photos {
-          fileName
-          url
-          uploadDatefileSize
-        }
+        serialisedFileName
+        thumbnailUrl
       }
+      containerUrl
+      serialisedGroupName
+      maxPhotos
+      photoCount
     }
   }
 `;

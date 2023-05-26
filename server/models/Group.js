@@ -43,9 +43,14 @@ const groupSchema = new Schema(
   {
     toJSON: {
       virtuals: true,
+      getters: true,
     },
   }
 );
+
+groupSchema.virtual("photoCount").get(function () {
+  return this.photos.length;
+});
 
 groupSchema.pre("save", async function (next) {
   if (this.isNew) {

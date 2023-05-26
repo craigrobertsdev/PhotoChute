@@ -19,16 +19,20 @@ const typeDefs = gql`
     photos: [Photo]
     containerUrl: String
     serialisedGroupName: String
+    maxPhotos: Int
+    photoCount: Int
   }
 
   type Photo {
     _id: ID
-    fileName: String!
-    url: String!
-    uploadDate: String!
-    fileSize: Int!
-    groupId: ID!
-    ownerId: ID!
+    fileName: String
+    url: String
+    uploadDate: String
+    fileSize: Float
+    group: Group
+    owner: User
+    serialisedFileName: String
+    thumbnailUrl: String
   }
 
   type Auth {
@@ -44,8 +48,8 @@ const typeDefs = gql`
   type Query {
     me(email: String): User
     photos: [Photo]
-    getFileUploadUrl(groupName: String!, blobName: String!): FileUrl
-    getPhotosForGroup(groupName: String!): Group
+    getFileUploadUrl(serialisedGroupName: String!, blobName: String!): FileUrl
+    getPhotosForGroup(serialisedGroupName: String!): Group
     getSignedUrl(groupName: String!, blobName: String!): FileUrl
   }
 
@@ -53,7 +57,14 @@ const typeDefs = gql`
     login(email: String!, password: String!): Auth
     addUser(username: String!, email: String!, password: String!): Auth
     addFriend(username: String, phone: String): User
-    savePhoto(fileName: String!, url: String!, fileSize: Int!, ownerId: ID!, groupId: ID!): Photo
+    savePhoto(
+      fileName: String!
+      url: String!
+      fileSize: Float!
+      ownerId: ID!
+      groupId: ID!
+      serialisedFileName: String!
+    ): Photo
     addPhotoToGroup(photoId: ID!, groupId: ID!): Group
     createGroup(groupName: String!): Group
     deleteSinglePhoto(photoId: ID!): ID

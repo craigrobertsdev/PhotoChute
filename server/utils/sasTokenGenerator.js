@@ -94,7 +94,10 @@ async function getBlobSasUri(containerName, blobName, sharedKeyCredential, permi
 }
 
 function serialiseBlobName(fileName) {
-  return `${fileName}-${uuidv1()}`;
+  const name = fileName.slice(0, fileName.lastIndexOf("."));
+  const fileExtension = fileName.slice(fileName.lastIndexOf("."));
+
+  return `${name.toLowerCase()}-${uuidv1()}${fileExtension}`;
 }
 
 module.exports = { generateFileUploadUrlData, getBlobSasUri };

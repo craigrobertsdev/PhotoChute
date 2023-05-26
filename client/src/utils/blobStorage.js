@@ -11,27 +11,13 @@ async function uploadFileToBlob(file, signedUrl) {
 
   try {
     // upload the file to Azure blob storage. Doing so will trigger an automatic function to create a thumbnail
-    const response = await blockBlobClient.uploadData(file, {
+    await blockBlobClient.uploadData(file, {
       blobHTTPHeaders: {
         blobContentType: file.type,
       },
     });
-
-    return response.json();
   } catch (err) {
     console.log(JSON.stringify(err, null, 2));
   }
 }
-
-/**
- * @description Creates a unique file name based on the file name parameter and current timestamp.
- * @param {string} fileName
- */
-function tokeniseFileName(fileName) {
-  const name = fileName.slice(0, fileName.lastIndexOf("."));
-  const fileExtension = fileName.slice(fileName.lastIndexOf("."));
-
-  return `${name.toLowerCase()}-${uuidv1()}${fileExtension}`;
-}
-
 export default uploadFileToBlob;
