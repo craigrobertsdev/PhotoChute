@@ -1,10 +1,22 @@
 import React from 'react';
 var premiumSelection = ''
+const postFunction
 
-const premiumSelector = (selection) => {
-        premiumSelection = { id: (selection), quantity: 1 }
-
-        console.log(premiumSelection)
+const premiumSelector = async (selection) => {
+    premiumSelection = { id: (selection), quantity: 1 }
+    
+    const postFunction = await fetch('http://localhost:3000/checkout', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            item: premiumSelection
+        })
+    })
+    .then(res => {
+        if (res.ok) return res.json()
+    })
 }
 
 const Premium = () => {
