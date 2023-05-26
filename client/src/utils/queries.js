@@ -80,3 +80,11 @@ export const GET_PHOTOS_FOR_GROUP = gql`
     }
   }
 `;
+
+export const GET_AUTHENTICATION_TOKEN = gql`
+  query getAuthenticationToken($groupName: String!) {
+    getAuthenticationToken(groupName: $groupName) {
+      sasToken
+    }
+  }
+`;

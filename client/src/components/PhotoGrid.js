@@ -17,13 +17,13 @@ const loadPhoto = async (event, photoId) => {
   // window.location.assign(signedUrl);
 };
 
-const PhotoGrid = ({ thumbnails }) => {
+const PhotoGrid = ({ thumbnails, sasToken }) => {
   console.log(thumbnails);
   return (
     <div className="photo-grid">
       {thumbnails.map((thumbnail, index) => (
         <div className="thumbnail-container" key={"thumbnail-" + index}>
-          <img className="thumbnail" src={thumbnail.url} /*{thumbnail.url}*/ alt="thumbnail" />
+          <img className="thumbnail" src={thumbnail.thumbnailUrl + sasToken} alt="thumbnail" />
           <div>
             <p className="text-center">
               Uploaded by {thumbnail.owner.username} on {formatDate(thumbnail.uploadDate)}

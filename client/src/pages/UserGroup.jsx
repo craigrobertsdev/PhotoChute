@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Modal from "react-bootstrap/Modal";
 import { DELETE_SINGLE_PHOTO, DELETE_MANY_PHOTOS, SAVE_PHOTO } from "../utils/mutations";
-import { GET_PHOTOS_FOR_GROUP, GET_FILE_UPLOAD_URL } from "../utils/queries";
+import {
+  GET_PHOTOS_FOR_GROUP,
+  GET_FILE_UPLOAD_URL,
+  GET_AUTHENTICATION_TOKEN,
+} from "../utils/queries";
 import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
 import { sizeInMb } from "../utils/helpers";
 import uploadFileToBlob from "../utils/blobStorage";
@@ -33,6 +37,19 @@ const Group = () => {
   const [deleteSinglePhoto] = useMutation(DELETE_SINGLE_PHOTO);
   const [deleteManyPhotos] = useMutation(DELETE_MANY_PHOTOS);
 
+  const { data: sasTokenData, error: tokenDataError } = useQuery(GET_AUTHENTICATION_TOKEN, {
+    variables: {
+      groupName: serialisedGroupName,
+    },
+  });
+
+  if (sasTokenData) {
+    console.log(sasTokenData);
+  }
+
+  if (tokenDataError) {
+    console.log(tokenDataError);
+  }
   const {
     loading: loadingPhotos,
     error: errorLoadingPhotos,
@@ -162,7 +179,10 @@ const Group = () => {
             {fileTypeValidationError && <div>File must be of type jpg, jpeg or png</div>}
           </Modal.Body>
         </Modal>
-        <PhotoGrid thumbnails={photos.getPhotosForGroup.photos} />
+        <PhotoGrid
+          thumbnails={photos.getPhotosForGroup.photos}
+          sasToken={sasTokenData.getAuthenticationToken.sasToken}
+        />
       </div>
     </div>
   );
