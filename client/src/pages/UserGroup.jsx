@@ -121,6 +121,10 @@ const Group = () => {
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
 
+  if (loadingPhotos) {
+    return "Loading...";
+  }
+
   return (
     <div>
       <div className="header-container">
@@ -158,17 +162,7 @@ const Group = () => {
             {fileTypeValidationError && <div>File must be of type jpg, jpeg or png</div>}
           </Modal.Body>
         </Modal>
-        <PhotoGrid
-          thumbnails={new Array(30).fill({
-            fileName: "test-thumbnail.jpg",
-            url: "https://picsum.photos/200",
-            uploadDate: new Date(),
-            fileSize: 4.3,
-            owner: {
-              username: "Craig",
-            },
-          })}
-        />
+        <PhotoGrid thumbnails={photos.getPhotosForGroup.photos} />
       </div>
     </div>
   );

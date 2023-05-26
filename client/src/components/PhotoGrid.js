@@ -18,10 +18,11 @@ const loadPhoto = async (event, photoId) => {
 };
 
 const PhotoGrid = ({ thumbnails }) => {
+  console.log(thumbnails);
   return (
     <div className="photo-grid">
       {thumbnails.map((thumbnail, index) => (
-        <div className="thumbnail-container" key={"thumb" + index}>
+        <div className="thumbnail-container" key={"thumbnail-" + index}>
           <img className="thumbnail" src={thumbnail.url} /*{thumbnail.url}*/ alt="thumbnail" />
           <div>
             <p className="text-center">
