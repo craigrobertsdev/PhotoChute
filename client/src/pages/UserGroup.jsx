@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import Modal from "react-bootstrap/Modal";
-import { DELETE_SINGLE_PHOTO, DELETE_MANY_PHOTOS, SAVE_PHOTO } from "../utils/mutations";
+import { DELETE_PHOTO, SAVE_PHOTO } from "../utils/mutations";
 import {
   GET_PHOTOS_FOR_GROUP,
   GET_FILE_UPLOAD_URL,
   GET_AUTHENTICATION_TOKEN,
+  GET_SIGNED_URL,
 } from "../utils/queries";
 import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
 import { sizeInMb } from "../utils/helpers";
@@ -15,28 +15,24 @@ import auth from "../utils/auth";
 import { ProgressBar } from "react-bootstrap";
 
 const Group = () => {
-  const name = "The Walruses";
-  const [showModal, setShowModal] = useState(false);
+  const userId = auth.getProfile().data._id;
   const [selectedFile, setSelectedFile] = useState();
   const [uploading, setUploading] = useState(false);
-  const [getFileUploadUrl] = useLazyQuery(GET_FILE_UPLOAD_URL);
   const [fileTypeValidationError, setFileTypeValidationError] = useState(false);
-  const [savePhoto] = useMutation(SAVE_PHOTO);
-  const userId = auth.getProfile().data._id;
   const [photoCount, setPhotoCount] = useState();
   const [maxPhotos, setMaxPhotos] = useState();
   const [uploadPaneOpen, setUploadPaneOpen] = useState(false);
+  const [getFileUploadUrl] = useLazyQuery(GET_FILE_UPLOAD_URL);
+  const [savePhoto] = useMutation(SAVE_PHOTO);
 
   /* THIS IS UNTIL THE USER PROFILE PAGE IS COMPLETE */
   const groupId = "64708396753160dc9cd92c1e";
   const serialisedGroupName = "the-walruses-5a8118b0-fbac-11ed-aaed-4bd91ebe2c21";
   /* THIS IS UNTIL THE USER PROFILE PAGE IS COMPLETE */
 
-  const [selectedPhotos, setSelectedPhotos] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const [deleteSinglePhoto] = useMutation(DELETE_SINGLE_PHOTO);
-  const [deleteManyPhotos] = useMutation(DELETE_MANY_PHOTOS);
+  const [deletePhoto] = useMutation(DELETE_PHOTO);
 
   const { data: sasTokenData, error: tokenDataError } = useQuery(GET_AUTHENTICATION_TOKEN, {
     variables: {
@@ -44,13 +40,6 @@ const Group = () => {
     },
   });
 
-  if (sasTokenData) {
-    console.log(sasTokenData);
-  }
-
-  if (tokenDataError) {
-    console.log(tokenDataError);
-  }
   const {
     loading: loadingPhotos,
     error: errorLoadingPhotos,
@@ -63,7 +52,8 @@ const Group = () => {
     console.log(photos);
   }
 
-  // TODO - fetches the list of thumbnails for photos attached to this group.
+  const [getSignedUrl] = useLazyQuery(GET_SIGNED_URL);
+
   useEffect(() => {
     if (photos?.getPhotosForGroup) {
       setPhotoCount(photos.getPhotosForGroup.photos.length);
@@ -75,19 +65,10 @@ const Group = () => {
    * Deletes a photo from the group's container. Only available if the user has permission to perform this action
    * @param {Event} event
    */
-  const deletePhoto = async (event) => {
+  const handleDeletePhoto = async (event, thumbnail) => {
     event.preventDefault();
 
-    if (!selectedPhotos.length) {
-      setErrorMessage("No photos selected for deletion.");
-      return;
-    }
-    const response =
-      selectedPhotos.length === 1
-        ? await deleteSinglePhoto(...selectedPhotos)
-        : await deleteManyPhotos(selectedPhotos);
-
-    console.log(response);
+    console.log(thumbnail);
   };
 
   const onFileChange = (event) => {
@@ -132,16 +113,33 @@ const Group = () => {
           },
         });
 
-        // reset state/form
-        setSelectedFile(null);
-        setUploading(false);
-        setUploadPaneOpen(false);
-        window.location.reload();
-      } catch (error) {
-        console.log(JSON.stringify(error, null, 2));
+        // reset state/formgroup
+      } catch (err) {
+        console.error(err);
       }
     }
   };
+
+  /**
+   * @description When called, gets a signed URL to view the requested photo
+   * @param {Event} event The click event
+   * @param {Number} photoId The ID of the photo to get a URL for
+   */
+  const handleLoadPhoto = async (event, fileName) => {
+    event.preventDefault();
+
+    try {
+      const signedUrl = await getSignedUrl({
+        variables: { groupName: serialisedGroupName, fileName },
+      });
+
+      window.location.assign(signedUrl.data.getSignedUrl.fileUrl);
+    } catch (err) {
+      console.log(JSON.stringify(err, null, 2));
+    }
+  };
+
+  const handleDownloadPhoto = async (event, fileName) => {};
 
   const toggleUploadPane = () => setUploadPaneOpen(!uploadPaneOpen);
 
@@ -152,7 +150,7 @@ const Group = () => {
   return (
     <div>
       <div className="header-container">
-        <h1 className="text-center">{name}</h1>
+        <h1 className="text-center">{photos.getPhotosForGroup.name}</h1>
         <button className="btn" onClick={toggleUploadPane}>
           Add Photos
         </button>
@@ -179,16 +177,20 @@ const Group = () => {
           </div>
         </div>
         <div className="members-container">
-          <h3>Owner</h3>
+          <h4>Group Owner</h4>
           <p>Craig</p>
-          <h3>Members</h3>
+          <h4>Members</h4>
           <p>Shae</p>
           <p>Lucien</p>
         </div>
 
         <PhotoGrid
-          thumbnails={photos.getPhotosForGroup.photos}
+          currentUser={userId}
+          thumbnails={photos.getPhotosForGroup?.photos}
           sasToken={sasTokenData.getAuthenticationToken.sasToken}
+          onPhotoDelete={handleDeletePhoto}
+          onPhotoLoad={handleLoadPhoto}
+          onPhotoDownload={handleDownloadPhoto}
         />
       </div>
     </div>

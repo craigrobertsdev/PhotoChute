@@ -68,6 +68,7 @@ export const GET_PHOTOS_FOR_GROUP = gql`
         uploadDate
         fileSize
         owner {
+          _id
           username
         }
         serialisedFileName
@@ -85,6 +86,14 @@ export const GET_AUTHENTICATION_TOKEN = gql`
   query getAuthenticationToken($groupName: String!) {
     getAuthenticationToken(groupName: $groupName) {
       sasToken
+    }
+  }
+`;
+
+export const GET_SIGNED_URL = gql`
+  query getSignedUrl($groupName: String!, $fileName: String!) {
+    getSignedUrl(groupName: $groupName, fileName: $fileName) {
+      fileUrl
     }
   }
 `;

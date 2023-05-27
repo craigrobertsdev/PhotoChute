@@ -55,6 +55,7 @@ const typeDefs = gql`
     getFileUploadUrl(serialisedGroupName: String!, blobName: String!): FileUrl
     getPhotosForGroup(serialisedGroupName: String!): Group
     getAuthenticationToken(groupName: String!): SasToken
+    getSignedUrl(groupName: String!, fileName: String!): FileUrl
   }
 
   type Mutation {
@@ -69,10 +70,8 @@ const typeDefs = gql`
       groupId: ID!
       serialisedFileName: String!
     ): Photo
-    addPhotoToGroup(photoId: ID!, groupId: ID!): Group
     createGroup(groupName: String!): Group
-    deleteSinglePhoto(photoId: ID!): ID
-    deleteManyPhotos(photoIds: [ID]!): [ID]
+    deletePhoto(photoId: ID!): ID
   }
 `;
 

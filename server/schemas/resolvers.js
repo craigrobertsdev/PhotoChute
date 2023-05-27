@@ -3,7 +3,7 @@ const { AuthenticationError } = require("apollo-server-express");
 const { signToken } = require("../utils/auth");
 const {
   generateFileUploadUrlData,
-  getBlobSasUri,
+  getSignedUrl,
   createContainerSAS,
 } = require("../utils/sasTokenGenerator");
 
@@ -27,9 +27,16 @@ const resolvers = {
 
     getFileUploadUrl: async (parent, { serialisedGroupName, blobName }, context) => {
       // if user exists on context, they are assumed to be logged in
-      // if (!context.user) {
-      //   throw new AuthenticationError("You need to be signed in to upload images");
-      // }
+      if (!context.user) {
+        throw new AuthenticationError("You need to be signed in to upload images");
+      }
+
+      const group = await Group.findOne({ serialisedGroupName });
+
+      if (group.photos.length >= group.maxPhotos) {
+        return new Error("Cannot exceed maximum number of photos for the group.");
+      }
+
       return await generateFileUploadUrlData(serialisedGroupName, blobName, "rw");
     },
     getPhotosForGroup: async (parent, { serialisedGroupName }, context) => {
@@ -74,6 +81,26 @@ const resolvers = {
       }
 
       return await createContainerSAS(groupName);
+    },
+
+    getSignedUrl: async (parent, { groupName, fileName }, context) => {
+      if (!context.user) {
+        return new AuthenticationError("You must be signed in to access a group's photos");
+      }
+
+      const photo = await Photo.findOne({ fileName });
+
+      const group = (await photo.populate("group")).group;
+
+      if (!photo) {
+        return new Error("Photo not found");
+      }
+
+      if (context.user !== photo.owner && !group.groupOwner._id.equals(context.user._id)) {
+        return new AuthenticationError("Only the owner is authorised to delete a photo");
+      }
+
+      return { fileUrl: getSignedUrl(groupName, fileName) };
     },
   },
   Mutation: {
@@ -129,8 +156,6 @@ const resolvers = {
         serialisedFileName,
       });
 
-      console.log(newPhoto.toJSON());
-
       await User.findOneAndUpdate(
         { _id: context.user._id },
         {
@@ -153,11 +178,7 @@ const resolvers = {
 
       return newPhoto;
     },
-    addPhotoToGroup: async (parent, { photoId, groupId }) => {},
-
-    deleteSinglePhoto: async (parent, { photoId }, context) => {},
-
-    deleteManyPhotos: async (parent, { photoIds }, context) => {},
+    deletePhoto: async (parent, { photoId }, context) => {},
 
     addFriend: async (parent, { username, email, password }) => {
       const user = await User.create({ username, phone });

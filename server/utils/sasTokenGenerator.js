@@ -14,8 +14,6 @@ const { v1: uuidv1 } = require("uuid");
 const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
 const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
 
-console.log(accountName, accountKey);
-
 const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
 
 /**
@@ -104,6 +102,25 @@ async function getBlobSasUri(containerName, blobName, sharedKeyCredential, permi
   };
 }
 
+function getSignedUrl(containerName, fileName) {
+  const TEN_MINUTES = 10 * 60 * 1000;
+  const NOW = new Date();
+  const TEN_MINUTES_BEFORE_NOW = new Date(NOW.valueOf() - TEN_MINUTES);
+  const TEN_MINUTES_AFTER_NOW = new Date(NOW.valueOf() + TEN_MINUTES);
+
+  const sasOptions = {
+    containerName,
+    blobName: fileName,
+    startsOn: TEN_MINUTES_BEFORE_NOW,
+    expiresOn: TEN_MINUTES_AFTER_NOW,
+    permissions: BlobSASPermissions.parse("r"),
+  };
+
+  const sasToken = generateBlobSASQueryParameters(sasOptions, sharedKeyCredential).toString();
+
+  return `https://photochute.blob.core.windows.net/${containerName}/${fileName}?${sasToken}`;
+}
+
 function serialiseBlobName(fileName) {
   const name = fileName.slice(0, fileName.lastIndexOf("."));
   const fileExtension = fileName.slice(fileName.lastIndexOf("."));
@@ -111,4 +128,4 @@ function serialiseBlobName(fileName) {
   return `${name.toLowerCase()}-${uuidv1()}${fileExtension}`;
 }
 
-module.exports = { generateFileUploadUrlData, getBlobSasUri, createContainerSAS };
+module.exports = { generateFileUploadUrlData, createContainerSAS, getSignedUrl };

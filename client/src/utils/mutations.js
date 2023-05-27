@@ -63,15 +63,6 @@ export const SAVE_PHOTO = gql`
   }
 `;
 
-export const ADD_PHOTO = gql`
-  mutation AddPhotoToGroup($photoId: ID!, $groupId: ID!) {
-    addPhotoToGroup(photoId: $photoId, groupId: $groupId) {
-      _id
-      name
-    }
-  }
-`;
-
 export const GET_FILE_UPLOAD_URL = gql`
   mutation getFileUploadUrl($groupName: String!) {
     getFileUploadUrl(groupName: $groupName) {
@@ -82,17 +73,9 @@ export const GET_FILE_UPLOAD_URL = gql`
   }
 `;
 
-export const DELETE_SINGLE_PHOTO = gql`
+export const DELETE_PHOTO = gql`
   mutation deleteSinglePhoto($photoId: ID!) {
-    deleteSinglePhoto(photoId: $photoId) {
-      _id
-    }
-  }
-`;
-
-export const DELETE_MANY_PHOTOS = gql`
-  mutation deleteManyPhotos($photoIds: [ID]!) {
-    deleteManyPhotos(photoIds: $photoIds) {
+    deletePhoto(photoId: $photoId) {
       _id
     }
   }
