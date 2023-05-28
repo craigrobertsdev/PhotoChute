@@ -1,7 +1,9 @@
 .photo-grid {
+  width: 100%;
   margin: auto;
   flex: 2 1 auto;
   display: flex;
+  justify-content: start;
   flex-wrap: wrap;
   row-gap: 2rem;
   column-gap: 2rem;

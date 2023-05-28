@@ -58,6 +58,9 @@ const Group = () => {
     if (photos?.getPhotosForGroup) {
       setPhotoCount(photos.getPhotosForGroup.photos.length);
       setMaxPhotos(photos.getPhotosForGroup.maxPhotos);
+    } else {
+      setPhotoCount(0);
+      setMaxPhotos(15);
     }
   }, [photos]);
 
@@ -131,7 +134,7 @@ const Group = () => {
 
         window.location.reload();
       } catch (err) {
-        console.error(err);
+        console.log(JSON.stringify(err, null, 2));
       }
     }
   };
@@ -146,7 +149,7 @@ const Group = () => {
 
     try {
       const signedUrl = await getSignedUrl({
-        variables: { groupName: serialisedGroupName, fileName: serialisedFileName },
+        variables: { groupName: serialisedGroupName, serialisedFileName },
       });
 
       window.location.assign(signedUrl.data.getSignedUrl.fileUrl);

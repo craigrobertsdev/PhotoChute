@@ -55,7 +55,7 @@ const typeDefs = gql`
     getFileUploadUrl(serialisedGroupName: String!, blobName: String!): FileUrl
     getPhotosForGroup(serialisedGroupName: String!): Group
     getAuthenticationToken(groupName: String!): SasToken
-    getSignedUrl(groupName: String!, fileName: String!): FileUrl
+    getSignedUrl(groupName: String!, serialisedFileName: String!): FileUrl
   }
 
   type Mutation {

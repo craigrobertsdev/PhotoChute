@@ -1,6 +1,9 @@
-const { BlobServiceClient, BlockBlobClient } = require("@azure/storage-blob");
+const {
+  BlobServiceClient,
+  BlockBlobClient,
+  StorageSharedKeyCredential,
+} = require("@azure/storage-blob");
 const { v1: uuidv1 } = require("uuid");
-const generateFileUploadUrlData = require("./sasTokenGenerator");
 // may need this in prod when server is running from my Azure details, rather than a SAS key
 // const { DefaultAzureCredential } = require("@azure/identity");
 
@@ -51,16 +54,35 @@ function serialiseGroupName(groupName) {
  * @returns a promise that resolves when the file is deleted
  */
 async function deleteBlob(containerName, blobName) {
-  const blockBlobClient = new BlockBlobClient(
-    process.env.CONNECTION_STRING_SAS,
-    containerName,
-    blobName
+  const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
+  const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
+
+  const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
+
+  const blobServiceClient = new BlobServiceClient(
+    "https://photochute.blob.core.windows.net",
+    sharedKeyCredential
   );
 
+  const containerClient = blobServiceClient.getContainerClient(containerName);
+
+  // Create blob client from container client
+  const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
+
+  const thumbnailClient = blobServiceClient.getContainerClient("thumbnails");
+
+  const thumbnailBlobClient = await thumbnailClient.getBlockBlobClient(blobName);
   try {
-    blockBlobClient.delete({
+    const deletePhoto = blockBlobClient.delete({
       deleteSnapshots: "include",
     });
+
+    const deleteThumbnail = thumbnailBlobClient.delete({
+      deleteSnapshots: "include",
+    });
+
+    const result = await Promise.all([deletePhoto, deleteThumbnail]);
+    console.log(result);
   } catch (err) {
     console.error(err);
   }

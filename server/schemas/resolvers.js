@@ -6,6 +6,8 @@ const {
   getSignedUrl,
   createContainerSAS,
 } = require("../utils/sasTokenGenerator");
+const { deleteBlob } = require("../utils/blobStorage");
+const { ObjectId } = require("mongoose").Types;
 
 const resolvers = {
   Query: {
@@ -83,12 +85,12 @@ const resolvers = {
       return await createContainerSAS(groupName);
     },
 
-    getSignedUrl: async (parent, { groupName, fileName }, context) => {
+    getSignedUrl: async (parent, { groupName, serialisedFileName }, context) => {
       if (!context.user) {
         return new AuthenticationError("You must be signed in to access a group's photos");
       }
 
-      const photo = await Photo.findOne({ fileName });
+      const photo = await Photo.findOne({ serialisedFileName });
 
       const group = (await photo.populate("group")).group;
 
@@ -100,7 +102,7 @@ const resolvers = {
         return new AuthenticationError("Only the owner is authorised to delete a photo");
       }
 
-      return { fileUrl: getSignedUrl(groupName, fileName) };
+      return { fileUrl: getSignedUrl(groupName, serialisedFileName) };
     },
   },
   Mutation: {
@@ -192,6 +194,14 @@ const resolvers = {
         return new AuthenticationError("You are not authorised to delete this photo");
       }
 
+      const photoToDelete = await Photo.findById(photoId);
+
+      try {
+        await deleteBlob(groupName, photoToDelete.serialisedFileName);
+      } catch (err) {
+        console.error(err);
+      }
+
       const deletedPhoto = await Photo.findOneAndDelete({ _id: photoId });
 
       if (!deletedPhoto) {
@@ -202,20 +212,19 @@ const resolvers = {
       const updatedGroup = await Group.findOneAndUpdate(
         { serialisedGroupName: groupName },
         {
-          $pull: { photos: { _id: photoId } },
-        }
+          $pull: { photos: new ObjectId(deletedPhoto._id) },
+        },
+        { new: true }
       );
-
-      console.log(updatedGroup.toJSON());
 
       const updatedUser = await User.findOneAndUpdate(
         { _id: deletedPhoto.owner },
         {
-          $pull: { photos: { _id: photoId } },
-        }
+          $pull: { photos: new ObjectId(deletedPhoto._id) },
+        },
+        { new: true }
       );
 
-      console.log(updatedUser.toJSON());
       return deletedPhoto;
     },
 

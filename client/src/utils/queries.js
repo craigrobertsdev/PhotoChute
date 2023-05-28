@@ -92,8 +92,8 @@ export const GET_AUTHENTICATION_TOKEN = gql`
 `;
 
 export const GET_SIGNED_URL = gql`
-  query getSignedUrl($groupName: String!, $fileName: String!) {
-    getSignedUrl(groupName: $groupName, fileName: $fileName) {
+  query getSignedUrl($groupName: String!, $serialisedFileName: String!) {
+    getSignedUrl(groupName: $groupName, serialisedFileName: $serialisedFileName) {
       fileUrl
     }
   }
