@@ -63,6 +63,7 @@ export const GET_PHOTOS_FOR_GROUP = gql`
         username
       }
       photos {
+        _id
         fileName
         url
         uploadDate

@@ -178,7 +178,46 @@ const resolvers = {
 
       return newPhoto;
     },
-    deletePhoto: async (parent, { photoId }, context) => {},
+    deletePhoto: async (parent, { groupName, photoId }, context) => {
+      if (!context.user) {
+        return new AuthenticationError("You must be signed in to create a group");
+      }
+
+      const group = await Group.findOne({ serialisedGroupName: groupName });
+
+      if (
+        !group.members?.includes(context.user._id) &&
+        !group.groupOwner._id.equals(context.user._id)
+      ) {
+        return new AuthenticationError("You are not authorised to delete this photo");
+      }
+
+      const deletedPhoto = await Photo.findOneAndDelete({ _id: photoId });
+
+      if (!deletedPhoto) {
+        return new Error("Photo could not be located");
+      }
+
+      // remove the photo from the group's photo array
+      const updatedGroup = await Group.findOneAndUpdate(
+        { serialisedGroupName: groupName },
+        {
+          $pull: { photos: { _id: photoId } },
+        }
+      );
+
+      console.log(updatedGroup.toJSON());
+
+      const updatedUser = await User.findOneAndUpdate(
+        { _id: deletedPhoto.owner },
+        {
+          $pull: { photos: { _id: photoId } },
+        }
+      );
+
+      console.log(updatedUser.toJSON());
+      return deletedPhoto;
+    },
 
     addFriend: async (parent, { username, email, password }) => {
       const user = await User.create({ username, phone });

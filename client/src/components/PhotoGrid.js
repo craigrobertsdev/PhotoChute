@@ -10,13 +10,15 @@ const PhotoGrid = ({
   onPhotoLoad,
   onPhotoDownload,
 }) => {
-  console.log(thumbnails);
+  console.log("thumbnails", thumbnails);
   console.log(currentUser);
   return (
     <div className="photo-grid">
       {thumbnails.map((thumbnail, index) => (
         <div className="thumbnail-container" key={"thumbnail-" + index}>
-          <button onClick={(event) => onPhotoLoad(event, thumbnail.fileName)}>
+          <button
+            className="thumbnail-button"
+            onClick={(event) => onPhotoLoad(event, thumbnail.serialisedFileName)}>
             <img className="thumbnail" src={thumbnail.thumbnailUrl + sasToken} alt="thumbnail" />
           </button>
           <div>

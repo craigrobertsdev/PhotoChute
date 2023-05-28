@@ -1,5 +1,4 @@
 import { BlockBlobClient } from "@azure/storage-blob";
-const { v1: uuidv1 } = require("uuid");
 
 /**
  * @description Uploads the provided file to the blob storage account via a temporarily signed URL

@@ -21,13 +21,6 @@ const CreateGroupForm = (groupName) => {
       });
 
       console.log(response.data);
-      navigate("/group", {
-        state: {
-          name: response.createGroup.name,
-          groupOwner: response.createGroup.groupOwner,
-        },
-      });
-      //setGroupDetails(response.data.createGroup);
     } catch (err) {
       console.error(JSON.stringify(err, null, 2));
     }

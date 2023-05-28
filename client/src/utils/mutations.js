@@ -74,8 +74,8 @@ export const GET_FILE_UPLOAD_URL = gql`
 `;
 
 export const DELETE_PHOTO = gql`
-  mutation deleteSinglePhoto($photoId: ID!) {
-    deletePhoto(photoId: $photoId) {
+  mutation deleteSinglePhoto($groupName: String!, $photoId: ID!) {
+    deletePhoto(groupName: $groupName, photoId: $photoId) {
       _id
     }
   }

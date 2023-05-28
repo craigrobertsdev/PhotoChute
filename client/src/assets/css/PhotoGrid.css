@@ -11,6 +11,10 @@
   width: 200px;
 }
 
+.thumbnail-button {
+  padding: 0;
+}
+
 .thumbnail {
   max-width: 100%;
 }

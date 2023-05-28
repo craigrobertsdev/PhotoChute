@@ -66,71 +66,7 @@ async function deleteBlob(containerName, blobName) {
   }
 }
 
-/**
- * @description Deletes each file listed in the blobNames array. Does not return a value or wait for the deletion to finish. Sends of a request to the storage account then returns.
- * @param {string} containerName The name of the container in which the blobs to be deleted are located
- * @param {[string]} blobNames the names of the blobs to be deleted
- */
-async function deleteManyBlobs(containerName, blobNames) {
-  try {
-    // iterate over the blobNames array and delete each blob
-    for (const blobName of blobNames) {
-      const blockBlobClient = new BlockBlobClient(
-        process.env.CONNECTION_STRING_SAS,
-        containerName,
-        blobName
-      );
-
-      blockBlobClient.delete({
-        deleteSnapshots: "include",
-      });
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-/**
- *
- * @param {string} blobName the name of the blob requested
- * @returns {string} A signed URL to the blob to enable viewing or downloading of the file
- */
-async function getSingleBlob(containerName, blobName) {
-  const blobServiceClient = BlobServiceClient.fromConnectionString(
-    process.env.CONNECTION_STRING_SAS
-  );
-
-  const containerClient = blobServiceClient.getContainerClient(containerName);
-
-  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-
-  const sasToken = await generateFileUploadUrlData("r");
-
-  return `${blockBlobClient.url}${sasToken}`;
-}
-
-/**
- * @param {string} containerName The name of the container in which the blobs to be obtained are located
- * @param {[string]} blobNames an array of requested blob names
- * @returns {[{blobName: string, url: string}]} an array of objects containing the blob name and signed url for each files in the request
- */
-async function getManyBlobs(containerName, blobNames) {
-  const response = [];
-
-  for (const blobName of blobNames) {
-    response.push({
-      blobName,
-      url: getSingleBlob(containerName, blobName),
-    });
-  }
-
-  return response;
-}
-
 module.exports = {
   createBlobStorageContainer,
   deleteBlob,
-  deleteManyBlobs,
-  getSingleBlob,
-  getManyBlobs,
 };

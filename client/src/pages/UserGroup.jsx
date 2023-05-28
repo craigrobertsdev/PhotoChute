@@ -19,15 +19,15 @@ const Group = () => {
   const [selectedFile, setSelectedFile] = useState();
   const [uploading, setUploading] = useState(false);
   const [fileTypeValidationError, setFileTypeValidationError] = useState(false);
-  const [photoCount, setPhotoCount] = useState();
-  const [maxPhotos, setMaxPhotos] = useState();
+  const [photoCount, setPhotoCount] = useState(0);
+  const [maxPhotos, setMaxPhotos] = useState(15);
   const [uploadPaneOpen, setUploadPaneOpen] = useState(false);
   const [getFileUploadUrl] = useLazyQuery(GET_FILE_UPLOAD_URL);
   const [savePhoto] = useMutation(SAVE_PHOTO);
 
   /* THIS IS UNTIL THE USER PROFILE PAGE IS COMPLETE */
-  const groupId = "64708396753160dc9cd92c1e";
-  const serialisedGroupName = "the-walruses-5a8118b0-fbac-11ed-aaed-4bd91ebe2c21";
+  const groupId = "6472e5b7d2e3a3d54cf8319b";
+  const serialisedGroupName = "the-walruses-04860d90-fd18-11ed-b68c-cf89f07a90c7";
   /* THIS IS UNTIL THE USER PROFILE PAGE IS COMPLETE */
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -49,7 +49,7 @@ const Group = () => {
   });
 
   if (photos) {
-    console.log(photos);
+    console.log("photos", photos);
   }
 
   const [getSignedUrl] = useLazyQuery(GET_SIGNED_URL);
@@ -69,6 +69,17 @@ const Group = () => {
     event.preventDefault();
 
     console.log(thumbnail);
+
+    const deletedPhotoResponse = await deletePhoto({
+      variables: {
+        groupName: serialisedGroupName,
+        photoId: thumbnail._id,
+      },
+    });
+
+    window.location.reload();
+
+    console.log(deletedPhotoResponse);
   };
 
   const onFileChange = (event) => {
@@ -85,12 +96,13 @@ const Group = () => {
     }
   }
 
-  const onFileUpload = async () => {
+  const onFileUpload = async (event) => {
+    event.preventDefault();
+
     if (selectedFile && selectedFile?.name) {
       // prepare UI
       setUploading(true);
       try {
-        // TODO - find a way to get the current group's containerName instead of hard coded value
         const urlData = await getFileUploadUrl({
           variables: {
             serialisedGroupName,
@@ -114,6 +126,10 @@ const Group = () => {
         });
 
         // reset state/formgroup
+        setUploading(false);
+        setSelectedFile(null);
+
+        window.location.reload();
       } catch (err) {
         console.error(err);
       }
@@ -125,12 +141,12 @@ const Group = () => {
    * @param {Event} event The click event
    * @param {Number} photoId The ID of the photo to get a URL for
    */
-  const handleLoadPhoto = async (event, fileName) => {
+  const handleLoadPhoto = async (event, serialisedFileName) => {
     event.preventDefault();
 
     try {
       const signedUrl = await getSignedUrl({
-        variables: { groupName: serialisedGroupName, fileName },
+        variables: { groupName: serialisedGroupName, fileName: serialisedFileName },
       });
 
       window.location.assign(signedUrl.data.getSignedUrl.fileUrl);
@@ -139,7 +155,28 @@ const Group = () => {
     }
   };
 
-  const handleDownloadPhoto = async (event, fileName) => {};
+  const handleDownloadPhoto = async (event, fileName) => {
+    const signedUrl = await getSignedUrl({
+      variables: {
+        groupName: serialisedGroupName,
+        fileName,
+      },
+    });
+
+    fetch(signedUrl.data.getSignedUrl.fileUrl, {
+      method: "GET",
+    })
+      .then((response) => response.blob())
+      .then((blob) => {
+        var url = window.URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
+        a.click();
+        a.remove(); //afterwards we remove the element again
+      });
+  };
 
   const toggleUploadPane = () => setUploadPaneOpen(!uploadPaneOpen);
 
@@ -150,14 +187,18 @@ const Group = () => {
   return (
     <div>
       <div className="header-container">
-        <h1 className="text-center">{photos.getPhotosForGroup.name}</h1>
+        <h1 className="text-center">{photos?.getPhotosForGroup.name}</h1>
         <button className="btn" onClick={toggleUploadPane}>
           Add Photos
         </button>
       </div>
       <div className="progress-container">
         <h4>Total Photos Uploaded</h4>
-        <ProgressBar now={photoCount} max={maxPhotos} label={`${photoCount}/${maxPhotos}`} />
+        <ProgressBar
+          now={photoCount}
+          max={maxPhotos}
+          label={`${photoCount ? photoCount : 0}/${maxPhotos}`}
+        />
       </div>
       <div className="group-container">
         <div className={`upload-pane ${uploadPaneOpen ? "" : "hidden"}`}>
@@ -186,7 +227,7 @@ const Group = () => {
 
         <PhotoGrid
           currentUser={userId}
-          thumbnails={photos.getPhotosForGroup?.photos}
+          thumbnails={photos?.getPhotosForGroup.photos}
           sasToken={sasTokenData.getAuthenticationToken.sasToken}
           onPhotoDelete={handleDeletePhoto}
           onPhotoLoad={handleLoadPhoto}
