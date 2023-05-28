@@ -150,6 +150,13 @@ Link:hover {
   color: #47294c;
 }
 
+.bRadius {
+  border-radius: 20px;
+}
+
+.altHeading {
+ color: white;
+}
 /* Copies */
 */
 *,
@@ -808,12 +815,6 @@ form .form-group {
   width: 100%;
   margin: 0.625rem 0;
 }
-
-input:focus {
-  border-color: #816f7d;
-}
-
-
 
 form select {
   -webkit-appearance: none;

@@ -42,7 +42,7 @@ const Login = (props) => {
 
   return (
     <main className="flex-row justify-center mb-4">
-      <div className="col-8">
+      <div className="col-6">
         <div>
           {data ? (
             <p>
@@ -52,7 +52,7 @@ const Login = (props) => {
           ) : (
             <form onSubmit={handleFormSubmit}>
               <div>
-                  <label for="email">Email:</label>
+                  <label htmlFor="email">Email:</label>
                   <input
                     className="form-input"
                     // placeholder="email"
@@ -63,7 +63,7 @@ const Login = (props) => {
                   />
               </div>
               <div>
-                  <label for="password">Password:</label>
+                  <label htmlFor="password">Password:</label>
                   <input
                     className="form-input"
                     // placeholder="********"
@@ -89,9 +89,9 @@ const Login = (props) => {
             )}
 
             {error && (
-              <div className="my-3 p-3 bg-danger text-white">
-                {error.message}
-              </div>
+              <div className="my-3 p-3 bg-danger text-center text-white bRadius">
+              {`Something went wrong, please try again!`}
+            </div>
             )}
         </div>
       </div>

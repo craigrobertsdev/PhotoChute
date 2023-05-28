@@ -23,7 +23,7 @@ const Header = () => {
                 Profile
               </Link>
               <Link className="navBtn m-2" to="/me">
-                Storage
+                Get Premium
               </Link>
               <button className="navBtn btn-logout m-2" onClick={logout}>
                 Logout

@@ -7,6 +7,8 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import CreateGroupForm from "./pages/CreateGroupForm";
 import Group from "./pages/Group";
+import Profile from "./pages/Profile";
+import User from "./pages/UserPage"
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -43,8 +45,10 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/create-group" element={<CreateGroupForm />} />
             <Route path="/group" element={<Group />} />
+            <Route path="/user" element={<User />} />
             <Route path="*" element={<h1 className="display-2">Wrong page!</h1>} />
           </Routes>
           <Footer />
