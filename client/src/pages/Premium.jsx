@@ -3,26 +3,6 @@ import {BUY_PREMIUM} from '../utils/mutations'
 import { useMutation } from '@apollo/client';
 import { loadStripe } from '@stripe/stripe-js';
 
-// const premiumSelector = async (selection) => {
-
-//     fetch('http://localhost:3001/create-checkout-session', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         },
-//         body: JSON.stringify({
-//             items: selection,
-//         }),
-//     })
-//     .then(res => {
-//         if (res.ok) return res.json()
-//         return res.json().then(json => Promise.reject(json))
-//     }).then (({ linkToStripe }) => {
-//         window.location = linkToStripe
-//     }).catch(err => {
-//         console.log(err)
-//     })
-// }
 const stripePromise = loadStripe('pk_test_51NBap4GOWFX5kO3G2CJEbUNpCY4pTx8GlmGczPNeFf8WUYgSg0xju3acib4PcIVvmStyNcQV0XeBUWVzxmB8yKmB00xJzsTSQf');
 
 const Premium = () => {
