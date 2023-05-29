@@ -11,6 +11,7 @@
     "@testing-library/user-event": "^7.1.2",
     "apollo-upload-client": "^17.0.0",
     "bootstrap": "^5.2.3",
+    "downloadjs": "^1.4.7",
     "graphql": "^15.4.0",
     "jwt-decode": "^2.2.0",
     "react": "^16.13.1",
