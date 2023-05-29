@@ -1,5 +1,4 @@
 import { BlockBlobClient } from "@azure/storage-blob";
-const { v1: uuidv1 } = require("uuid");
 
 /**
  * @description Uploads the provided file to the blob storage account via a temporarily signed URL
@@ -9,8 +8,6 @@ const { v1: uuidv1 } = require("uuid");
 async function uploadFileToBlob(file, signedUrl) {
   const blockBlobClient = new BlockBlobClient(signedUrl);
 
-  const blobName = tokeniseFileName(file.name);
-
   try {
     // upload the file to Azure blob storage. Doing so will trigger an automatic function to create a thumbnail
     await blockBlobClient.uploadData(file, {
@@ -18,22 +15,8 @@ async function uploadFileToBlob(file, signedUrl) {
         blobContentType: file.type,
       },
     });
-
-    return blobName;
   } catch (err) {
     console.log(JSON.stringify(err, null, 2));
   }
 }
-
-/**
- * @description Creates a unique file name based on the file name parameter and current timestamp.
- * @param {string} fileName
- */
-function tokeniseFileName(fileName) {
-  const name = fileName.slice(0, fileName.lastIndexOf("."));
-  const fileExtension = fileName.slice(fileName.lastIndexOf("."));
-
-  return `${name.toLowerCase()}-${uuidv1()}${fileExtension}`;
-}
-
 export default uploadFileToBlob;

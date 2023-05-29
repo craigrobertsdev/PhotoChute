@@ -3,6 +3,8 @@ const { gql } = require("apollo-server-express");
 const typeDefs = gql`
   type User {
     _id: ID
+    firstName: String
+    lastName: String
     username: String
     email: String
     phone: String
@@ -11,22 +13,28 @@ const typeDefs = gql`
     photos: [Photo]
   }
 
-  type Photo {
-    _id: ID
-    fileName: String!
-    url: String!
-    uploadDate: String
-    fileSize: Int
-    groups: [Group]
-    owner: User!
-  }
-
   type Group {
     _id: ID
     name: String
     members: [User]
+    groupOwner: User
     photos: [Photo]
     containerUrl: String
+    serialisedGroupName: String
+    maxPhotos: Int
+    photoCount: Int
+  }
+
+  type Photo {
+    _id: ID
+    fileName: String
+    url: String
+    uploadDate: String
+    fileSize: Float
+    group: Group
+    owner: User
+    serialisedFileName: String
+    thumbnailUrl: String
   }
 
   type Auth {
@@ -36,25 +44,38 @@ const typeDefs = gql`
 
   type FileUrl {
     fileUrl: String
+    serialisedFileName: String
+  }
+
+  type SasToken {
+    sasToken: String!
   }
 
   type Query {
-    me: User
+    me(email: String): User
     photos: [Photo]
-    getFileUploadUrl(groupName: String!, blobName: String!): FileUrl
-    getPhotosForGroup(groupName: String!): Group
-    getSignedUrl(groupName: String!, blobName: String!): FileUrl
+    getFileUploadUrl(serialisedGroupName: String!, blobName: String!): FileUrl
+    getPhotosForGroup(serialisedGroupName: String!): Group
+    getAuthenticationToken(groupName: String!): SasToken
+    getSignedUrl(groupName: String!, serialisedFileName: String!): FileUrl
   }
 
   type Mutation {
     login(email: String!, password: String!): Auth
     addUser(username: String!, email: String!, password: String!): Auth
     addFriend(username: String, phone: String): User
-    savePhoto(fileName: String!, url: String!, fileSize: Int!, owner: ID!): User
-    addPhotoToGroup(photoId: ID!, groupId: ID!): Group
-    createGroup(groupName: String!, userId: ID!): Group
-    deleteSinglePhoto(photoId: ID!): ID
-    deleteManyPhotos(photoIds: [ID]!): [ID]
+    savePhoto(
+      fileName: String!
+      url: String!
+      fileSize: Float!
+      ownerId: ID!
+      groupId: ID!
+      serialisedFileName: String!
+    ): Photo
+    createGroup(groupName: String!): Group
+    deletePhoto(groupName: String!, photoId: ID!): Photo
+    addGroupMembers(groupId: ID!, memberIds: [ID]!): Group
+    deleteGroupMembers(groupId: ID!, memberIds: [ID]!): Group
   }
 `;
 
