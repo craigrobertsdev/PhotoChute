@@ -38,6 +38,11 @@ const typeDefs = gql`
     fileUrl: String
   }
 
+  type Premium {
+    session: ID
+  }
+
+
   type Query {
     me: User
     photos: [Photo]
@@ -55,6 +60,7 @@ const typeDefs = gql`
     createGroup(groupName: String!, userId: ID!): Group
     deleteSinglePhoto(photoId: ID!): ID
     deleteManyPhotos(photoIds: [ID]!): [ID]
+    buyPremium(premium: Int): Premium
   }
 `;
 

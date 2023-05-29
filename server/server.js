@@ -15,7 +15,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.post('/create-checkout-session', async (req, res) => {
-  console.log('you made it!!!!!!!!!!!!!!!!')
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',

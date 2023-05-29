@@ -3,6 +3,13 @@ const { AuthenticationError } = require("apollo-server-express");
 const { signToken } = require("../utils/auth");
 const { generateFileUploadUrlData, getBlobSasUri } = require("../utils/sasTokenGenerator");
 const { getSingleBlob } = require("../utils/blobStorage");
+const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY)
+
+const premiumAccounts = new Map([
+  [1, {price: 199, description: '' ,name: "Photo Enthusiast"}],
+  [2, {price: 599, description: 'photo2' ,name: "Social Butterfly"}],
+  [3, {price: 999, description: 'photo3' ,name: "Over Sharer"}],
+])
 
 const resolvers = {
   Query: {
@@ -70,6 +77,43 @@ const resolvers = {
         },
         { new: true }
       );
+    },
+
+    buyPremium: async (parent, {premium}, context) => {
+      console.log(context.headers.origin)
+      const url = new URL(context.headers.origin).origin;
+      const line_items = [];
+      
+      const premiumAccount = premiumAccounts.get(premium)
+      console.log(premiumAccount)
+      if(!premiumAccount){
+        throw 'invalid product int'
+      }
+
+      const product = await stripe.products.create({
+        name: premiumAccount.name,
+        description: premiumAccount.description,
+      });
+      const price = await stripe.prices.create({
+        product: product.id,
+        unit_amount: premiumAccount.price,
+        currency: 'aud',
+      });
+      line_items.push({
+        price: price.id,
+        quantity: 1
+      });
+      
+
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items,
+        mode: 'payment',
+        success_url: `${url}/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${url}/`
+      });
+
+      return { session: session.id };
     },
 
     addPhotoToGroup: async (parent, { photoId, groupId }) => {},

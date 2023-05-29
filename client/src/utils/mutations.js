@@ -84,3 +84,11 @@ export const DELETE_MANY_PHOTOS = gql`
     }
   }
 `;
+
+export const BUY_PREMIUM = gql`
+    mutation BuyPremium($premium: Int) {
+    buyPremium(premium: $premium) {
+      session
+    }
+  }
+`
