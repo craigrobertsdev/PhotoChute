@@ -316,6 +316,32 @@ const resolvers = {
         }
       );
     },
+
+    buyPremium: async (parent, {premium}, context) => {
+      console.log(context.headers.origin)
+      const url = new URL(context.headers.origin).origin;
+      const line_items = [];
+      
+      const premiumAccount = premiumAccounts.get(premium)
+      console.log(premiumAccount)
+      if(!premiumAccount){
+        throw 'invalid product int'
+      }
+
+      const product = await stripe.products.create({
+        name: premiumAccount.name,
+        description: premiumAccount.description,
+      });
+      const price = await stripe.prices.create({
+        product: product.id,
+        unit_amount: premiumAccount.price,
+        currency: 'aud',
+      });
+      line_items.push({
+        price: price.id,
+        quantity: 1
+      });
+    },
     //     singleUploadFile: async (parent, { username }, context) => {},
     //     saveBook: async (parent, { bookId, authors, description, title, image, link }, context) => {
     //       // if there is a user attached to context, we know they have already been authenticated via the authMiddleware function
