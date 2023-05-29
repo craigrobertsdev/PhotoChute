@@ -11,9 +11,9 @@ const { ObjectId } = require("mongoose").Types;
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY)
 
 const premiumAccounts = new Map([
-  [1, {price: 199, description: '' ,name: "Photo Enthusiast"}],
-  [2, {price: 599, description: 'photo2' ,name: "Social Butterfly"}],
-  [3, {price: 999, description: 'photo3' ,name: "Over Sharer"}],
+  [1, {price: 199, description: 'You can now be in up to 5 groups at anyone time and have the ability to upload 20 photos, this is a great option who likes sharing a few photos with friend or family' ,name: "Photo Enthusiast"}],
+  [2, {price: 599, description: 'You can now be in up to 10 groups at anyone time and have the ability to upload 35 photos, this is a great option who people who want to share lots of photos with lots of different people!' ,name: "Social Butterfly"}],
+  [3, {price: 999, description: 'You can now be in up to 20 groups at anyone time and have the ability to upload 50 photos, this account type is reserved for the type of person who loves sharing lots photos and memories with family and friends' ,name: "Over Sharer"}],
 ])
 
 const resolvers = {
