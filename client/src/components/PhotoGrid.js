@@ -25,6 +25,7 @@ const PhotoGrid = ({
     }
   };
 
+  console.log(thumbnails);
   return (
     <div className="photo-grid">
       {thumbnails.map((thumbnail, index) => (
@@ -51,7 +52,12 @@ const PhotoGrid = ({
                 Download
               </button>
               <button
-                className={`btn ${thumbnail.owner._id === currentUser ? "" : "hidden"}`}
+                className={`btn ${
+                  thumbnail.owner._id === currentUser || // the user is the person who uploaded the photo
+                  thumbnail.group.groupOwner._id === currentUser // the user is the owner of the group
+                    ? ""
+                    : "hidden"
+                }`}
                 onClick={(event) => onPhotoDelete(event, thumbnail)}>
                 Delete
               </button>

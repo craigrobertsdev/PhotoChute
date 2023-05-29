@@ -80,6 +80,11 @@ export const GET_PHOTOS_FOR_GROUP = gql`
           _id
           firstName
         }
+        group {
+          groupOwner {
+            _id
+          }
+        }
         serialisedFileName
         thumbnailUrl
       }

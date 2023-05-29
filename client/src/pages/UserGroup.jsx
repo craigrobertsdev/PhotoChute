@@ -3,7 +3,7 @@ import {
   DELETE_PHOTO,
   SAVE_PHOTO,
   ADD_GROUP_MEMBERS,
-  DELETE_GROUP_MEMBERS,
+  REMOVE_GROUP_MEMBERS,
 } from "../utils/mutations";
 import {
   GET_PHOTOS_FOR_GROUP,
@@ -41,7 +41,7 @@ const Group = () => {
   const [savePhoto] = useMutation(SAVE_PHOTO);
   const [deletePhoto] = useMutation(DELETE_PHOTO);
   const [addGroupMembers] = useMutation(ADD_GROUP_MEMBERS);
-  const [deleteGroupMembers] = useMutation(DELETE_GROUP_MEMBERS);
+  const [deleteGroupMembers] = useMutation(REMOVE_GROUP_MEMBERS);
   const { data: sasTokenData, error: tokenDataError } = useQuery(GET_AUTHENTICATION_TOKEN, {
     variables: {
       groupName: serialisedGroupName,
@@ -198,15 +198,17 @@ const Group = () => {
         memberIds: selectedFriends,
       },
     });
+    setSelectedFriends([]);
   };
 
-  const deleteMemberFromGroup = () => {
+  const handleRemoveGroupMember = () => {
     deleteGroupMembers({
       variables: {
         groupId,
         memberIds: selectedMembers,
       },
     });
+    setSelectedMembers([]);
   };
 
   const handleSelectFriend = (event, memberId) => {
@@ -266,6 +268,9 @@ const Group = () => {
       <div className={`add-member-pane ${memberPaneOpen ? "" : "hidden"}`}>
         <button className="btn mx-1 mb-2" onClick={handleAddGroupMember}>
           Add member to group
+        </button>
+        <button className="btn mx-1 mb-2" onClick={handleRemoveGroupMember}>
+          Remove member from group
         </button>
         <button className="btn mx-1 mb-2" onClick={toggleMemberPane}>
           Close

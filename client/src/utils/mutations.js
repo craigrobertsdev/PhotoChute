@@ -93,9 +93,9 @@ export const ADD_GROUP_MEMBERS = gql`
   }
 `;
 
-export const DELETE_GROUP_MEMBERS = gql`
-  mutation deleteGroupMembers($groupId: ID!, $memberIds: [ID]!) {
-    addGroupMembers(groupId: $groupId, memberIds: $memberIds) {
+export const REMOVE_GROUP_MEMBERS = gql`
+  mutation removeGroupMembers($groupId: ID!, $memberIds: [ID]!) {
+    removeGroupMembers(groupId: $groupId, memberIds: $memberIds) {
       _id
       members {
         firstName
