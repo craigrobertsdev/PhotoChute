@@ -80,7 +80,6 @@ h6 {
 }
 
 .img {
-justify-content: center;
 max-width: 100%;
 max-height: 100%;
 padding: 20px;
@@ -150,6 +149,18 @@ Link:hover {
   color: #47294c;
 }
 
+.bRadius {
+  border-radius: 20px;
+}
+
+.altHeading {
+ color: white;
+}
+
+.imageCont {
+  height: 700px;
+  text-align: right;
+}
 /* Copies */
 */
 *,
@@ -808,12 +819,6 @@ form .form-group {
   width: 100%;
   margin: 0.625rem 0;
 }
-
-input:focus {
-  border-color: #816f7d;
-}
-
-
 
 form select {
   -webkit-appearance: none;
