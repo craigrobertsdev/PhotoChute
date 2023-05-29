@@ -48,16 +48,29 @@ const resolvers = {
 
       const userGroup = await (
         await Group.findOne({ serialisedGroupName })
-      ).populate({
-        path: "photos",
-        populate: {
-          path: "owner",
+      ).populate([
+        {
+          path: "photos",
+          populate: {
+            path: "owner",
+          },
         },
-      });
+        {
+          path: "groupOwner",
+          populate: {
+            path: "friends",
+          },
+        },
+        { path: "members" },
+      ]);
+
+      console.log(userGroup.toJSON());
 
       if (!userGroup) {
         return new Error("No group could be found with that name");
       }
+
+      // const populatedUserGroup = await userGroup.populate("groupOwner members");
 
       if (
         !userGroup.members?.includes(context.user._id) &&
@@ -233,7 +246,35 @@ const resolvers = {
       const token = signToken(user);
       return { token, user };
     },
+    addGroupMembers: async (parent, { groupId, memberIds }, context) => {
+      if (!context.user) {
+        return new AuthenticationError("You must be signed in to create a group");
+      }
 
+      const group = await Group.findById(groupId);
+
+      if (!group) {
+        return new Error("Group not found");
+      }
+
+      if (!group.groupOwner.equals(context.user._id)) {
+        return new AuthenticationError("Only the owner of the group can add members");
+      }
+
+      const updatedGroup = await Group.findOneAndUpdate(
+        { _id: groupId },
+        {
+          $addToSet: { members: { $each: [...memberIds] } },
+        },
+        {
+          new: true,
+        }
+      );
+
+      console.log((await updatedGroup.populate("members")).toJSON());
+
+      return updatedGroup;
+    },
     //     singleUploadFile: async (parent, { username }, context) => {},
     //     saveBook: async (parent, { bookId, authors, description, title, image, link }, context) => {
     //       // if there is a user attached to context, we know they have already been authenticated via the authMiddleware function

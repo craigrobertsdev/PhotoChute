@@ -80,3 +80,15 @@ export const DELETE_PHOTO = gql`
     }
   }
 `;
+
+export const ADD_GROUP_MEMBERS = gql`
+  mutation addGroupMembers($groupId: ID!, $memberIds: [ID]!) {
+    addGroupMembers(groupId: $groupId, memberIds: $memberIds) {
+      _id
+      members {
+        firstName
+        lastName
+      }
+    }
+  }
+`;

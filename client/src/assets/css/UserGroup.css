@@ -1,3 +1,8 @@
+#group {
+  position: relative;
+  flex-grow: 1;
+}
+
 .header-container {
   display: flex;
   gap: 2rem;
@@ -5,9 +10,10 @@
   margin-bottom: 2rem;
 }
 
-.grid-container {
-  max-height: calc(200px * 3 + 5rem);
-  overflow-y: auto;
+.button-panel {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
 }
 
 .group-container {
@@ -20,11 +26,7 @@
 .members-container {
   flex-grow: 1;
   text-align: center;
-  padding: 2rem 0;
-}
-
-.upload-modal {
-  background: white;
+  padding: 1rem;
 }
 
 .progress-container {
@@ -38,7 +40,6 @@
   top: 0;
   left: 0;
   right: 0;
-  /* height: 200px; */
   z-index: 1;
   display: flex;
   flex-direction: column;
@@ -47,6 +48,29 @@
   background-color: #a0908d;
   list-style: none;
   padding: 2rem 5rem;
+}
+
+.add-member-pane {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 2;
+  background-color: #a0908d;
+  padding: 2rem;
+}
+
+.add-member-pane ul {
+  list-style-type: none;
+  display: flex;
+  flex-direction: column;
+  padding-left: 0; /* resets reset css file */
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.add-member-pane ul li {
+  user-select: none;
 }
 
 .hidden {
@@ -70,4 +94,9 @@
   justify-content: center;
   align-items: center;
   gap: 0.5rem;
+}
+
+.selected {
+  background: #c3a9b7;
+  border-radius: 20px;
 }

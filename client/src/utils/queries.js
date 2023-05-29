@@ -56,11 +56,19 @@ export const GET_PHOTOS_FOR_GROUP = gql`
       _id
       name
       members {
-        username
+        _id
+        firstName
+        lastName
       }
       groupOwner {
         _id
-        username
+        firstName
+        lastName
+        friends {
+          _id
+          firstName
+          lastName
+        }
       }
       photos {
         _id
@@ -70,7 +78,7 @@ export const GET_PHOTOS_FOR_GROUP = gql`
         fileSize
         owner {
           _id
-          username
+          firstName
         }
         serialisedFileName
         thumbnailUrl
