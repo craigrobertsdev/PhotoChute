@@ -7,7 +7,6 @@ import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Signup from "./pages/Signup";
 import CreateGroupForm from "./pages/CreateGroupForm";
-import Profile from "./pages/Profile";
 import User from "./pages/UserPage"
 import UserGroup from "./pages/UserGroup";
 import Header from "./components/Header";
