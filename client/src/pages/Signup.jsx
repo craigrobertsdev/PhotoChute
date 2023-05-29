@@ -131,6 +131,7 @@ const Signup = () => {
             )}
 
             {error && (
+              <form>
               <div className="my-3 p-3 bg-danger text-center text-white bRadius">
                 {`Something went wrong, please try again!`}
               </div>
