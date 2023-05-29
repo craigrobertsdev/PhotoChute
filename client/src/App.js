@@ -48,6 +48,7 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/create-group" element={<CreateGroupForm />} />
+            <Route path="/user" element={<User />} />
             <Route path="/group" element={<UserGroup />} />
             <Route path="*" element={<h1 className="display-2">Wrong page!</h1>} />
           </Routes>

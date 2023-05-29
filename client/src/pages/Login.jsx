@@ -71,6 +71,27 @@ const Login = (props) => {
                   value={formState.password}
                   onChange={handleChange}
                 />
+                  <label htmlFor="email">Email:</label>
+                  <input
+                    className="form-input"
+                    // placeholder="email"
+                    name="email"
+                    type="email"
+                    value={formState.email}
+                    onChange={handleChange}
+                  />
+              </div>
+              <div>
+                  <label htmlFor="password">Password:</label>
+                  <input
+                    className="form-input"
+                    // placeholder="********"
+                    name="password"
+                    type="password"
+                    value={formState.password}
+                    onChange={handleChange}
+                  />
+
               </div>
               <div className="submitBtn">
                 <button className="btn" style={{ cursor: "pointer" }} type="submit">
@@ -88,7 +109,12 @@ const Login = (props) => {
             </form>
           )}
 
-          {error && <div className="my-3 p-3 bg-danger text-white">{error.message}</div>}
+            {error && (
+              <div className="my-3 p-3 bg-danger text-center text-white bRadius">
+              {`Something went wrong, please try again!`}
+            </div>
+            )}
+
         </div>
       </div>
     </main>
