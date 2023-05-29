@@ -4,13 +4,14 @@ import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from "@ap
 import { setContext } from "@apollo/client/link/context";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import Profile from "./pages/Profile";
 import Signup from "./pages/Signup";
 import CreateGroupForm from "./pages/CreateGroupForm";
-import Group from "./pages/Group";
-import Premium from "./pages/Premium";
+import User from "./pages/UserPage"
+import UserGroup from "./pages/UserGroup";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "bootstrap/dist/css/bootstrap.min.css";
 
 // construct the GraphQL endpoint
 const httpLink = createHttpLink({
@@ -42,11 +43,12 @@ function App() {
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/me" element={<Profile />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/create-group" element={<CreateGroupForm />} />
             <Route path="/group" element={<Group />} />
-            <Route path="/Premium" element={<Premium />} />
             <Route path="*" element={<h1 className="display-2">Wrong page!</h1>} />
           </Routes>
           <Footer />

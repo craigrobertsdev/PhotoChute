@@ -1,6 +1,9 @@
-const { BlobServiceClient, BlockBlobClient } = require("@azure/storage-blob");
+const {
+  BlobServiceClient,
+  BlockBlobClient,
+  StorageSharedKeyCredential,
+} = require("@azure/storage-blob");
 const { v1: uuidv1 } = require("uuid");
-const generateFileUploadUrlData = require("./sasTokenGenerator");
 // may need this in prod when server is running from my Azure details, rather than a SAS key
 // const { DefaultAzureCredential } = require("@azure/identity");
 
@@ -24,7 +27,6 @@ async function createBlobStorageContainer(groupName) {
   const containerClient = blobServiceClient.getContainerClient(containerName);
   // create the container
   const createContainerResponse = await containerClient.create();
-
 
   console.log(
     `Container was created successfully.\n\trequestId:${createContainerResponse.requestId}\n\tURL: ${containerClient.url}`
@@ -52,86 +54,41 @@ function serialiseGroupName(groupName) {
  * @returns a promise that resolves when the file is deleted
  */
 async function deleteBlob(containerName, blobName) {
-  const blockBlobClient = new BlockBlobClient(
-    process.env.CONNECTION_STRING_SAS,
-    containerName,
-    blobName
-  );
+  const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
+  const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
 
-  try {
-    blockBlobClient.delete({
-      deleteSnapshots: "include",
-    });
-  } catch (err) {
-    console.error(err);
-  }
-}
+  const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
 
-/**
- * @description Deletes each file listed in the blobNames array. Does not return a value or wait for the deletion to finish. Sends of a request to the storage account then returns.
- * @param {string} containerName The name of the container in which the blobs to be deleted are located
- * @param {[string]} blobNames the names of the blobs to be deleted
- */
-async function deleteManyBlobs(containerName, blobNames) {
-  try {
-    // iterate over the blobNames array and delete each blob
-    for (const blobName of blobNames) {
-      const blockBlobClient = new BlockBlobClient(
-        process.env.CONNECTION_STRING_SAS,
-        containerName,
-        blobName
-      );
-
-      blockBlobClient.delete({
-        deleteSnapshots: "include",
-      });
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-/**
- *
- * @param {string} blobName the name of the blob requested
- * @returns {string} A signed URL to the blob to enable viewing or downloading of the file
- */
-async function getSingleBlob(containerName, blobName) {
-  const blobServiceClient = BlobServiceClient.fromConnectionString(
-    process.env.CONNECTION_STRING_SAS
+  const blobServiceClient = new BlobServiceClient(
+    "https://photochute.blob.core.windows.net",
+    sharedKeyCredential
   );
 
   const containerClient = blobServiceClient.getContainerClient(containerName);
 
-  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+  // Create blob client from container client
+  const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
 
-  const sasToken = await generateFileUploadUrlData("r");
+  const thumbnailClient = blobServiceClient.getContainerClient("thumbnails");
 
-  return `${blockBlobClient.url}${sasToken}`;
-}
-
-/**
- * @param {string} containerName The name of the container in which the blobs to be obtained are located
- * @param {[string]} blobNames an array of requested blob names
- * @returns {[{blobName: string, url: string}]} an array of objects containing the blob name and signed url for each files in the request
- */
-async function getManyBlobs(containerName, blobNames) {
-  const response = [];
-
-  for (const blobName of blobNames) {
-    response.push({
-      blobName,
-      url: getSingleBlob(containerName, blobName),
+  const thumbnailBlobClient = await thumbnailClient.getBlockBlobClient(blobName);
+  try {
+    const deletePhoto = blockBlobClient.delete({
+      deleteSnapshots: "include",
     });
-  }
 
-  return response;
+    const deleteThumbnail = thumbnailBlobClient.delete({
+      deleteSnapshots: "include",
+    });
+
+    const result = await Promise.all([deletePhoto, deleteThumbnail]);
+    console.log(result);
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 module.exports = {
   createBlobStorageContainer,
   deleteBlob,
-  deleteManyBlobs,
-  getSingleBlob,
-  getManyBlobs,
 };

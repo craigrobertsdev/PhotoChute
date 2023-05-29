@@ -2,27 +2,40 @@ import React, { useState } from "react";
 import { Button, Form, Container, Row, Col } from "react-bootstrap";
 import { CREATE_GROUP } from "../utils/mutations";
 import { useMutation } from "@apollo/client";
+import { useNavigate } from "react-router-dom";
 
 const CreateGroupForm = (groupName) => {
   const [searchInput, setSearchInput] = useState("");
   const [groupDetails, setGroupDetails] = useState();
+  const [validationError, setValidationError] = useState(false);
   const [createGroup] = useMutation(CREATE_GROUP);
+  const navigate = useNavigate();
+  const groupNameRegex = /^[a-zA-Z0-9]+{3-20}$/; // can only contain letters or numbers and must be between 3 and 20 characters long
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     try {
       console.log(searchInput);
       const response = await createGroup({
-        variables: { groupName: searchInput, userId: "64643d485dae24e94331f29d" },
+        variables: { groupName: searchInput.trim() },
       });
 
       console.log(response.data);
-
-      setGroupDetails(response.data.createGroup);
     } catch (err) {
       console.error(JSON.stringify(err, null, 2));
     }
     setSearchInput("");
+  };
+
+  const validateGroupName = (event) => {
+    const value = event.target.value;
+
+    // regex is due to limitations of azure container naming requirements
+    if (!value || value.length < 3 || value.length > 30 || value.match(/--/)) {
+      setValidationError(true);
+    } else {
+      setValidationError(false);
+    }
   };
 
   return (
@@ -38,15 +51,22 @@ const CreateGroupForm = (groupName) => {
                 onChange={(e) => setSearchInput(e.target.value)}
                 type="text"
                 size="lg"
+                onBlur={validateGroupName}
                 placeholder="Enter group name"
               />
             </Col>
             <Col xs={12} md={4}>
-              <Button type="submit" variant="success" size="lg">
+              <Button type="submit" variant="success" size="lg" disabled={validationError}>
                 Create Group
               </Button>
             </Col>
           </Row>
+          {validationError && (
+            <p className="text-red">
+              Group name must be between 3 and 30 characters long and not include consecutive '-'
+              characters
+            </p>
+          )}
         </Form>
       </Container>
 
@@ -54,7 +74,7 @@ const CreateGroupForm = (groupName) => {
         <Row>
           <p>{groupDetails && groupDetails.name}</p>
         </Row>
-        <Row>{groupDetails && groupDetails.members.map((member) => <p>{member.name}</p>)}</Row>
+        <Row>{groupDetails && groupDetails.members?.map((member) => <p>{member.name}</p>)}</Row>
         <Row>
           <p>{groupDetails && groupDetails.photos}</p>
         </Row>

@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
-import { useMutation } from '@apollo/client';
-import { ADD_USER } from '../utils/mutations';
+import { useMutation } from "@apollo/client";
+import { ADD_USER } from "../utils/mutations";
 
-import Auth from '../utils/auth';
+import Auth from "../utils/auth";
 
 const Signup = () => {
   const [formState, setFormState] = useState({
-    username: '',
-    email: '',
-    password: '',
+    username: "",
+    email: "",
+    password: "",
   });
   const [addUser, { error, data }] = useMutation(ADD_USER);
 
@@ -40,7 +40,7 @@ const Signup = () => {
 
   return (
     <main className="flex-row justify-center mb-4">
-      <div className="col-8">
+      <div className="col-6">
           <div>
             {data ? (
               <p>
@@ -50,7 +50,7 @@ const Signup = () => {
             ) : (
               <form onSubmit={handleFormSubmit}>
                 <div>
-                  <label for="firstName">First Name:</label>
+                  <label htmlFor="firstName">First Name:</label>
                   <input
                     className="form-input"
                     // placeholder="Username"
@@ -61,7 +61,7 @@ const Signup = () => {
                   />
                 </div>
                 <div>
-                  <label for="lastName">Last Name:</label>
+                  <label htmlFor="lastName">Last Name:</label>
                   <input
                     className="form-input"
                     // placeholder="Username"
@@ -72,7 +72,7 @@ const Signup = () => {
                   />
                 </div>
                 <div>
-                  <label for="username">Username:</label>
+                  <label htmlFor="username">Username:</label>
                   <input
                     className="form-input"
                     // placeholder="Username"
@@ -83,7 +83,7 @@ const Signup = () => {
                   />
                 </div>
                 <div>
-                  <label for="email">Email:</label>
+                  <label htmlFor="email">Email:</label>
                   <input
                     className="form-input"
                     // placeholder="email"
@@ -94,7 +94,7 @@ const Signup = () => {
                   />
                 </div>
                 <div>
-                  <label for="phoneNumber">Phone Number:</label>
+                  <label htmlFor="phoneNumber">Phone Number:</label>
                   <input
                     className="form-input"
                     // placeholder="phone number"
@@ -105,7 +105,7 @@ const Signup = () => {
                   />
                 </div>
                 <div>
-                  <label for="password">Password:</label>
+                  <label htmlFor="password">Password:</label>
                   <input
                     className="form-input"
                     // placeholder="********"
@@ -131,12 +131,40 @@ const Signup = () => {
             )}
 
             {error && (
-              <div className="my-3 p-3 bg-danger text-white">
-                {error.message}
+              <form>
+              <div className="my-3 p-3 bg-danger text-center text-white bRadius">
+                {`Something went wrong, please try again!`}
               </div>
-            )}
-          </div>
+              <div>
+                <label for="password">Password:</label>
+                <input
+                  className="form-input"
+                  // placeholder="********"
+                  name="password"
+                  type="password"
+                  value={formState.password}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="submitBtn">
+                <button className="btn" style={{ cursor: "pointer" }} type="submit">
+                  Submit
+                </button>
+              </div>
+              <div className="loginLink">
+                <p>
+                  Already have an account?
+                  <Link className="m-2" to="/login">
+                    Login Here!
+                  </Link>
+                </p>
+              </div>
+            </form>
+          )}
+
+          {error && <div className="my-3 p-3 bg-danger text-white">{error.message}</div>}
         </div>
+      </div>
     </main>
   );
 };

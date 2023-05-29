@@ -1,0 +1,36 @@
+.photo-grid {
+  width: 100%;
+  margin: auto;
+  flex: 2 1 auto;
+  display: flex;
+  justify-content: start;
+  flex-wrap: wrap;
+  row-gap: 2rem;
+  column-gap: 2rem;
+}
+
+.thumbnail-container {
+  width: 200px;
+}
+
+.thumbnail-button {
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.thumbnail {
+  max-width: 100%;
+}
+
+.button-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.loading {
+  display: none;
+}

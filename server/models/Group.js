@@ -10,7 +10,7 @@ const groupSchema = new Schema(
       validate: {
         validator: validateGroupName,
         message:
-          "Group name must be no more than 30 characters long and not include consecutive '-' characters",
+          "Group name must be between 3 and 30 characters long and not include consecutive '-' characters",
       },
     },
     members: [
@@ -32,18 +32,31 @@ const groupSchema = new Schema(
     containerUrl: {
       type: String,
     },
+    serialisedGroupName: {
+      type: String,
+    },
+    maxPhotos: {
+      type: Number,
+      default: 15,
+    },
   }, // set this to use virtual below
   {
     toJSON: {
       virtuals: true,
+      getters: true,
     },
   }
 );
+
+groupSchema.virtual("photoCount").get(function () {
+  return this.photos.length;
+});
 
 groupSchema.pre("save", async function (next) {
   if (this.isNew) {
     try {
       this.containerUrl = await createBlobStorageContainer(this.name);
+      this.serialisedGroupName = this.containerUrl.slice(this.containerUrl.lastIndexOf("/") + 1);
     } catch (err) {
       console.error(JSON.stringify(err, null, 2));
       dbLogger.error(JSON.stringify(err, null, 2));
@@ -65,11 +78,11 @@ groupSchema.pre("deleteOne", async function (next) {
  * @returns true if input conforms to the required naming convention, false if not
  */
 function validateGroupName(name) {
-  if (name.length > 30) return false;
+  if (name.length < 3 || name.length > 30) return false;
   // TODO
   // implement regex to determine 2 consecutive '-' characters.
 
-  return !name.match(/[-]{2}/);
+  return !name.match(/--/);
 }
 
 const Group = model("Group", groupSchema);

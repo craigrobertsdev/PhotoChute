@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { useLazyQuery } from "@apollo/client";
+import { useLazyQuery, useMutation } from "@apollo/client";
 import uploadFileToBlob from "../utils/blobStorage";
 import { GET_FILE_UPLOAD_URL } from "../utils/queries";
+import { SAVE_PHOTO } from "../utils/mutations";
+
 const Azure = () => {
   const [fileName, setFileName] = useState("");
   const [fileSelected, setFileSelected] = useState();
   const [uploading, setUploading] = useState(false);
   const [getFileUploadUrl] = useLazyQuery(GET_FILE_UPLOAD_URL);
   const [fileTypeValidationError, setFileTypeValidationError] = useState(false);
+  const [savePhoto] = useMutation(SAVE_PHOTO);
 
   const onFileChange = (event) => {
     // capture file into state
@@ -26,7 +29,8 @@ const Azure = () => {
       setUploading(true);
       try {
         // TODO - find a way to get the current group's containerName instead of hard coded value
-        const groupName = "images";
+        const groupName = "the-walruses-a4e50880-faa3-11ed-a777-394dc37315ec";
+
         const urlData = await getFileUploadUrl({
           variables: {
             groupName,
@@ -35,13 +39,10 @@ const Azure = () => {
         });
 
         const { fileUrl } = urlData.data.getFileUploadUrl;
-        console.log(urlData);
-        console.log(fileUrl);
-        // get url for uploading file to Azure blob storage
 
         // *** UPLOAD TO AZURE STORAGE ***
         const fileUploadUrl = await uploadFileToBlob(fileSelected, fileUrl);
-        console.log(fileUrl);
+
         // reset state/form
       } catch (error) {
         console.log(JSON.stringify(error, null, 2));

@@ -25,36 +25,40 @@ export const ADD_USER = gql`
 `;
 
 export const CREATE_GROUP = gql`
-  mutation createGroup($groupName: String!, $userId: ID!) {
-    createGroup(groupName: $groupName, userId: $userId) {
+  mutation createGroup($groupName: String!) {
+    createGroup(groupName: $groupName) {
       name
-      members {
+      groupOwner {
         _id
         username
         email
       }
-      photos {
-        _id
-      }
       containerUrl
+      serialisedGroupName
     }
   }
 `;
 
 export const SAVE_PHOTO = gql`
-  mutation SavePhoto($fileName: String!, $url: String!, $fileSize: Int!, $owner: ID!) {
-    savePhoto(fileName: $fileName, url: $url, fileSize: $fileSize, owner: $owner) {
+  mutation SavePhoto(
+    $fileName: String!
+    $url: String!
+    $fileSize: Float!
+    $ownerId: ID!
+    $groupId: ID!
+    $serialisedFileName: String!
+  ) {
+    savePhoto(
+      fileName: $fileName
+      url: $url
+      fileSize: $fileSize
+      ownerId: $ownerId
+      groupId: $groupId
+      serialisedFileName: $serialisedFileName
+    ) {
       _id
-      username
-    }
-  }
-`;
-
-export const ADD_PHOTO = gql`
-  mutation AddPhotoToGroup($photoId: ID!, $groupId: ID!) {
-    addPhotoToGroup(photoId: $photoId, groupId: $groupId) {
-      _id
-      name
+      fileName
+      url
     }
   }
 `;
@@ -69,18 +73,34 @@ export const GET_FILE_UPLOAD_URL = gql`
   }
 `;
 
-export const DELETE_SINGLE_PHOTO = gql`
-  mutation deleteSinglePhoto($photoId: ID!) {
-    deleteSinglePhoto(photoId: $photoId) {
+export const DELETE_PHOTO = gql`
+  mutation deleteSinglePhoto($groupName: String!, $photoId: ID!) {
+    deletePhoto(groupName: $groupName, photoId: $photoId) {
       _id
     }
   }
 `;
 
-export const DELETE_MANY_PHOTOS = gql`
-  mutation deleteManyPhotos($photoIds: [ID]!) {
-    deleteManyPhotos(photoIds: $photoIds) {
+export const ADD_GROUP_MEMBERS = gql`
+  mutation addGroupMembers($groupId: ID!, $memberIds: [ID]!) {
+    addGroupMembers(groupId: $groupId, memberIds: $memberIds) {
       _id
+      members {
+        firstName
+        lastName
+      }
+    }
+  }
+`;
+
+export const REMOVE_GROUP_MEMBERS = gql`
+  mutation removeGroupMembers($groupId: ID!, $memberIds: [ID]!) {
+    removeGroupMembers(groupId: $groupId, memberIds: $memberIds) {
+      _id
+      members {
+        firstName
+        lastName
+      }
     }
   }
 `;

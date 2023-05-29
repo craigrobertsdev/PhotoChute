@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useMutation } from '@apollo/client';
-import { LOGIN_USER } from '../utils/mutations';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { useMutation } from "@apollo/client";
+import { LOGIN_USER } from "../utils/mutations";
 
-import Auth from '../utils/auth';
+import Auth from "../utils/auth";
 
 const Login = (props) => {
-  const [formState, setFormState] = useState({ email: '', password: '' });
+  const [formState, setFormState] = useState({ email: "", password: "" });
   const [login, { error, data }] = useMutation(LOGIN_USER);
 
   // update state based on form input changes
@@ -35,24 +35,23 @@ const Login = (props) => {
 
     // clear form values
     setFormState({
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     });
   };
 
   return (
     <main className="flex-row justify-center mb-4">
-      <div className="col-8">
+      <div className="col-6">
         <div>
           {data ? (
             <p>
-            Success! You may now head{' '}
-            <Link to="/">back to the homepage.</Link>
+              Success! You may now head <Link to="/">back to the homepage.</Link>
             </p>
           ) : (
             <form onSubmit={handleFormSubmit}>
               <div>
-                  <label for="email">Email:</label>
+                  <label htmlFor="email">Email:</label>
                   <input
                     className="form-input"
                     // placeholder="email"
@@ -63,7 +62,7 @@ const Login = (props) => {
                   />
               </div>
               <div>
-                  <label for="password">Password:</label>
+                  <label htmlFor="password">Password:</label>
                   <input
                     className="form-input"
                     // placeholder="********"
@@ -72,27 +71,30 @@ const Login = (props) => {
                     value={formState.password}
                     onChange={handleChange}
                   />
+
               </div>
               <div className="submitBtn">
-                  <button
-                    className="btn"
-                    style={{ cursor: 'pointer' }}
-                    type="submit"
-                  >
-                    Submit
-                  </button>
-                </div>
-                <div className='loginLink'>
-                  <p>Don't have an account?<Link className="m-2" to="/signup">Sign up Here!</Link></p>
+                <button className="btn" style={{ cursor: "pointer" }} type="submit">
+                  Submit
+                </button>
+              </div>
+              <div className="loginLink">
+                <p>
+                  Don't have an account?
+                  <Link className="m-2" to="/signup">
+                    Sign up Here!
+                  </Link>
+                </p>
               </div>
             </form>
-            )}
+          )}
 
             {error && (
-              <div className="my-3 p-3 bg-danger text-white">
-                {error.message}
-              </div>
+              <div className="my-3 p-3 bg-danger text-center text-white bRadius">
+              {`Something went wrong, please try again!`}
+            </div>
             )}
+
         </div>
       </div>
     </main>
