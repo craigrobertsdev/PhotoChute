@@ -6,12 +6,37 @@ const { ApolloServer } = require("apollo-server-express");
 const { typeDefs, resolvers } = require("./schemas/index");
 const { authMiddleware } = require("./utils/auth");
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY)
+const {premiumAccounts} = require('./utils/stripeStore')
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+app.post('/create-checkout-session', async (req, res) => {
+  console.log('you made it!!!!!!!!!!!!!!!!')
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items: req.body.items.map(item => {
+        const premiumAccount = premiumAccounts.get(item.id)
+        return {
+          price_data: {
+            currency: 'aud',
+            product_data: {
+              name: premiumAccount.class
+            },
+            unit_amount: premiumAccount.price
+          },
+          quantity: 1
+        }
+      }),
+      success_url: `http://localhost:3000/`,
+      cancel_url: `http://localhost:3000/`,
+    })
+    res.redirect(303, session.url);
+})
 
 // configure our GraphQL server with our authentication middleware as the context
 const server = new ApolloServer({

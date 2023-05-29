@@ -1,21 +1,24 @@
 import React from 'react';
-var premiumSelection = ''
-const postFunction
+
 
 const premiumSelector = async (selection) => {
-    premiumSelection = { id: (selection), quantity: 1 }
-    
-    const postFunction = await fetch('http://localhost:3000/checkout', {
+
+    fetch('http://localhost:3001/create-checkout-session', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            item: premiumSelection
-        })
+            items: selection,
+        }),
     })
     .then(res => {
         if (res.ok) return res.json()
+        return res.json().then(json => Promise.reject(json))
+    }).then (({ linkToStripe }) => {
+        window.location = linkToStripe
+    }).catch(err => {
+        console.log(err)
     })
 }
 
