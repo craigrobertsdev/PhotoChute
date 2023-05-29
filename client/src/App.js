@@ -12,6 +12,7 @@ import UserGroup from "./pages/UserGroup";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import "bootstrap/dist/css/bootstrap.min.css";
+import Premium from "./pages/Premium";
 
 // construct the GraphQL endpoint
 const httpLink = createHttpLink({
@@ -48,7 +49,9 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/create-group" element={<CreateGroupForm />} />
-            <Route path="/group" element={<Group />} />
+            <Route path="/user" element={<User />} />
+            <Route path="/group" element={<UserGroup />} />
+            <Route path="/premium" element={<Premium />} />
             <Route path="*" element={<h1 className="display-2">Wrong page!</h1>} />
           </Routes>
           <Footer />

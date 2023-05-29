@@ -246,13 +246,6 @@ const resolvers = {
       return deletedPhoto;
     },
 
-    addPhotoToGroup: async (parent, { photoId, groupId }) => {},
-
-    deleteSinglePhoto: async (parent, { photoId }, context) => {},
-
-
-    deleteManyPhotos: async (parent, { photoIds }, context) => {},
-
     addFriend: async (parent, { username, email, password }) => {
       const user = await User.create({ username, phone });
       const token = signToken(user);

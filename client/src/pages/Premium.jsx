@@ -15,6 +15,7 @@ const Premium = () => {
             });
 
             stripePromise.then((res) => {
+                console.log(data.buyPremium)
                 res.redirectToCheckout({ sessionId: data.buyPremium.session });
             });
       
