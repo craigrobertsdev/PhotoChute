@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { DELETE_PHOTO, SAVE_PHOTO, ADD_GROUP_MEMBERS } from "../utils/mutations";
+import {
+  DELETE_PHOTO,
+  SAVE_PHOTO,
+  ADD_GROUP_MEMBERS,
+  DELETE_GROUP_MEMBERS,
+} from "../utils/mutations";
 import {
   GET_PHOTOS_FOR_GROUP,
   GET_FILE_UPLOAD_URL,
@@ -17,6 +22,7 @@ import { ProgressBar } from "react-bootstrap";
 const Group = () => {
   const userId = auth.getProfile().data._id;
   const [selectedFile, setSelectedFile] = useState();
+  const [selectedFriends, setSelectedFriends] = useState([]);
   const [selectedMembers, setSelectedMembers] = useState([]);
   const [availableFriends, setAvailableFriends] = useState([]);
   const [uploading, setUploading] = useState(false);
@@ -35,6 +41,7 @@ const Group = () => {
   const [savePhoto] = useMutation(SAVE_PHOTO);
   const [deletePhoto] = useMutation(DELETE_PHOTO);
   const [addGroupMembers] = useMutation(ADD_GROUP_MEMBERS);
+  const [deleteGroupMembers] = useMutation(DELETE_GROUP_MEMBERS);
   const { data: sasTokenData, error: tokenDataError } = useQuery(GET_AUTHENTICATION_TOKEN, {
     variables: {
       groupName: serialisedGroupName,
@@ -161,11 +168,11 @@ const Group = () => {
     }
   };
 
-  const handleDownloadPhoto = async (event, fileName) => {
+  const handleDownloadPhoto = async (event, serialisedFileName) => {
     const signedUrl = await getSignedUrl({
       variables: {
         groupName: serialisedGroupName,
-        fileName,
+        serialisedFileName,
       },
     });
 
@@ -177,7 +184,7 @@ const Group = () => {
         var url = window.URL.createObjectURL(blob);
         var a = document.createElement("a");
         a.href = url;
-        a.download = fileName;
+        a.download = serialisedFileName;
         document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
         a.click();
         a.remove(); //afterwards we remove the element again
@@ -188,9 +195,26 @@ const Group = () => {
     addGroupMembers({
       variables: {
         groupId,
+        memberIds: selectedFriends,
+      },
+    });
+  };
+
+  const deleteMemberFromGroup = () => {
+    deleteGroupMembers({
+      variables: {
+        groupId,
         memberIds: selectedMembers,
       },
     });
+  };
+
+  const handleSelectFriend = (event, memberId) => {
+    if (selectedFriends.includes(memberId)) {
+      setSelectedFriends(selectedFriends.filter((member) => member !== memberId));
+    } else {
+      setSelectedFriends((prev) => [...prev, memberId]);
+    }
   };
 
   const handleSelectMember = (event, memberId) => {
@@ -246,11 +270,22 @@ const Group = () => {
         <button className="btn mx-1 mb-2" onClick={toggleMemberPane}>
           Close
         </button>
-        <h4 className="text-center">Friends</h4>
+        <h4 className="text-center">Available Friends</h4>
         <ul>
           {availableFriends.map((member, index) => (
             <div
               key={`selectedMember-${member._id}`}
+              className={`mb-2 ${selectedFriends?.includes(member._id) ? "selected" : ""}`}
+              onClick={(event) => handleSelectFriend(event, member._id)}>
+              <li>{member.firstName}</li>
+            </div>
+          ))}
+        </ul>
+        <h4 className="text-center">Current Members</h4>
+        <ul>
+          {group.getPhotosForGroup.members.map((member, index) => (
+            <div
+              key={`groupMember-${member._id}`}
               className={`mb-2 ${selectedMembers?.includes(member._id) ? "selected" : ""}`}
               onClick={(event) => handleSelectMember(event, member._id)}>
               <li>{member.firstName}</li>

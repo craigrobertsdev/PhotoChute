@@ -47,7 +47,7 @@ const PhotoGrid = ({
             <div className="button-row">
               <button
                 className="btn"
-                onClick={(event) => onPhotoDownload(event, thumbnail.fileName)}>
+                onClick={(event) => onPhotoDownload(event, thumbnail.serialisedFileName)}>
                 Download
               </button>
               <button

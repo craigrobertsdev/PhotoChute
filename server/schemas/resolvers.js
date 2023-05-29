@@ -70,12 +70,10 @@ const resolvers = {
         return new Error("No group could be found with that name");
       }
 
-      // const populatedUserGroup = await userGroup.populate("groupOwner members");
+      const groupMemberIds = userGroup.members.map((member) => member._id);
+      const memberInGroup = groupMemberIds.filter((id) => id.equals(context.user._id));
 
-      if (
-        !userGroup.members?.includes(context.user._id) &&
-        !userGroup.groupOwner._id.equals(context.user._id)
-      ) {
+      if (!memberInGroup.length && !userGroup.groupOwner._id.equals(context.user._id)) {
         return new AuthenticationError("You are not a member of this group");
       }
 
@@ -251,6 +249,39 @@ const resolvers = {
         return new AuthenticationError("You must be signed in to create a group");
       }
 
+      if (!memberIds.length) {
+        return;
+      }
+      const group = await Group.findById(groupId);
+
+      if (!group) {
+        return new Error("Group not found");
+      }
+
+      if (!group.groupOwner.equals(context.user._id)) {
+        return new AuthenticationError("Only the owner of the group can add members");
+      }
+
+      const updatedGroup = await Group.findOneAndUpdate(
+        { _id: groupId },
+        {
+          $pull: { members: { $each: [...memberIds] } },
+        },
+        {
+          new: true,
+        }
+      );
+
+      console.log((await updatedGroup.populate("members")).toJSON());
+
+      return updatedGroup;
+    },
+
+    deleteGroupMembers: async (parent, { groupId, memberIds }, context) => {
+      if (!context.user) {
+        return new AuthenticationError("You must be signed in to create a group");
+      }
+
       const group = await Group.findById(groupId);
 
       if (!group) {
@@ -270,10 +301,6 @@ const resolvers = {
           new: true,
         }
       );
-
-      console.log((await updatedGroup.populate("members")).toJSON());
-
-      return updatedGroup;
     },
     //     singleUploadFile: async (parent, { username }, context) => {},
     //     saveBook: async (parent, { bookId, authors, description, title, image, link }, context) => {

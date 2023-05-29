@@ -92,3 +92,15 @@ export const ADD_GROUP_MEMBERS = gql`
     }
   }
 `;
+
+export const DELETE_GROUP_MEMBERS = gql`
+  mutation deleteGroupMembers($groupId: ID!, $memberIds: [ID]!) {
+    addGroupMembers(groupId: $groupId, memberIds: $memberIds) {
+      _id
+      members {
+        firstName
+        lastName
+      }
+    }
+  }
+`;
