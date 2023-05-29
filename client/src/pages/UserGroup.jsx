@@ -60,7 +60,6 @@ const Group = () => {
 
       // filter out the group owner's friends who are already in the group by their Id
       const groupMemberIds = group.getPhotosForGroup.members.map((member) => member._id);
-      //
       const friendsNotInGroup = group.getPhotosForGroup.groupOwner.friends.filter((friend) => {
         return !groupMemberIds.includes(friend._id);
       });
