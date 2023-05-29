@@ -66,6 +66,7 @@ const Profile = () => {
           <Link className="homeJoin m-2" to="/User">Cancel</Link>
           </div>
         </form>
+
       </div>
     </div>
   );

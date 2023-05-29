@@ -1,11 +1,9 @@
 import React from "react";
-import { Link } from 'react-router-dom';
-import HomeImage from '../assets/images/home-image.jpg';
-import Signup from '../pages/Signup';
-
+import { Link } from "react-router-dom";
+import HomeImage from "../assets/images/home-image.jpg";
+import Signup from "../pages/Signup";
 
 const Home = () => {
-
   return (
     <div className="body row mx-4">
         <div className="col">
@@ -21,8 +19,7 @@ const Home = () => {
         </Link>
       </div>
     </div>
-  )
+  );
 };
 
 export default Home;
-    

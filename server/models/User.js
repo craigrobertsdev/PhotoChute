@@ -3,6 +3,14 @@ const bcrypt = require("bcrypt");
 
 const userSchema = new Schema(
   {
+    firstName: {
+      type: String,
+      require: true,
+    },
+    lastName: {
+      type: String,
+      require: true,
+    },
     username: {
       type: String,
       required: true,
@@ -28,6 +36,12 @@ const userSchema = new Schema(
       {
         type: Schema.Types.ObjectId,
         ref: "Group",
+      },
+    ],
+    friends: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "User",
       },
     ],
   },
