@@ -55,9 +55,6 @@ const Group = () => {
     variables: { serialisedGroupName },
   });
 
-  if (group) {
-    console.log("group", group);
-  }
   const [getSignedUrl] = useLazyQuery(GET_SIGNED_URL);
 
   useEffect(() => {
@@ -81,9 +78,7 @@ const Group = () => {
   const handleDeletePhoto = async (event, thumbnail) => {
     event.preventDefault();
 
-    console.log(thumbnail);
-
-    const deletedPhotoResponse = await deletePhoto({
+    await deletePhoto({
       variables: {
         groupName: serialisedGroupName,
         photoId: thumbnail._id,
@@ -91,8 +86,6 @@ const Group = () => {
     });
 
     window.location.reload();
-
-    console.log(deletedPhotoResponse);
   };
 
   const onFileChange = (event) => {

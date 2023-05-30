@@ -25,7 +25,6 @@ const PhotoGrid = ({
     }
   };
 
-  console.log(thumbnails);
   return (
     <div className="photo-grid">
       {thumbnails.map((thumbnail, index) => (

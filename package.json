@@ -5,7 +5,7 @@
   "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js",
-    "develop": "concurrently \"cd server && npm run watch\" \"cd client && npm start\"",
+    "develop": "set NODE_ENV=production && concurrently \"cd server && npm run watch\" \"cd client && npm start\"",
     "install": "cd server && npm i && cd ../client && npm i",
     "build": "cd client && npm run build",
     "test-build": "concurrently \"node server/server.js\" \"http-server public\""
@@ -20,7 +20,6 @@
     "node": "16.x"
   },
   "dependencies": {
-
     "mongodb": "^5.5.0",
     "@apollo/client": "^3.5.8",
     "@testing-library/jest-dom": "^5.11.4",
@@ -29,7 +28,6 @@
     "bootstrap": "^5.2.3",
     "graphql": "^15.4.0",
     "jwt-decode": "^3.1.2",
-    "mongodb": "^5.5.0",
     "react": "^17.0.1",
     "react-bootstrap": "^2.7.4",
     "react-burger-menu": "^3.0.9",

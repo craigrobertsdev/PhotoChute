@@ -64,7 +64,8 @@
   list-style-type: none;
   display: flex;
   flex-direction: column;
-  padding-left: 0; /* resets reset css file */
+  /* resets reset css file */
+  padding-left: 0;
   text-align: center;
   margin-bottom: 2rem;
 }

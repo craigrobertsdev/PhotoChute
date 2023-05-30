@@ -51,9 +51,14 @@ const resolvers = {
       ).populate([
         {
           path: "photos",
-          populate: {
-            path: "owner",
-          },
+          populate: [
+            {
+              path: "owner",
+            },
+            {
+              path: "group",
+            },
+          ],
         },
         {
           path: "groupOwner",
@@ -63,8 +68,6 @@ const resolvers = {
         },
         { path: "members" },
       ]);
-
-      console.log(userGroup.toJSON());
 
       if (!userGroup) {
         return new Error("No group could be found with that name");
@@ -265,21 +268,19 @@ const resolvers = {
       const updatedGroup = await Group.findOneAndUpdate(
         { _id: groupId },
         {
-          $pull: { members: { $each: [...memberIds] } },
+          $addToSet: { members: { $each: [...memberIds] } },
         },
         {
           new: true,
         }
       );
 
-      console.log((await updatedGroup.populate("members")).toJSON());
-
       return updatedGroup;
     },
 
-    deleteGroupMembers: async (parent, { groupId, memberIds }, context) => {
+    removeGroupMembers: async (parent, { groupId, memberIds }, context) => {
       if (!context.user) {
-        return new AuthenticationError("You must be signed in to create a group");
+        return new AuthenticationError("You must be signed in to remove a group member");
       }
 
       const group = await Group.findById(groupId);
@@ -295,40 +296,14 @@ const resolvers = {
       const updatedGroup = await Group.findOneAndUpdate(
         { _id: groupId },
         {
-          $addToSet: { members: { $each: [...memberIds] } },
+          $pull: { members: { $in: memberIds } },
         },
         {
           new: true,
         }
       );
+      return updatedGroup;
     },
-    //     singleUploadFile: async (parent, { username }, context) => {},
-    //     saveBook: async (parent, { bookId, authors, description, title, image, link }, context) => {
-    //       // if there is a user attached to context, we know they have already been authenticated via the authMiddleware function
-    //       if (!context.user) {
-    //         throw new AuthenticationError("You need to be logged in to save books");
-    //       }
-    //       // added to ensure description has a value (some books don't) as the Book model requires a value
-    //       if (!description) {
-    //         description = " ";
-    //       }
-    //       return User.findOneAndUpdate(
-    //         { _id: context.user._id },
-    //         { $addToSet: { savedBooks: { authors, description, bookId, title, image, link } } },
-    //         { new: true, runValidators: true }
-    //       );
-    //     },
-    //     removeBook: async (parent, { bookId }, context) => {
-    //       if (!context.user) {
-    //         throw new AuthenticationError("You need to be logged in to delete books");
-    //       }
-    //       const updatedUser = await User.findOneAndUpdate(
-    //         { _id: context.user._id },
-    //         { $pull: { savedBooks: { bookId } } },
-    //         { new: true }
-    //       );
-    //       return updatedUser;
-    //     },
   },
 };
 
