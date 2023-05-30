@@ -23,9 +23,40 @@ const resolvers = {
   Query: {
     me: async (parent, { email }, context) => {
       if (context.user) {
-        return User.findOne({ _id: context.user._id }).populate("friends", "groups", "photos");
+        const user = await User.findOne({ _id: context.user._id })
+        const populatedUser = await user.populate([
+          {
+            path: "groups", 
+            populate: {
+              path: "groupOwner"
+            }
+          },
+          {
+            path: "friends"
+          },
+          {
+            path: "photos"
+          }
+        ])
+        console.log(populatedUser.toJSON())
+        return populatedUser;
       } else if (email) {
-        return User.findOne({ email }).populate("friends groups photos");
+        const user = await User.findOne({ email })
+        const populatedUser = await user.populate([
+          {
+            path: "groups", 
+            populate: {
+              path: "groupOwner"
+            }
+          },
+          {
+            path: "friends"
+          },
+          {
+            path: "photos"
+          }
+        ])
+        return populatedUser;
       }
 
       throw new AuthenticationError("Please log in");
@@ -154,6 +185,16 @@ const resolvers = {
       const newGroup = await (
         await Group.create({ name: groupName, groupOwner: user })
       ).populate("groupOwner");
+      
+      const updatedUser = await User.findOneAndUpdate(
+        { _id: context.user._id },
+        {
+          $addToSet: {
+            groups: newGroup,
+          },
+        },
+        { new: true }
+      );
 
       const { name, groupOwner, photos, containerUrl, serialisedGroupName } = newGroup;
 
