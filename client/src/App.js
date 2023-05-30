@@ -13,6 +13,7 @@ import UserGroup from "./pages/UserGroup";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import "bootstrap/dist/css/bootstrap.min.css";
+import Premium from "./pages/Premium";
 
 // construct the GraphQL endpoint
 const httpLink = createHttpLink({
@@ -53,6 +54,7 @@ function App() {
     <ApolloProvider client={client}>
       <Router>
         <div className="flex-column justify-flex-start min-100-vh bg">
+<<<<<<< HEAD
           <Suspense fallback={<div>Loading...</div>}>
             <Header />
             <Routes>
@@ -68,6 +70,22 @@ function App() {
             </Routes>
             <Footer />
           </Suspense>
+=======
+          <Header />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/me" element={<Profile />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/create-group" element={<CreateGroupForm />} />
+            <Route path="/user" element={<User />} />
+            <Route path="/group" element={<UserGroup />} />
+            <Route path="/premium" element={<Premium />} />
+            <Route path="*" element={<h1 className="display-2">Wrong page!</h1>} />
+          </Routes>
+          <Footer />
+>>>>>>> main
         </div>
       </Router>
     </ApolloProvider>

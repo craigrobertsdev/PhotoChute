@@ -22,8 +22,8 @@ const Header = () => {
               <Link className="navBtn m-2" to="/me">
                 Profile
               </Link>
-              <Link className="navBtn m-2" to="/me">
-                Get Premium
+              <Link className="navBtn m-2" to="/premium">
+                Premium
               </Link>
               <button className="navBtn btn-logout m-2" onClick={logout}>
                 Logout
