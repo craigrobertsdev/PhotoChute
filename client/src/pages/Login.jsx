@@ -71,28 +71,8 @@ const Login = (props) => {
                   value={formState.password}
                   onChange={handleChange}
                 />
-                  <label htmlFor="email">Email:</label>
-                  <input
-                    className="form-input"
-                    // placeholder="email"
-                    name="email"
-                    type="email"
-                    value={formState.email}
-                    onChange={handleChange}
-                  />
               </div>
-              <div>
-                  <label htmlFor="password">Password:</label>
-                  <input
-                    className="form-input"
-                    // placeholder="********"
-                    name="password"
-                    type="password"
-                    value={formState.password}
-                    onChange={handleChange}
-                  />
 
-              </div>
               <div className="submitBtn">
                 <button className="btn" style={{ cursor: "pointer" }} type="submit">
                   Submit

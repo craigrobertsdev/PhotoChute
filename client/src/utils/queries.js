@@ -11,6 +11,10 @@ export const GET_ME = gql`
       }
       groups {
         _id
+        name
+        groupOwner {
+          _id
+        }
       }
       phone
       photos {
