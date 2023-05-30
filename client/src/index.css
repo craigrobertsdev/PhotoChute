@@ -69,6 +69,10 @@ h6 {
   background-color: #c3b9b7;
 }
 
+#root {
+  flex-direction: column;
+}
+
 .footerBg {
   background-color: #47294c;
   color: #faf4fc;
@@ -134,11 +138,14 @@ label {
   display: flex;
   justify-content: center;
   padding: 20px;
+  height: min-content;
 }
 
 .loginLink {
   display: flex;
   justify-content: center;
+  padding: 20px;
+  height: min-content;
 }
 
 Link {
@@ -160,6 +167,13 @@ Link:hover {
 .imageCont {
   height: 700px;
   text-align: right;
+}
+
+.progBar{
+  height: 30px;
+  border-radius: 20px;
+  background-color: #B1A4A1;
+  color: #816F7D;
 }
 /* Copies */
 *,

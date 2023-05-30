@@ -19,7 +19,7 @@ import "../assets/css/UserGroup.css";
 import auth from "../utils/auth";
 import { ProgressBar } from "react-bootstrap";
 
-const Group = () => {
+const Group = ({groupId, serialisedGroupId}) => {
   const userId = auth.getProfile().data._id;
   const [selectedFile, setSelectedFile] = useState();
   const [selectedFriends, setSelectedFriends] = useState([]);
@@ -34,8 +34,8 @@ const Group = () => {
 
   const imagePreview = useRef();
   /* THIS IS UNTIL THE USER PROFILE PAGE IS COMPLETE */
-  const groupId = "6472e5b7d2e3a3d54cf8319b";
-  const serialisedGroupName = "the-walruses-04860d90-fd18-11ed-b68c-cf89f07a90c7";
+  //const groupId = "6472e5b7d2e3a3d54cf8319b";
+  //const serialisedGroupName = "the-walruses-04860d90-fd18-11ed-b68c-cf89f07a90c7";
   /* THIS IS UNTIL THE USER PROFILE PAGE IS COMPLETE */
 
   // query and mutation declarations
