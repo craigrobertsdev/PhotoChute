@@ -2,7 +2,7 @@ import React, { Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
-import { persistCache, LocalStorageWrapper } from "apollo3-cache-persist";
+import { LocalStorageWrapper, CachePersistor } from "apollo3-cache-persist";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
@@ -22,6 +22,10 @@ const httpLink = createHttpLink({
 const cache = new InMemoryCache();
 
 // await before instantiating ApolloClient, else queries might run before the cache is persisted
+const persistor = new CachePersistor({
+  cache,
+  storage: new LocalStorageWrapper(window.localStorage),
+});
 // await persistCache({
 //   cache,
 //   storage: new LocalStorageWrapper(window.localStorage),

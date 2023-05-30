@@ -10,7 +10,7 @@ self.addEventListener("install", (event) => {
   // Perform the install steps
   event.waitUntil(
     caches.open(CACHE_NAME).then(function (cache) {
-      console.log("Cache opened");
+      // console.log("Cache opened");
       return cache.addAll(urlsToCache);
     })
   );
@@ -18,70 +18,16 @@ self.addEventListener("install", (event) => {
 
 // Cache and return the requests
 self.addEventListener("fetch", async (event) => {
-  //   let reqUrl = event.request.url;
-  //   const cacheRes = await caches.match(event.request);
-
-  //   if (!reqUrl.startsWith("http")) {
-  //     event.respondWith(fetch(event.request));
-  //     return;
-  //   }
-  //   console.log(event);
-  //   if (cacheRes) {
-  //     return cacheRes;
-  //   } else {
-  //     const fetchResponse = await fetch(event.request);
-
-  //     let type = fetchResponse.headers.get("content-type");
-  //     console.log({
-  //       event: { ...event },
-  //       cacheRes,
-  //       fetchResponse,
-  //       type,
-  //     });
-
-  //     try {
-  //       if (
-  //         type &&
-  //         (type.match(/^text\/css/i) ||
-  //           type.match(/^application\//i) ||
-  //           event.request.url.match(/fonts.googleapis.com/i))
-  //       ) {
-  //         //css to save in dynamic cache
-  //         console.log(`save a static file ${event.request.url}`);
-  //         const cache = await caches.open(staticCache);
-  //         await cache.put(event.request, fetchResponse.clone());
-  //         return event.respondWith(fetchResponse);
-  //       } else if (
-  //         (type && type.match(/^font\//i)) ||
-  //         event.request.url.match(/fonts.gstatic.com/i)
-  //       ) {
-  //         console.log(`save a FONT file ${event.request.url}`);
-  //         const cache = await caches.open(staticCache);
-  //         await cache.put(event.request, fetchResponse.clone());
-  //         return event.respondWith(fetchResponse);
-  //       } else if ((type && type.match(/^image\//i)) || reqUrl.startsWith("https://photochute")) {
-  //         //save in image cache
-  //         console.log(`save an IMAGE file ${event.request.url}`);
-  //         const cache = await caches.open(imageCache);
-  //         await cache.put(event.request, fetchResponse.clone());
-  //         return event.respondWith(fetchResponse);
-  //       } else {
-  //         //save in dynamic cache
-  //         console.log(`OTHER save ${event.request.url}`);
-  //         const cache = await caches.open(staticCache);
-  //         await cache.put(event.request, fetchResponse.clone());
-  //         return event.respondWith(fetchResponse);
-  //       }
-  //     } catch (err) {
-  //       console.error(err, fetchResponse, event);
-  //     }
-  //   }
-  // });
-  console.log(event);
-  event.respondWith(
-    caches.match(checkImageUrl(event.request)).then((cacheRes) => {
-      return (
-        cacheRes ||
+  if (!event.request.url.startsWith("http") || event.request.method === "POST") {
+    event.respondWith(fetch(event.request));
+  } else {
+    // checks to see whether the requested url begins with "https://photochute". if so, returns the appropriate image, ignoring the query string
+    const cacheRes = await checkImageUrl(event.request);
+    if (cacheRes) {
+      event.respondWith(cacheRes);
+      return;
+    } else {
+      event.respondWith(
         fetch(event.request).then((fetchResponse) => {
           let type = fetchResponse.headers.get("content-type");
           let reqUrl = event.request.url;
@@ -90,7 +36,7 @@ self.addEventListener("fetch", async (event) => {
             event.request.url.match(/fonts.googleapis.com/i)
           ) {
             //css to save in dynamic cache
-            console.log(`save a CSS file ${event.request.url}`);
+            // console.log(`save a CSS file ${event.request.url}`);
             return caches.open(staticCache).then((cache) => {
               cache.put(event.request, fetchResponse.clone());
               return fetchResponse;
@@ -99,34 +45,54 @@ self.addEventListener("fetch", async (event) => {
             (type && type.match(/^font\//i)) ||
             event.request.url.match(/fonts.gstatic.com/i)
           ) {
-            console.log(`save a FONT file ${event.request.url}`);
+            // console.log(`save a FONT file ${event.request.url}`);
             return caches.open(staticCache).then((cache) => {
               cache.put(event.request, fetchResponse.clone());
               return fetchResponse;
             });
           } else if ((type && type.match(/^image\//i)) || reqUrl.startsWith("https://photochute")) {
             //save in image cache
-            console.log(`save an IMAGE file ${event.request.url}`);
+            // console.log(`save an IMAGE file ${event.request.url}`);
             return caches.open(imageCache).then((cache) => {
-              if (reqUrl.startsWith("https://photochute")) {
-                cache.put(reqUrl.slice(0, reqUrl.lastIndexOf("?")), fetchResponse.clone());
-              } else {
-                cache.put(event.request, fetchResponse.clone());
-              }
+              // if (reqUrl.startsWith("https://photochute")) {
+              //   console.log(reqUrl);
+              //   console.log("event.request", event.request);
+              //   console.log(event);
+              //   console.log("type", type);
+              //   const responseBlob = fetchResponse
+              //     .clone()
+              //     .blob()
+              //     .then((blob) => blob);
+              //   const updatedResponse = fetchResponse.clone();
+              //   updatedResponse.body = responseBlob;
+              //   console.log(updatedResponse);
+              //   updatedResponse.blob();
+              //   cache.put(reqUrl.slice(0, reqUrl.lastIndexOf("?")), fetchResponse.clone());
+              // } else {
+              // console.log("fetchResponse", fetchResponse);
+              cache.put(event.request, fetchResponse.clone());
+              // }
               return fetchResponse;
             });
           } else {
-            //save in dynamic cache
-            console.log(`OTHER save ${event.request.url}`);
-            return caches.open(staticCache).then((cache) => {
-              cache.put(event.request, fetchResponse.clone());
-              return fetchResponse;
-            });
+            try {
+              //save in dynamic cache
+              // console.log(`OTHER save ${event.request.url}`);
+              if (!fetchResponse) {
+                // console.log("No fetch response");
+              }
+              return caches.open(staticCache).then((cache) => {
+                cache.put(event.request, fetchResponse.clone());
+                return fetchResponse;
+              });
+            } catch (err) {
+              // console.error(err);
+            }
           }
         })
       );
-    })
-  );
+    }
+  }
 });
 
 // Update service worker
@@ -145,6 +111,15 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-function checkImageUrl(eventRequest) {
-  return eventRequest;
+async function checkImageUrl(eventRequest) {
+  console.log(eventRequest);
+  if (eventRequest.url.startsWith("https://photochute")) {
+    const imageCache = await caches.open("images");
+    console.log("imageCache", await imageCache.keys());
+
+    const url = eventRequest.url.slice(0, eventRequest.url.lastIndexOf("?"));
+    return await caches.match(url);
+  }
+
+  return await caches.match(eventRequest);
 }

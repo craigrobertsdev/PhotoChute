@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   DELETE_PHOTO,
   SAVE_PHOTO,
@@ -31,6 +31,8 @@ const Group = () => {
   const [maxPhotos, setMaxPhotos] = useState(15);
   const [uploadPaneOpen, setUploadPaneOpen] = useState(false);
   const [memberPaneOpen, setMemberPaneOpen] = useState(false);
+
+  const imagePreview = useRef();
   /* THIS IS UNTIL THE USER PROFILE PAGE IS COMPLETE */
   const groupId = "6472e5b7d2e3a3d54cf8319b";
   const serialisedGroupName = "the-walruses-04860d90-fd18-11ed-b68c-cf89f07a90c7";
@@ -154,10 +156,16 @@ const Group = () => {
       const signedUrl = await getSignedUrl({
         variables: { groupName: serialisedGroupName, serialisedFileName },
       });
+      const corsRequest = new Request(signedUrl.data.getSignedUrl.fileUrl, { mode: "cors" });
+      console.log(signedUrl.data.getSignedUrl.fileUrl);
+      await fetch(corsRequest);
 
-      window.location.assign(signedUrl.data.getSignedUrl.fileUrl);
+      imagePreview.current.src = signedUrl.data.getSignedUrl.fileUrl;
+      imagePreview.current.classList.remove("hidden");
+      // window.location.assign(signedUrl.data.getSignedUrl.fileUrl);
     } catch (err) {
-      console.log(JSON.stringify(err, null, 2));
+      // console.log(JSON.stringify(err, null, 2));
+      console.error(err);
     }
   };
 
@@ -317,6 +325,7 @@ const Group = () => {
             <p key={`member-${member._id}`}>{member.firstName}</p>
           ))}
         </div>
+        <img className="image-preview hidden" ref={imagePreview} crossOrigin="anonymous"></img>
 
         <PhotoGrid
           currentUser={userId}

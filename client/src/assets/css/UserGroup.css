@@ -101,3 +101,8 @@
   background: #c3a9b7;
   border-radius: 20px;
 }
+
+.image-preview {
+  max-width: 80%;
+  max-height: 80%;
+}

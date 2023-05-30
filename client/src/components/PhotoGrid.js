@@ -36,6 +36,7 @@ const PhotoGrid = ({
               className="thumbnail"
               ref={index === thumbnails.length - 1 ? newestImage : null}
               src={thumbnail.thumbnailUrl + sasToken}
+              crossOrigin="anonymous"
               alt="thumbnail"
               onError={async () => await loadImage(thumbnail.thumbnailUrl + sasToken)}
             />
