@@ -45,7 +45,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: #a0908d;
+  background-color: #faf4fc;
   list-style: none;
   padding: 2rem 5rem;
 }
@@ -56,7 +56,7 @@
   left: 0;
   bottom: 0;
   z-index: 2;
-  background-color: #a0908d;
+  background-color: #faf4fc;
   padding: 2rem;
 }
 

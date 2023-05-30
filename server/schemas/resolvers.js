@@ -171,7 +171,7 @@ const resolvers = {
       const token = signToken(user);
       return { token, user };
     },
-    createGroup: async (parent, { groupName, userId }, context) => {
+    createGroup: async (parent, { groupName }, context) => {
       if (!context.user) {
         return new AuthenticationError("You must be signed in to create a group");
       }
@@ -183,6 +183,18 @@ const resolvers = {
       ).populate("groupOwner");
 
       const { name, groupOwner, photos, containerUrl, serialisedGroupName } = newGroup;
+
+      const updatedUser = await User.findOneAndUpdate(
+        { _id: context.user._id },
+        {
+          $addToSet: {
+            groups: newGroup,
+          },
+        },
+        { new: true }
+      );
+
+      console.log(updatedUser.toJSON());
 
       return { name, groupOwner, photos, containerUrl, serialisedGroupName };
     },

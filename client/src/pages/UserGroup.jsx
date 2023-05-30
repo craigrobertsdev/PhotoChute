@@ -218,6 +218,7 @@ const Group = () => {
     } else {
       setSelectedFriends((prev) => [...prev, memberId]);
     }
+    setSelectedMembers([]);
   };
 
   const handleSelectMember = (event, memberId) => {
@@ -226,6 +227,7 @@ const Group = () => {
     } else {
       setSelectedMembers((prev) => [...prev, memberId]);
     }
+    setSelectedFriends([]);
   };
 
   const toggleUploadPane = () => {
@@ -270,7 +272,10 @@ const Group = () => {
         <button className="btn mx-1 mb-2" onClick={handleAddGroupMember}>
           Add member to group
         </button>
-        <button className="btn mx-1 mb-2" onClick={handleRemoveGroupMember}>
+        <button
+          className="btn mx-1 mb-2"
+          // disabled={`${selectedFriends.length > 0}`}
+          onClick={handleRemoveGroupMember}>
           Remove member from group
         </button>
         <button className="btn mx-1 mb-2" onClick={toggleMemberPane}>
