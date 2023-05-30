@@ -9,6 +9,16 @@ const {
 const { deleteBlob } = require("../utils/blobStorage");
 const { ObjectId } = require("mongoose").Types;
 
+//getting stripe private key from .env file
+const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY)
+
+//Declaring the 3 types of premium account and the data that stripe will use in the checkout
+const premiumAccounts = new Map([
+  [1, {price: 199, description: 'You can now be in up to 5 groups at anyone time and have the ability to upload 20 photos, this is a great option who likes sharing a few photos with friend or family' ,name: "Photo Enthusiast"}],
+  [2, {price: 599, description: 'You can now be in up to 10 groups at anyone time and have the ability to upload 35 photos, this is a great option who people who want to share lots of photos with lots of different people!' ,name: "Social Butterfly"}],
+  [3, {price: 999, description: 'You can now be in up to 20 groups at anyone time and have the ability to upload 50 photos, this account type is reserved for the type of person who loves sharing lots photos and memories with family and friends' ,name: "Over Sharer"}],
+])
+
 const resolvers = {
   Query: {
     me: async (parent, { email }, context) => {
@@ -301,6 +311,45 @@ const resolvers = {
           new: true,
         }
       );
+    },
+
+    //mutation for buying premium using stripe checkout
+    buyPremium: async (parent, {premium}, context) => {
+      const url = new URL(context.headers.origin).origin;
+      const line_items = [];
+      
+      //get selection type of what account has been selected
+      const premiumAccount = premiumAccounts.get(premium)
+      if(!premiumAccount){
+        throw 'invalid product selection'
+      }
+
+      //creating a stripe product that will be sent to checkout
+      const product = await stripe.products.create({
+        name: premiumAccount.name,
+        description: premiumAccount.description,
+      });
+      // price is added to product object
+      const price = await stripe.prices.create({
+        product: product.id,
+        unit_amount: premiumAccount.price,
+        currency: 'aud',
+      });
+      //pushes price data in cents and quantity of product
+      line_items.push({
+        price: price.id,
+        quantity: 1
+      });
+      //sends total data to stripe checkout with method and mode for payment also provides a return url for both successful and un-successful purchases
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items,
+        mode: 'payment',
+        success_url: `http://localhost:3000/`,
+        cancel_url: `http://localhost:3000/premium`
+      });
+      //returns session id to be used in redirect in premium.jsx
+      return { session: session.id };
     },
     //     singleUploadFile: async (parent, { username }, context) => {},
     //     saveBook: async (parent, { bookId, authors, description, title, image, link }, context) => {

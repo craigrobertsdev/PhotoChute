@@ -51,6 +51,11 @@ const typeDefs = gql`
     sasToken: String!
   }
 
+  type Premium {
+    session: ID
+  }
+
+
   type Query {
     me(email: String): User
     photos: [Photo]
@@ -76,6 +81,7 @@ const typeDefs = gql`
     deletePhoto(groupName: String!, photoId: ID!): Photo
     addGroupMembers(groupId: ID!, memberIds: [ID]!): Group
     deleteGroupMembers(groupId: ID!, memberIds: [ID]!): Group
+    buyPremium(premium: Int): Premium
   }
 `;
 

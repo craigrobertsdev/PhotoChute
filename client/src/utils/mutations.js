@@ -104,3 +104,11 @@ export const REMOVE_GROUP_MEMBERS = gql`
     }
   }
 `;
+
+export const BUY_PREMIUM = gql`
+    mutation BuyPremium($premium: Int) {
+    buyPremium(premium: $premium) {
+      session
+    }
+  }
+`
