@@ -18,8 +18,11 @@ import PhotoGrid from "../components/PhotoGrid";
 import "../assets/css/UserGroup.css";
 import auth from "../utils/auth";
 import { ProgressBar } from "react-bootstrap";
+import { useLocation } from "react-router-dom";
 
-const Group = ({groupId, serialisedGroupId}) => {
+const Group = () => {
+  const { groupId, serialisedGroupName } = useLocation().state;
+
   const userId = auth.getProfile().data._id;
   const [selectedFile, setSelectedFile] = useState();
   const [selectedFriends, setSelectedFriends] = useState([]);

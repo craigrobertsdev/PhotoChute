@@ -47,39 +47,39 @@ const resolvers = {
   Query: {
     me: async (parent, { email }, context) => {
       if (context.user) {
-        const user = await User.findOne({ _id: context.user._id })
+        const user = await User.findOne({ _id: context.user._id });
         const populatedUser = await user.populate([
           {
-            path: "groups", 
+            path: "groups",
             populate: {
-              path: "groupOwner"
-            }
+              path: "groupOwner",
+            },
           },
           {
-            path: "friends"
+            path: "friends",
           },
           {
-            path: "photos"
-          }
-        ])
-        console.log(populatedUser.toJSON())
+            path: "photos",
+          },
+        ]);
+        console.log(populatedUser.toJSON());
         return populatedUser;
       } else if (email) {
-        const user = await User.findOne({ email })
+        const user = await User.findOne({ email });
         const populatedUser = await user.populate([
           {
-            path: "groups", 
+            path: "groups",
             populate: {
-              path: "groupOwner"
-            }
+              path: "groupOwner",
+            },
           },
           {
-            path: "friends"
+            path: "friends",
           },
           {
-            path: "photos"
-          }
-        ])
+            path: "photos",
+          },
+        ]);
         return populatedUser;
       }
 
@@ -212,7 +212,7 @@ const resolvers = {
       const newGroup = await (
         await Group.create({ name: groupName, groupOwner: user })
       ).populate("groupOwner");
-      
+
       const updatedUser = await User.findOneAndUpdate(
         { _id: context.user._id },
         {
@@ -224,18 +224,6 @@ const resolvers = {
       );
 
       const { name, groupOwner, photos, containerUrl, serialisedGroupName } = newGroup;
-
-      const updatedUser = await User.findOneAndUpdate(
-        { _id: context.user._id },
-        {
-          $addToSet: {
-            groups: newGroup,
-          },
-        },
-        { new: true }
-      );
-
-      console.log(updatedUser.toJSON());
 
       return { name, groupOwner, photos, containerUrl, serialisedGroupName };
     },

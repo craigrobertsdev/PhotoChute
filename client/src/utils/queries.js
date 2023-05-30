@@ -15,6 +15,7 @@ export const GET_ME = gql`
         groupOwner {
           _id
         }
+        serialisedGroupName
       }
       phone
       photos {
