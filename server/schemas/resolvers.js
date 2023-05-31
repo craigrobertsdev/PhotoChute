@@ -317,11 +317,30 @@ const resolvers = {
       return deletedPhoto;
     },
 
-    addFriend: async (parent, { username, email, password }) => {
-      const user = await User.create({ username, phone });
-      const token = signToken(user);
-      return { token, user };
+    addFriend: async (parent, { username }, context) => {
+      console.log(username)
+      const user = await User.findOne({ username: username });
+
+      if (!user) {
+        return new Error("User not found");
+      }
+      console.log(user)
+      console.log("christmas")
+      console.log(context.user)
+
+      const updatedFriendList = await User.findOneAndUpdate(
+        { _id: context.user._id },
+        {
+          $addToSet: { friends: [user] },
+        },
+        {
+          new: true,
+        }
+      );
+        console.log(updatedFriendList)
+      return { updatedFriendList };
     },
+
     addGroupMembers: async (parent, { groupId, memberIds }, context) => {
       if (!context.user) {
         return new AuthenticationError("You must be signed in to create a group");
