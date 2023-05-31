@@ -23,6 +23,7 @@ const typeDefs = gql`
     serialisedGroupName: String
     maxPhotos: Int
     photoCount: Int
+    maxMembers: Int
   }
 
   type Photo {
@@ -55,7 +56,6 @@ const typeDefs = gql`
     session: ID
   }
 
-
   type Query {
     me(email: String): User
     photos: [Photo]
@@ -80,7 +80,7 @@ const typeDefs = gql`
     createGroup(groupName: String!): Group
     deletePhoto(groupName: String!, photoId: ID!): Photo
     addGroupMembers(groupId: ID!, memberIds: [ID]!): Group
-    deleteGroupMembers(groupId: ID!, memberIds: [ID]!): Group
+    removeGroupMembers(groupId: ID!, memberIds: [ID]!): Group
     buyPremium(premium: Int): Premium
   }
 `;

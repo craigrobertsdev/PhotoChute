@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   DELETE_PHOTO,
   SAVE_PHOTO,
@@ -18,19 +18,22 @@ import PhotoGrid from "../components/PhotoGrid";
 import "../assets/css/UserGroup.css";
 import auth from "../utils/auth";
 import { ProgressBar } from "react-bootstrap";
+import { useLocation } from "react-router-dom";
 
-const Group = ({groupId, serialisedGroupId}) => {
+const Group = () => {
+  const { groupId, serialisedGroupName } = useLocation().state;
   const userId = auth.getProfile().data._id;
   const [selectedFile, setSelectedFile] = useState();
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [selectedMembers, setSelectedMembers] = useState([]);
   const [availableFriends, setAvailableFriends] = useState([]);
   const [uploading, setUploading] = useState(false);
-  const [fileTypeValidationError, setFileTypeValidationError] = useState(false);
+  const [fileValidationError, setFileValidationError] = useState(false);
   const [photoCount, setPhotoCount] = useState(0);
   const [maxPhotos, setMaxPhotos] = useState(15);
   const [uploadPaneOpen, setUploadPaneOpen] = useState(false);
   const [memberPaneOpen, setMemberPaneOpen] = useState(false);
+  const MAX_FILE_SIZE = 5242880; // 5MB
   /* THIS IS UNTIL THE USER PROFILE PAGE IS COMPLETE */
   //const groupId = "6472e5b7d2e3a3d54cf8319b";
   //const serialisedGroupName = "the-walruses-04860d90-fd18-11ed-b68c-cf89f07a90c7";
@@ -55,9 +58,6 @@ const Group = ({groupId, serialisedGroupId}) => {
     variables: { serialisedGroupName },
   });
 
-  if (group) {
-    console.log("group", group);
-  }
   const [getSignedUrl] = useLazyQuery(GET_SIGNED_URL);
 
   useEffect(() => {
@@ -81,9 +81,7 @@ const Group = ({groupId, serialisedGroupId}) => {
   const handleDeletePhoto = async (event, thumbnail) => {
     event.preventDefault();
 
-    console.log(thumbnail);
-
-    const deletedPhotoResponse = await deletePhoto({
+    await deletePhoto({
       variables: {
         groupName: serialisedGroupName,
         photoId: thumbnail._id,
@@ -91,21 +89,30 @@ const Group = ({groupId, serialisedGroupId}) => {
     });
 
     window.location.reload();
-
-    console.log(deletedPhotoResponse);
   };
 
   const onFileChange = (event) => {
+    console.log(event);
+    const file = event.target.files[0];
     // capture file into state
-    setSelectedFile(event.target.files[0]);
-    validateFileType(event.target.files[0].type);
+    setSelectedFile(file);
+    if (event.target.files.length > 0) {
+      validateFile(file);
+    } else {
+      setSelectedFile(null);
+    }
   };
 
-  function validateFileType(fileType) {
-    if (fileType === "image/jpeg" || fileType === "image/jpg" || fileType === "image/png") {
-      setFileTypeValidationError(false);
+  function validateFile(file) {
+    if (
+      ((file && file.type === "image/jpeg") ||
+        file.type === "image/jpg" ||
+        file.type === "image/png") &&
+      file.size < MAX_FILE_SIZE
+    ) {
+      setFileValidationError(false);
     } else {
-      setFileTypeValidationError(true);
+      setFileValidationError(true);
     }
   }
 
@@ -119,7 +126,7 @@ const Group = ({groupId, serialisedGroupId}) => {
         const urlData = await getFileUploadUrl({
           variables: {
             serialisedGroupName,
-            blobName: selectedFile.name,
+            blobName: selectedFile.name.toLowerCase(),
           },
         });
 
@@ -212,11 +219,15 @@ const Group = ({groupId, serialisedGroupId}) => {
   };
 
   const handleSelectFriend = (event, memberId) => {
+    if (group.getPhotosForGroup.members.length + 1 === group.getPhotosForGroup.maxMembers) {
+      return;
+    }
     if (selectedFriends.includes(memberId)) {
       setSelectedFriends(selectedFriends.filter((member) => member !== memberId));
     } else {
       setSelectedFriends((prev) => [...prev, memberId]);
     }
+    setSelectedMembers([]);
   };
 
   const handleSelectMember = (event, memberId) => {
@@ -225,6 +236,7 @@ const Group = ({groupId, serialisedGroupId}) => {
     } else {
       setSelectedMembers((prev) => [...prev, memberId]);
     }
+    setSelectedFriends([]);
   };
 
   const toggleUploadPane = () => {
@@ -250,53 +262,94 @@ const Group = ({groupId, serialisedGroupId}) => {
         <button className="btn" onClick={toggleUploadPane}>
           Add Photos
         </button>
-        <button
-          className={`btn ${group.getPhotosForGroup.groupOwner._id === userId ? "" : "hidden"}`}
-          onClick={toggleMemberPane}>
-          Add/Remove Member
+        <button className={"btn"} onClick={toggleMemberPane}>
+          {group.getPhotosForGroup.groupOwner._id === userId
+            ? "Add/Remove Member"
+            : "View Group Members"}
         </button>
       </div>
       <div className="progress-container">
-        <h4>Total Photos Uploaded</h4>
+        <h4 className="text-purple">Total Photos Uploaded</h4>
         <ProgressBar
           now={photoCount}
           max={maxPhotos}
           label={`${photoCount ? photoCount : 0}/${maxPhotos}`}
+          variant="photochute"
         />
       </div>
       {/* flyout pane with list of friends to add to group */}
       <div className={`add-member-pane ${memberPaneOpen ? "" : "hidden"}`}>
-        <button className="btn mx-1 mb-2" onClick={handleAddGroupMember}>
-          Add member to group
-        </button>
-        <button className="btn mx-1 mb-2" onClick={handleRemoveGroupMember}>
-          Remove member from group
-        </button>
         <button className="btn mx-1 mb-2" onClick={toggleMemberPane}>
           Close
         </button>
-        <h4 className="text-center">Available Friends</h4>
-        <ul>
-          {availableFriends.map((member, index) => (
-            <div
-              key={`selectedMember-${member._id}`}
-              className={`mb-2 ${selectedFriends?.includes(member._id) ? "selected" : ""}`}
-              onClick={(event) => handleSelectFriend(event, member._id)}>
-              <li>{member.firstName}</li>
+        <div className="flex">
+          <h4 className="text-center">Group Owner</h4>
+          <div
+            className={`mb-2 text-center ${
+              userId === group.getPhotosForGroup.groupOwner._id ? "underline" : ""
+            }`}>
+            <p>{group.getPhotosForGroup.groupOwner.firstName}</p>
+          </div>
+          <h4 className="text-center">
+            Members{" "}
+            <span className="font-small">
+              {group.getPhotosForGroup.members.length + 1}/{group.getPhotosForGroup.maxMembers}{" "}
+              {/* +1 to account for group owner */}
+            </span>
+          </h4>
+          <div className="members-container">
+            <button
+              className={`btn mx-1 mb-2 ${
+                group.getPhotosForGroup.groupOwner._id === userId ? "" : "hidden"
+              }`}
+              disabled={selectedFriends.length > 0 || selectedMembers.length === 0}
+              onClick={handleRemoveGroupMember}>
+              Remove member from group
+            </button>
+            <ul>
+              {group.getPhotosForGroup.members.map((member, index) => (
+                <div
+                  key={`groupMember-${member._id}`}
+                  className={`mb-2 ${selectedMembers?.includes(member._id) ? "selected" : ""}`}
+                  onClick={(event) => handleSelectMember(event, member._id)}>
+                  <li>
+                    {member.firstName} {member.lastName}
+                  </li>
+                </div>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <div className={group.getPhotosForGroup.groupOwner._id === userId ? "" : "hidden"}>
+          <h4 className="text-center">Available Friends</h4>
+          <div className="members-container">
+            <button
+              className="btn mx-1 mb-2"
+              onClick={handleAddGroupMember}
+              disabled={
+                selectedMembers.length > 0 ||
+                selectedFriends.length === 0 ||
+                selectedFriends.length + group.getPhotosForGroup.members.length + 1 >
+                  group.getPhotosForGroup.maxMembers
+              }>
+              Add member to group
+            </button>
+            <div className="scrollable">
+              <ul>
+                {availableFriends.map((member, index) => (
+                  <div
+                    key={`selectedMember-${member._id}`}
+                    className={`mb-2 ${selectedFriends?.includes(member._id) ? "selected" : ""}`}
+                    onClick={(event) => handleSelectFriend(event, member._id)}>
+                    <li>
+                      {member.firstName} {member.lastName}
+                    </li>
+                  </div>
+                ))}
+              </ul>
             </div>
-          ))}
-        </ul>
-        <h4 className="text-center">Current Members</h4>
-        <ul>
-          {group.getPhotosForGroup.members.map((member, index) => (
-            <div
-              key={`groupMember-${member._id}`}
-              className={`mb-2 ${selectedMembers?.includes(member._id) ? "selected" : ""}`}
-              onClick={(event) => handleSelectMember(event, member._id)}>
-              <li>{member.firstName}</li>
-            </div>
-          ))}
-        </ul>
+          </div>
+        </div>
       </div>
       <div className="group-container">
         {/* pop up pane with upload photo form */}
@@ -305,7 +358,7 @@ const Group = ({groupId, serialisedGroupId}) => {
             <input type="file" onChange={onFileChange} className=" upload-input" />
             <button
               className="btn"
-              disabled={!selectedFile || photoCount > maxPhotos || fileTypeValidationError}
+              disabled={!selectedFile || photoCount > maxPhotos || fileValidationError}
               type="submit"
               onClick={onFileUpload}>
               Upload!
@@ -313,26 +366,25 @@ const Group = ({groupId, serialisedGroupId}) => {
           </form>
           <div>
             {uploading && <div>Uploading</div>}
-            {fileTypeValidationError && <div>File must be of type jpg, jpeg or png</div>}
+            {fileValidationError && (
+              <div>File must be of type jpg, jpeg or png and less than 5MB </div>
+            )}
           </div>
         </div>
-        <div className="members-container">
-          <h4>Group Owner</h4>
-          <p>{group.getPhotosForGroup.groupOwner.firstName}</p>
-          <h4>Members</h4>
-          {group.getPhotosForGroup.members.map((member) => (
-            <p key={`member-${member._id}`}>{member.firstName}</p>
-          ))}
-        </div>
-
-        <PhotoGrid
-          currentUser={userId}
-          thumbnails={group?.getPhotosForGroup.photos}
-          sasToken={sasTokenData.getAuthenticationToken.sasToken}
-          onPhotoDelete={handleDeletePhoto}
-          onPhotoLoad={handleLoadPhoto}
-          onPhotoDownload={handleDownloadPhoto}
-        />
+        {group?.getPhotosForGroup?.photos.length === 0 ? (
+          <h3 className="text-center text-purple no-photos">No photos yet... get sharing!</h3>
+        ) : (
+          <>
+            <PhotoGrid
+              currentUser={userId}
+              thumbnails={group?.getPhotosForGroup.photos}
+              sasToken={sasTokenData.getAuthenticationToken.sasToken}
+              onPhotoDelete={handleDeletePhoto}
+              onPhotoLoad={handleLoadPhoto}
+              onPhotoDownload={handleDownloadPhoto}
+            />
+          </>
+        )}
       </div>
     </div>
   );

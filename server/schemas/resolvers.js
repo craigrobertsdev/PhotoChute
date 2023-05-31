@@ -10,22 +10,77 @@ const { deleteBlob } = require("../utils/blobStorage");
 const { ObjectId } = require("mongoose").Types;
 
 //getting stripe private key from .env file
-const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY)
+const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 
 //Declaring the 3 types of premium account and the data that stripe will use in the checkout
 const premiumAccounts = new Map([
-  [1, {price: 199, description: 'You can now be in up to 5 groups at anyone time and have the ability to upload 20 photos, this is a great option who likes sharing a few photos with friend or family' ,name: "Photo Enthusiast"}],
-  [2, {price: 599, description: 'You can now be in up to 10 groups at anyone time and have the ability to upload 35 photos, this is a great option who people who want to share lots of photos with lots of different people!' ,name: "Social Butterfly"}],
-  [3, {price: 999, description: 'You can now be in up to 20 groups at anyone time and have the ability to upload 50 photos, this account type is reserved for the type of person who loves sharing lots photos and memories with family and friends' ,name: "Over Sharer"}],
-])
+  [
+    1,
+    {
+      price: 199,
+      description:
+        "You can now be in up to 5 groups at anyone time and have the ability to upload 20 photos, this is a great option who likes sharing a few photos with friend or family",
+      name: "Photo Enthusiast",
+    },
+  ],
+  [
+    2,
+    {
+      price: 599,
+      description:
+        "You can now be in up to 10 groups at anyone time and have the ability to upload 35 photos, this is a great option who people who want to share lots of photos with lots of different people!",
+      name: "Social Butterfly",
+    },
+  ],
+  [
+    3,
+    {
+      price: 999,
+      description:
+        "You can now be in up to 20 groups at anyone time and have the ability to upload 50 photos, this account type is reserved for the type of person who loves sharing lots photos and memories with family and friends",
+      name: "Over Sharer",
+    },
+  ],
+]);
 
 const resolvers = {
   Query: {
     me: async (parent, { email }, context) => {
       if (context.user) {
-        return User.findOne({ _id: context.user._id }).populate("friends", "groups", "photos");
+        const user = await User.findOne({ _id: context.user._id })
+        const populatedUser = await user.populate([
+          {
+            path: "groups", 
+            populate: {
+              path: "groupOwner"
+            }
+          },
+          {
+            path: "friends"
+          },
+          {
+            path: "photos"
+          }
+        ])
+        console.log(populatedUser.toJSON())
+        return populatedUser;
       } else if (email) {
-        return User.findOne({ email }).populate("friends groups photos");
+        const user = await User.findOne({ email })
+        const populatedUser = await user.populate([
+          {
+            path: "groups", 
+            populate: {
+              path: "groupOwner"
+            }
+          },
+          {
+            path: "friends"
+          },
+          {
+            path: "photos"
+          }
+        ])
+        return populatedUser;
       }
 
       throw new AuthenticationError("Please log in");
@@ -61,9 +116,14 @@ const resolvers = {
       ).populate([
         {
           path: "photos",
-          populate: {
-            path: "owner",
-          },
+          populate: [
+            {
+              path: "owner",
+            },
+            {
+              path: "group",
+            },
+          ],
         },
         {
           path: "groupOwner",
@@ -73,8 +133,6 @@ const resolvers = {
         },
         { path: "members" },
       ]);
-
-      console.log(userGroup.toJSON());
 
       if (!userGroup) {
         return new Error("No group could be found with that name");
@@ -144,7 +202,7 @@ const resolvers = {
       const token = signToken(user);
       return { token, user };
     },
-    createGroup: async (parent, { groupName, userId }, context) => {
+    createGroup: async (parent, { groupName }, context) => {
       if (!context.user) {
         return new AuthenticationError("You must be signed in to create a group");
       }
@@ -154,6 +212,16 @@ const resolvers = {
       const newGroup = await (
         await Group.create({ name: groupName, groupOwner: user })
       ).populate("groupOwner");
+      
+      const updatedUser = await User.findOneAndUpdate(
+        { _id: context.user._id },
+        {
+          $addToSet: {
+            groups: newGroup,
+          },
+        },
+        { new: true }
+      );
 
       const { name, groupOwner, photos, containerUrl, serialisedGroupName } = newGroup;
 
@@ -275,21 +343,19 @@ const resolvers = {
       const updatedGroup = await Group.findOneAndUpdate(
         { _id: groupId },
         {
-          $pull: { members: { $each: [...memberIds] } },
+          $addToSet: { members: { $each: [...memberIds] } },
         },
         {
           new: true,
         }
       );
 
-      console.log((await updatedGroup.populate("members")).toJSON());
-
       return updatedGroup;
     },
 
-    deleteGroupMembers: async (parent, { groupId, memberIds }, context) => {
+    removeGroupMembers: async (parent, { groupId, memberIds }, context) => {
       if (!context.user) {
-        return new AuthenticationError("You must be signed in to create a group");
+        return new AuthenticationError("You must be signed in to remove a group member");
       }
 
       const group = await Group.findById(groupId);
@@ -305,23 +371,24 @@ const resolvers = {
       const updatedGroup = await Group.findOneAndUpdate(
         { _id: groupId },
         {
-          $addToSet: { members: { $each: [...memberIds] } },
+          $pull: { members: { $in: memberIds } },
         },
         {
           new: true,
         }
       );
+      return updatedGroup;
     },
 
     //mutation for buying premium using stripe checkout
-    buyPremium: async (parent, {premium}, context) => {
+    buyPremium: async (parent, { premium }, context) => {
       const url = new URL(context.headers.origin).origin;
       const line_items = [];
-      
+
       //get selection type of what account has been selected
-      const premiumAccount = premiumAccounts.get(premium)
-      if(!premiumAccount){
-        throw 'invalid product selection'
+      const premiumAccount = premiumAccounts.get(premium);
+      if (!premiumAccount) {
+        throw "invalid product selection";
       }
 
       //creating a stripe product that will be sent to checkout
@@ -333,51 +400,24 @@ const resolvers = {
       const price = await stripe.prices.create({
         product: product.id,
         unit_amount: premiumAccount.price,
-        currency: 'aud',
+        currency: "aud",
       });
       //pushes price data in cents and quantity of product
       line_items.push({
         price: price.id,
-        quantity: 1
+        quantity: 1,
       });
       //sends total data to stripe checkout with method and mode for payment also provides a return url for both successful and un-successful purchases
       const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
+        payment_method_types: ["card"],
         line_items,
-        mode: 'payment',
+        mode: "payment",
         success_url: `http://localhost:3000/`,
-        cancel_url: `http://localhost:3000/premium`
+        cancel_url: `http://localhost:3000/premium`,
       });
       //returns session id to be used in redirect in premium.jsx
       return { session: session.id };
     },
-    //     singleUploadFile: async (parent, { username }, context) => {},
-    //     saveBook: async (parent, { bookId, authors, description, title, image, link }, context) => {
-    //       // if there is a user attached to context, we know they have already been authenticated via the authMiddleware function
-    //       if (!context.user) {
-    //         throw new AuthenticationError("You need to be logged in to save books");
-    //       }
-    //       // added to ensure description has a value (some books don't) as the Book model requires a value
-    //       if (!description) {
-    //         description = " ";
-    //       }
-    //       return User.findOneAndUpdate(
-    //         { _id: context.user._id },
-    //         { $addToSet: { savedBooks: { authors, description, bookId, title, image, link } } },
-    //         { new: true, runValidators: true }
-    //       );
-    //     },
-    //     removeBook: async (parent, { bookId }, context) => {
-    //       if (!context.user) {
-    //         throw new AuthenticationError("You need to be logged in to delete books");
-    //       }
-    //       const updatedUser = await User.findOneAndUpdate(
-    //         { _id: context.user._id },
-    //         { $pull: { savedBooks: { bookId } } },
-    //         { new: true }
-    //       );
-    //       return updatedUser;
-    //     },
   },
 };
 

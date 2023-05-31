@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap");
 
 body {
-  font-family: 'Rubik', sans-serif;
+  font-family: "Rubik", sans-serif;
 }
 
 h1,
@@ -10,7 +10,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Rubik', sans-serif;
+  font-family: "Rubik", sans-serif;
 }
 
 .small {
@@ -28,7 +28,7 @@ h6 {
   border-radius: 20px;
   border: 1px solid transparent;
   outline: none;
-  background-color: #B1A4A1;
+  background-color: #b1a4a1;
   color: white;
   transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
   font-family: Comfortaa;
@@ -62,7 +62,7 @@ h6 {
 }
 
 .btn-logout {
-  color: #816f7d
+  color: #816f7d;
 }
 
 .bg {
@@ -80,15 +80,15 @@ h6 {
 
 .title-link {
   text-decoration: none;
-  color:black
+  color: black;
 }
 
 .img {
-max-width: 100%;
-max-height: 100%;
-padding: 20px;
-object-fit: cover;
-top: 0%;
+  max-width: 100%;
+  max-height: 100%;
+  padding: 20px;
+  object-fit: cover;
+  top: 0%;
 }
 
 .homeCol1 {
@@ -112,7 +112,7 @@ top: 0%;
   text-decoration: none;
   font-size: 1rem;
   border-radius: 20px;
-  border: 2px solid #B1A4A1;
+  border: 2px solid #b1a4a1;
   outline: none;
   color: white;
   background: none;
@@ -121,7 +121,7 @@ top: 0%;
 }
 
 .homeJoin:hover {
-  background-color: #B1A4A1;
+  background-color: #b1a4a1;
   color: white;
   text-decoration: none;
 }
@@ -161,7 +161,7 @@ Link:hover {
 }
 
 .altHeading {
- color: white;
+  color: white;
 }
 
 .imageCont {
@@ -176,7 +176,6 @@ Link:hover {
   color: #816F7D;
 }
 /* Copies */
-*/
 *,
 *::before,
 *::after {
@@ -191,9 +190,8 @@ body {
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-    'Segoe UI Symbol';
+  font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   font-size: 16px;
   color: #1a1a1a;
 }
@@ -262,7 +260,7 @@ a:hover {
   color: inherit;
 }
 
-/* HEIGHT / WIDTH UTILS */
+/* HEIGHT/WIDTH UTILS */
 .w-100 {
   width: 100%;
 }
@@ -744,8 +742,6 @@ a:hover {
   color: #000000 !important;
 }
 
-
-
 /* BACKGROUND UTILS */
 .bg-primary {
   background-color: #2d3e50 !important;
@@ -849,10 +845,10 @@ form .form-input {
   padding-left: 0.75rem;
   padding-right: 0.75rem;
   color: #faf4fc;
-  background-color: #816F7D;
+  background-color: #816f7d;
   margin: 0.625rem 0;
   font-size: 1.2rem;
-  border: 1px solid #816F7D;
+  border: 1px solid #816f7d;
   border-radius: 20px;
 }
 
@@ -860,8 +856,8 @@ form .form-input.form-input-squared {
   border-radius: 0;
 }
 
-form [type='checkbox'],
-form [type='radio'] {
+form [type="checkbox"],
+form [type="radio"] {
   display: inline-block;
 }
 
@@ -957,7 +953,7 @@ form [type='radio'] {
   margin-right: -15px;
 }
 
-[class*='col-'] {
+[class*="col-"] {
   position: relative;
   width: 100%;
   padding-right: 15px;

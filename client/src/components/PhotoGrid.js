@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import "../assets/css/PhotoGrid.css";
 import { formatDate } from "../utils/helpers";
 
@@ -12,20 +12,26 @@ const PhotoGrid = ({
 }) => {
   // attaches to the last element of the thumbnails array (which is where the photo that has just been uploaded is)
   const newestImage = useRef();
+  const [thumbnailLoading, setThumbnailLoading] = useState(false);
 
-  // this function repeatedly attempts to load the thumbnail for the image as there is a delay between the image upload and the thumbnail creation in Azure
-  const loadImage = async (url) => {
+  // this function repeatedly attempts to load the thumbnail for the image as there is a delay between the image upload and the thumbnail creation in Azure. tries for 10 seconds - this should be more than enough time for the thumbnail to be generated
+  const loadImage = async (url, retries = 20) => {
+    if (retries === 0) {
+      return;
+    }
+    setThumbnailLoading(true);
     newestImage.current.classList.add("loading");
     let fetchResponse = await fetch(url);
     if (fetchResponse.status === 200) {
+      setThumbnailLoading(false);
       newestImage.current.classList.remove("loading");
       newestImage.current.src = url;
     } else {
-      setTimeout(() => loadImage(url), 500);
+      setThumbnailLoading(true);
+      setTimeout(() => loadImage(url, --retries), 500);
     }
   };
 
-  console.log(thumbnails);
   return (
     <div className="photo-grid">
       {thumbnails.map((thumbnail, index) => (
@@ -33,13 +39,18 @@ const PhotoGrid = ({
           <button
             className="thumbnail-button"
             onClick={(event) => onPhotoLoad(event, thumbnail.serialisedFileName)}>
+            {/* {thumbnailLoading ? (
+              <div className="loading"></div>
+            ) : ( */}
             <img
               className="thumbnail"
               ref={index === thumbnails.length - 1 ? newestImage : null}
               src={thumbnail.thumbnailUrl + sasToken}
+              crossOrigin="anonymous"
               alt="thumbnail"
               onError={async () => await loadImage(thumbnail.thumbnailUrl + sasToken)}
             />
+            {/* )} */}
           </button>
           <div>
             <p className="text-center">
