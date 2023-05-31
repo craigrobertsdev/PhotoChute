@@ -16,9 +16,10 @@ const User = () => {
         (group) => group.groupOwner._id === data.me._id
       );
       setMyGroups(myUpdatedGroups);
+      const friendsGroups = data.me.groups.filter((group) => group.groupOwner._id !== data.me._id);
+      setFriendsGroups(friendsGroups);
     }
   }, [data]);
-  // const friendsGroups = data.me.groups.filter(group => group.groupOwner._id !== data.me._id)
   return (
     <div className="flex-row justify-center mb-4">
       <div className="col-8">
@@ -40,7 +41,17 @@ const User = () => {
       <div className="col-8">
         <h2 className="altHeading">Friends Groups</h2>
         <ul>
-          <li></li>
+          {friendsGroups?.length !== undefined ? (
+            friendsGroups.map((group) => (
+              <Link
+                to="/group"
+                state={{ groupId: group._id, serialisedGroupName: group.serialisedGroupName }}>
+                {group.name}
+              </Link>
+            ))
+          ) : (
+            <div>loading...</div>
+          )}
         </ul>
       </div>
     </div>

@@ -259,10 +259,10 @@ const Group = () => {
         <button className="btn" onClick={toggleUploadPane}>
           Add Photos
         </button>
-        <button
-          className={`btn ${group.getPhotosForGroup.groupOwner._id === userId ? "" : "hidden"}`}
-          onClick={toggleMemberPane}>
-          Add/Remove Member
+        <button className={"btn"} onClick={toggleMemberPane}>
+          {group.getPhotosForGroup.groupOwner._id === userId
+            ? "Add/Remove Member"
+            : "View Group Members"}
         </button>
       </div>
       <div className="progress-container">
@@ -285,14 +285,16 @@ const Group = () => {
             <p>{group.getPhotosForGroup.groupOwner.firstName}</p>
           </div>
           <h4 className="text-center">
-            Current Members{" "}
+            Members{" "}
             <span className="font-small">
               {group.getPhotosForGroup.members.length}/{group.getPhotosForGroup.maxMembers}
             </span>
           </h4>
           <div className="members-container">
             <button
-              className="btn mx-1 mb-2"
+              className={`btn mx-1 mb-2 ${
+                group.getPhotosForGroup.groupOwner._id === userId ? "" : "hidden"
+              }`}
               disabled={selectedFriends.length > 0 || selectedMembers.length === 0}
               onClick={handleRemoveGroupMember}>
               Remove member from group
@@ -303,13 +305,15 @@ const Group = () => {
                   key={`groupMember-${member._id}`}
                   className={`mb-2 ${selectedMembers?.includes(member._id) ? "selected" : ""}`}
                   onClick={(event) => handleSelectMember(event, member._id)}>
-                  <li>{member.firstName}</li>
+                  <li>
+                    {member.firstName} {member.lastName}
+                  </li>
                 </div>
               ))}
             </ul>
           </div>
         </div>
-        <div>
+        <div className={group.getPhotosForGroup.groupOwner._id === userId ? "" : "hidden"}>
           <h4 className="text-center">Available Friends</h4>
           <div className="members-container">
             <button

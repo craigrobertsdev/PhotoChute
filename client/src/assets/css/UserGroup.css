@@ -19,6 +19,7 @@
 .group-container {
   position: relative;
   padding: 0 2rem;
+  margin-bottom: 1rem;
 }
 
 .members-container {
@@ -63,6 +64,7 @@
   flex-direction: column;
   overflow: auto;
   align-items: center;
+  min-width: 250px;
 }
 
 .add-member-pane > button {
