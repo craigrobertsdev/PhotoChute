@@ -31,13 +31,12 @@ const Group = () => {
   const [fileValidationError, setFileValidationError] = useState(false);
   const [photoCount, setPhotoCount] = useState(0);
   const [maxPhotos, setMaxPhotos] = useState(15);
+  const [userAtMaxPhotos, setUserAtMaxPhotos] = useState();
   const [uploadPaneOpen, setUploadPaneOpen] = useState(false);
   const [memberPaneOpen, setMemberPaneOpen] = useState(false);
+  const [thumbnailLoading, setThumbnailLoading] = useState(false);
+
   const MAX_FILE_SIZE = 5242880; // 5MB
-  /* THIS IS UNTIL THE USER PROFILE PAGE IS COMPLETE */
-  //const groupId = "6472e5b7d2e3a3d54cf8319b";
-  //const serialisedGroupName = "the-walruses-04860d90-fd18-11ed-b68c-cf89f07a90c7";
-  /* THIS IS UNTIL THE USER PROFILE PAGE IS COMPLETE */
 
   // query and mutation declarations
   const [getFileUploadUrl] = useLazyQuery(GET_FILE_UPLOAD_URL);
@@ -64,6 +63,19 @@ const Group = () => {
     if (group?.getPhotosForGroup) {
       setPhotoCount(group.getPhotosForGroup.photos.length);
       setMaxPhotos(group.getPhotosForGroup.maxPhotos);
+
+      // determine the current user's total photos uploaded and whether this is greater than or equal to their maximum upload count
+      let userMaxPhotos, userPhotoCount;
+      if (group.getPhotosForGroup.groupOwner._id === userId) {
+        userMaxPhotos = group.getPhotosForGroup.groupOwner.maxPhotos;
+        userPhotoCount = group.getPhotosForGroup.groupOwner.photos.length;
+      } else {
+        const user = group.getPhotosForGroup.members.find((member) => member._id === userId);
+        userMaxPhotos = user.maxPhotos;
+        userPhotoCount = user.photos.length;
+      }
+
+      setUserAtMaxPhotos(userMaxPhotos >= userPhotoCount);
 
       // filter out the group owner's friends who are already in the group by their Id
       const groupMemberIds = group.getPhotosForGroup.members.map((member) => member._id);
@@ -231,6 +243,10 @@ const Group = () => {
   };
 
   const handleSelectMember = (event, memberId) => {
+    if (userId !== group.getPhotosForGroup.groupOwner._id) {
+      return;
+    }
+
     if (selectedMembers.includes(memberId)) {
       setSelectedMembers(selectedMembers.filter((member) => member !== memberId));
     } else {
@@ -288,15 +304,19 @@ const Group = () => {
             className={`mb-2 text-center ${
               userId === group.getPhotosForGroup.groupOwner._id ? "underline" : ""
             }`}>
-            <p>{group.getPhotosForGroup.groupOwner.firstName}</p>
+            <p>
+              {group.getPhotosForGroup.groupOwner.firstName}{" "}
+              {group.getPhotosForGroup.groupOwner.lastName}
+            </p>
           </div>
           <h4 className="text-center">
             Members{" "}
             <span className="font-small">
-              {group.getPhotosForGroup.members.length + 1}/{group.getPhotosForGroup.maxMembers}{" "}
               {/* +1 to account for group owner */}
+              {group.getPhotosForGroup.members.length + 1}/{group.getPhotosForGroup.maxMembers}{" "}
             </span>
           </h4>
+          {/* Current group members list */}
           <div className="members-container">
             <button
               className={`btn mx-1 mb-2 ${
@@ -320,6 +340,7 @@ const Group = () => {
             </ul>
           </div>
         </div>
+        {/* List of friends who aren't currenly group members */}
         <div className={group.getPhotosForGroup.groupOwner._id === userId ? "" : "hidden"}>
           <h4 className="text-center">Available Friends</h4>
           <div className="members-container">
@@ -358,12 +379,24 @@ const Group = () => {
             <input type="file" onChange={onFileChange} className=" upload-input" />
             <button
               className="btn"
-              disabled={!selectedFile || photoCount > maxPhotos || fileValidationError}
+              disabled={
+                !selectedFile ||
+                photoCount > maxPhotos ||
+                fileValidationError ||
+                thumbnailLoading ||
+                userAtMaxPhotos
+              }
               type="submit"
               onClick={onFileUpload}>
               Upload!
             </button>
           </form>
+          {thumbnailLoading && (
+            <p>Please wait for your upload to complete before uploading another</p>
+          )}
+          {userAtMaxPhotos && (
+            <p>You have reached your upload capacity. Upgrade to premium to increase this limit!</p>
+          )}
           <div>
             {uploading && <div>Uploading</div>}
             {fileValidationError && (
@@ -382,6 +415,7 @@ const Group = () => {
               onPhotoDelete={handleDeletePhoto}
               onPhotoLoad={handleLoadPhoto}
               onPhotoDownload={handleDownloadPhoto}
+              setThumbnailLoading={setThumbnailLoading}
             />
           </>
         )}
