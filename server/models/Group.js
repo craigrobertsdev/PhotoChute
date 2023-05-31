@@ -39,6 +39,10 @@ const groupSchema = new Schema(
       type: Number,
       default: 15,
     },
+    maxMembers: {
+      type: Number,
+      default: 5,
+    },
   }, // set this to use virtual below
   {
     toJSON: {

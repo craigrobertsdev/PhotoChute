@@ -97,6 +97,7 @@ export const GET_PHOTOS_FOR_GROUP = gql`
       serialisedGroupName
       maxPhotos
       photoCount
+      maxMembers
     }
   }
 `;

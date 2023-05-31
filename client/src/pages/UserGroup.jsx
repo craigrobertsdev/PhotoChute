@@ -22,20 +22,18 @@ import { useLocation } from "react-router-dom";
 
 const Group = () => {
   const { groupId, serialisedGroupName } = useLocation().state;
-
   const userId = auth.getProfile().data._id;
   const [selectedFile, setSelectedFile] = useState();
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [selectedMembers, setSelectedMembers] = useState([]);
   const [availableFriends, setAvailableFriends] = useState([]);
   const [uploading, setUploading] = useState(false);
-  const [fileTypeValidationError, setFileTypeValidationError] = useState(false);
+  const [fileValidationError, setFileValidationError] = useState(false);
   const [photoCount, setPhotoCount] = useState(0);
   const [maxPhotos, setMaxPhotos] = useState(15);
   const [uploadPaneOpen, setUploadPaneOpen] = useState(false);
   const [memberPaneOpen, setMemberPaneOpen] = useState(false);
-
-  const imagePreview = useRef();
+  const MAX_FILE_SIZE = 5242880; // 5MB
   /* THIS IS UNTIL THE USER PROFILE PAGE IS COMPLETE */
   //const groupId = "6472e5b7d2e3a3d54cf8319b";
   //const serialisedGroupName = "the-walruses-04860d90-fd18-11ed-b68c-cf89f07a90c7";
@@ -94,16 +92,27 @@ const Group = () => {
   };
 
   const onFileChange = (event) => {
+    console.log(event);
+    const file = event.target.files[0];
     // capture file into state
-    setSelectedFile(event.target.files[0]);
-    validateFileType(event.target.files[0].type);
+    setSelectedFile(file);
+    if (event.target.files.length > 0) {
+      validateFile(file);
+    } else {
+      setSelectedFile(null);
+    }
   };
 
-  function validateFileType(fileType) {
-    if (fileType === "image/jpeg" || fileType === "image/jpg" || fileType === "image/png") {
-      setFileTypeValidationError(false);
+  function validateFile(file) {
+    if (
+      ((file && file.type === "image/jpeg") ||
+        file.type === "image/jpg" ||
+        file.type === "image/png") &&
+      file.size < MAX_FILE_SIZE
+    ) {
+      setFileValidationError(false);
     } else {
-      setFileTypeValidationError(true);
+      setFileValidationError(true);
     }
   }
 
@@ -159,16 +168,10 @@ const Group = () => {
       const signedUrl = await getSignedUrl({
         variables: { groupName: serialisedGroupName, serialisedFileName },
       });
-      const corsRequest = new Request(signedUrl.data.getSignedUrl.fileUrl, { mode: "cors" });
-      console.log(signedUrl.data.getSignedUrl.fileUrl);
-      await fetch(corsRequest);
 
-      imagePreview.current.src = signedUrl.data.getSignedUrl.fileUrl;
-      imagePreview.current.classList.remove("hidden");
-      // window.location.assign(signedUrl.data.getSignedUrl.fileUrl);
+      window.location.assign(signedUrl.data.getSignedUrl.fileUrl);
     } catch (err) {
-      // console.log(JSON.stringify(err, null, 2));
-      console.error(err);
+      console.log(JSON.stringify(err, null, 2));
     }
   };
 
@@ -268,44 +271,67 @@ const Group = () => {
           now={photoCount}
           max={maxPhotos}
           label={`${photoCount ? photoCount : 0}/${maxPhotos}`}
+          variant="photochute"
         />
       </div>
       {/* flyout pane with list of friends to add to group */}
       <div className={`add-member-pane ${memberPaneOpen ? "" : "hidden"}`}>
-        <button className="btn mx-1 mb-2" onClick={handleAddGroupMember}>
-          Add member to group
-        </button>
-        <button
-          className="btn mx-1 mb-2"
-          // disabled={`${selectedFriends.length > 0}`}
-          onClick={handleRemoveGroupMember}>
-          Remove member from group
-        </button>
         <button className="btn mx-1 mb-2" onClick={toggleMemberPane}>
           Close
         </button>
-        <h4 className="text-center">Available Friends</h4>
-        <ul>
-          {availableFriends.map((member, index) => (
-            <div
-              key={`selectedMember-${member._id}`}
-              className={`mb-2 ${selectedFriends?.includes(member._id) ? "selected" : ""}`}
-              onClick={(event) => handleSelectFriend(event, member._id)}>
-              <li>{member.firstName}</li>
+        <div>
+          <h4 className="text-center">Group Owner</h4>
+          <div className="mb-2 text-center">
+            <p>{group.getPhotosForGroup.groupOwner.firstName}</p>
+          </div>
+          <h4 className="text-center">
+            Current Members{" "}
+            <span className="font-small">
+              {group.getPhotosForGroup.members.length}/{group.getPhotosForGroup.maxMembers}
+            </span>
+          </h4>
+          <div className="members-container">
+            <button
+              className="btn mx-1 mb-2"
+              disabled={selectedFriends.length > 0 || selectedMembers.length === 0}
+              onClick={handleRemoveGroupMember}>
+              Remove member from group
+            </button>
+            <ul>
+              {group.getPhotosForGroup.members.map((member, index) => (
+                <div
+                  key={`groupMember-${member._id}`}
+                  className={`mb-2 ${selectedMembers?.includes(member._id) ? "selected" : ""}`}
+                  onClick={(event) => handleSelectMember(event, member._id)}>
+                  <li>{member.firstName}</li>
+                </div>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <div>
+          <h4 className="text-center">Available Friends</h4>
+          <div className="members-container">
+            <button
+              className="btn mx-1 mb-2"
+              onClick={handleAddGroupMember}
+              disabled={selectedMembers.length > 0 || selectedFriends.length === 0}>
+              Add member to group
+            </button>
+            <div className="scrollable">
+              <ul>
+                {availableFriends.map((member, index) => (
+                  <div
+                    key={`selectedMember-${member._id}`}
+                    className={`mb-2 ${selectedFriends?.includes(member._id) ? "selected" : ""}`}
+                    onClick={(event) => handleSelectFriend(event, member._id)}>
+                    <li>{member.firstName}</li>
+                  </div>
+                ))}
+              </ul>
             </div>
-          ))}
-        </ul>
-        <h4 className="text-center">Current Members</h4>
-        <ul>
-          {group.getPhotosForGroup.members.map((member, index) => (
-            <div
-              key={`groupMember-${member._id}`}
-              className={`mb-2 ${selectedMembers?.includes(member._id) ? "selected" : ""}`}
-              onClick={(event) => handleSelectMember(event, member._id)}>
-              <li>{member.firstName}</li>
-            </div>
-          ))}
-        </ul>
+          </div>
+        </div>
       </div>
       <div className="group-container">
         {/* pop up pane with upload photo form */}
@@ -314,7 +340,7 @@ const Group = () => {
             <input type="file" onChange={onFileChange} className=" upload-input" />
             <button
               className="btn"
-              disabled={!selectedFile || photoCount > maxPhotos || fileTypeValidationError}
+              disabled={!selectedFile || photoCount > maxPhotos || fileValidationError}
               type="submit"
               onClick={onFileUpload}>
               Upload!
@@ -322,18 +348,11 @@ const Group = () => {
           </form>
           <div>
             {uploading && <div>Uploading</div>}
-            {fileTypeValidationError && <div>File must be of type jpg, jpeg or png</div>}
+            {fileValidationError && (
+              <div>File must be of type jpg, jpeg or png and less than 5MB </div>
+            )}
           </div>
         </div>
-        <div className="members-container">
-          <h4>Group Owner</h4>
-          <p>{group.getPhotosForGroup.groupOwner.firstName}</p>
-          <h4>Members</h4>
-          {group.getPhotosForGroup.members.map((member) => (
-            <p key={`member-${member._id}`}>{member.firstName}</p>
-          ))}
-        </div>
-        <img className="image-preview hidden" ref={imagePreview} crossOrigin="anonymous"></img>
 
         <PhotoGrid
           currentUser={userId}

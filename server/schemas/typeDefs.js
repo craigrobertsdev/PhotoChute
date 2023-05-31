@@ -23,6 +23,7 @@ const typeDefs = gql`
     serialisedGroupName: String
     maxPhotos: Int
     photoCount: Int
+    maxMembers: Int
   }
 
   type Photo {
