@@ -219,6 +219,9 @@ const Group = () => {
   };
 
   const handleSelectFriend = (event, memberId) => {
+    if (group.getPhotosForGroup.members.length + 1 === group.getPhotosForGroup.maxMembers) {
+      return;
+    }
     if (selectedFriends.includes(memberId)) {
       setSelectedFriends(selectedFriends.filter((member) => member !== memberId));
     } else {
@@ -279,15 +282,19 @@ const Group = () => {
         <button className="btn mx-1 mb-2" onClick={toggleMemberPane}>
           Close
         </button>
-        <div>
+        <div className="flex">
           <h4 className="text-center">Group Owner</h4>
-          <div className="mb-2 text-center">
+          <div
+            className={`mb-2 text-center ${
+              userId === group.getPhotosForGroup.groupOwner._id ? "underline" : ""
+            }`}>
             <p>{group.getPhotosForGroup.groupOwner.firstName}</p>
           </div>
           <h4 className="text-center">
             Members{" "}
             <span className="font-small">
-              {group.getPhotosForGroup.members.length}/{group.getPhotosForGroup.maxMembers}
+              {group.getPhotosForGroup.members.length + 1}/{group.getPhotosForGroup.maxMembers}{" "}
+              {/* +1 to account for group owner */}
             </span>
           </h4>
           <div className="members-container">
@@ -319,7 +326,12 @@ const Group = () => {
             <button
               className="btn mx-1 mb-2"
               onClick={handleAddGroupMember}
-              disabled={selectedMembers.length > 0 || selectedFriends.length === 0}>
+              disabled={
+                selectedMembers.length > 0 ||
+                selectedFriends.length === 0 ||
+                selectedFriends.length + group.getPhotosForGroup.members.length + 1 >
+                  group.getPhotosForGroup.maxMembers
+              }>
               Add member to group
             </button>
             <div className="scrollable">
@@ -329,7 +341,9 @@ const Group = () => {
                     key={`selectedMember-${member._id}`}
                     className={`mb-2 ${selectedFriends?.includes(member._id) ? "selected" : ""}`}
                     onClick={(event) => handleSelectFriend(event, member._id)}>
-                    <li>{member.firstName}</li>
+                    <li>
+                      {member.firstName} {member.lastName}
+                    </li>
                   </div>
                 ))}
               </ul>
