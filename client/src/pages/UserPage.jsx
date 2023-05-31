@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { GET_ME } from "../utils/queries";
-import { CREATE_GROUP } from "../utils/mutations";
+import { CREATE_GROUP, ADD_FRIEND} from "../utils/mutations";
 
 import { useQuery, useMutation } from "@apollo/client";
 
@@ -10,7 +10,6 @@ const User = () => {
   const { data } = useQuery(GET_ME);
   const [myGroups, setMyGroups] = useState([]);
   const [friendsGroups, setFriendsGroups] = useState([]);
-  console.log("first", data);
 
   useEffect(() => {
     if (data?.me) {
@@ -44,6 +43,25 @@ const User = () => {
     setSearchInput("");
     window.location.reload();
   };
+
+  const [addFriend] = useMutation(ADD_FRIEND);
+  const [friendInput, setFriendInput] = useState("");
+
+  //function to handle addFriend mutation and input into friend search box
+  const handleFriendFormSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const friendAdded = await addFriend({
+        variables: { username: friendInput.trim() },
+      })
+      console.log(friendAdded)
+      window.location.reload();
+    } catch (err) {
+      console.error(JSON.stringify(err, null, 2));
+    }
+  };
+
+
 
   const validateGroupName = (event) => {
     const value = event.target.value;
@@ -135,14 +153,30 @@ const User = () => {
         </Row>
       </Container>
 
+      <Container>   
       <h3 className="text-center">My Friends</h3>
       <div style={{ display: "flex", justifyContent: "center", gap: "1rem" }}>
-        <input placeholder="Search for a friend" />
-        <button className="btn">Add a friend</button>
+        <form onSubmit={handleFriendFormSubmit}>
+          <input 
+            placeholder="Search for a friend" 
+            name='friend'
+            type='text'
+            value={friendInput}
+            onChange={(e) => setFriendInput(e.target.value)}
+            
+          />
+          <button type='submit' className="btn">Add a friend</button>
+        </form>
       </div>
+      </Container>
       <ul>
-        <li>Shae</li>
-        <li>Lucien</li>
+      {data?.me.friends?.length !== undefined?(
+              data.me.friends.map((friend) => (
+                <li>{friend.username}</li>
+              ))
+            ) : (
+              <div>Add Friends Above!</div>
+            )}
       </ul>
     </>
   );

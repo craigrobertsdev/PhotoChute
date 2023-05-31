@@ -125,4 +125,16 @@ export const BUY_PREMIUM = gql`
       session
     }
   }
+`
+
+export const ADD_FRIEND = gql`
+  mutation addFriend($username: String) {
+    addFriend(username: $username) {
+      username
+      _id
+      firstName
+      lastName
+    }
+  }
 `;
+
