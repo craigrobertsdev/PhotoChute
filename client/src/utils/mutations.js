@@ -39,6 +39,12 @@ export const CREATE_GROUP = gql`
   }
 `;
 
+export const DELETE_GROUP = gql`
+  mutation deleteGroup($groupName: String!) {
+    _id
+  }
+`;
+
 export const SAVE_PHOTO = gql`
   mutation SavePhoto(
     $fileName: String!
@@ -105,8 +111,16 @@ export const REMOVE_GROUP_MEMBERS = gql`
   }
 `;
 
+export const DELETE_ACCOUNT = gql`
+  mutation deleteAccount {
+    deleteAccount {
+      _id
+    }
+  }
+`;
+
 export const BUY_PREMIUM = gql`
-    mutation BuyPremium($premium: Int) {
+  mutation BuyPremium($premium: Int) {
     buyPremium(premium: $premium) {
       session
     }
@@ -115,11 +129,12 @@ export const BUY_PREMIUM = gql`
 
 export const ADD_FRIEND = gql`
   mutation addFriend($username: String) {
-  addFriend(username: $username) {
-    username
-    _id
-    firstName
-    lastName
+    addFriend(username: $username) {
+      username
+      _id
+      firstName
+      lastName
+    }
   }
-}
-`
+`;
+
