@@ -48,39 +48,39 @@ const resolvers = {
   Query: {
     me: async (parent, { email }, context) => {
       if (context.user) {
-        const user = await User.findOne({ _id: context.user._id })
+        const user = await User.findOne({ _id: context.user._id });
         const populatedUser = await user.populate([
           {
-            path: "groups", 
+            path: "groups",
             populate: {
-              path: "groupOwner"
-            }
+              path: "groupOwner",
+            },
           },
           {
-            path: "friends"
+            path: "friends",
           },
           {
-            path: "photos"
-          }
-        ])
-        console.log(populatedUser.toJSON())
+            path: "photos",
+          },
+        ]);
+        console.log(populatedUser.toJSON());
         return populatedUser;
       } else if (email) {
-        const user = await User.findOne({ email })
+        const user = await User.findOne({ email });
         const populatedUser = await user.populate([
           {
-            path: "groups", 
+            path: "groups",
             populate: {
-              path: "groupOwner"
-            }
+              path: "groupOwner",
+            },
           },
           {
-            path: "friends"
+            path: "friends",
           },
           {
-            path: "photos"
-          }
-        ])
+            path: "photos",
+          },
+        ]);
         return populatedUser;
       }
 
@@ -224,7 +224,7 @@ const resolvers = {
       const newGroup = await (
         await Group.create({ name: groupName, groupOwner: user })
       ).populate("groupOwner");
-      
+
       const updatedUser = await User.findOneAndUpdate(
         { _id: context.user._id },
         {
@@ -377,7 +377,7 @@ const resolvers = {
       return deletedPhoto;
     },
 
-    //add friend mutation gets username of new friend and adds that to current users friend list
+    // add friend mutation gets username of new friend and adds that to current users friend list
     addFriend: async (parent, { username }, context) => {
       const user = await User.findOne({ username: username });
 
@@ -472,6 +472,26 @@ const resolvers = {
       if (!context.user) {
         return new AuthenticationError("You must be signed in to delete an account");
       }
+
+      const userToDelete = await User.findById({ _id: context.user._id });
+
+      if (!userToDelete) {
+        return new Error("User not found");
+      }
+
+      const friendsToUpdate = await User.find({ _id: { $in: [...userToDelete.friends] } });
+
+      console.log(friendsToUpdate);
+
+      const updatedUsers = await User.updateMany(
+        { _id: { $in: [...userToDelete.friends] } },
+        {
+          $pull: { friends: context.user._id },
+        },
+        { new: true }
+      );
+
+      console.log(updatedUsers);
 
       const deletedUser = await User.deleteOne({ _id: context.user._id });
 
