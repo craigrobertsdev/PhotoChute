@@ -317,6 +317,7 @@ const resolvers = {
       return deletedPhoto;
     },
 
+    //add friend mutation gets username of new friend and adds that to current users friend list
     addFriend: async (parent, { username }, context) => {
       const user = await User.findOne({ username: username });
 

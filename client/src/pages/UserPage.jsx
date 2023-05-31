@@ -47,6 +47,7 @@ const User = () => {
   const [addFriend] = useMutation(ADD_FRIEND);
   const [friendInput, setFriendInput] = useState("");
 
+  //function to handle addFriend mutation and input into friend search box
   const handleFriendFormSubmit = async (event) => {
     event.preventDefault();
     try {
