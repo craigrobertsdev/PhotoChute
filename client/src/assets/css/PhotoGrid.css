@@ -1,16 +1,15 @@
 .photo-grid {
   width: 100%;
   margin: auto;
-  flex: 2 1 auto;
   display: flex;
-  justify-content: start;
+  justify-content: center;
   flex-wrap: wrap;
-  row-gap: 2rem;
-  column-gap: 2rem;
+  gap: 3rem;
 }
 
 .thumbnail-container {
-  width: 200px;
+  width: 150px;
+  height: 100%;
 }
 
 .thumbnail-button {
@@ -18,9 +17,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  border: none;
 }
 
 .thumbnail {
+  width: 150px;
+  height: 150px;
+  max-height: 100%;
   max-width: 100%;
 }
 
@@ -33,4 +36,16 @@
 
 .loading {
   display: none;
+}
+
+.bg-photochute {
+  background-color: #47294c;
+}
+
+.no-photos {
+  margin-top: 3rem;
+}
+
+.text-purple {
+  color: #47294c;
 }

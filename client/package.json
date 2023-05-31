@@ -11,6 +11,7 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "apollo-upload-client": "^17.0.0",
+    "apollo3-cache-persist": "^0.14.1",
     "bootstrap": "^5.2.3",
     "downloadjs": "^1.4.7",
     "graphql": "^15.4.0",

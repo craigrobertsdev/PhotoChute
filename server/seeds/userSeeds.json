@@ -1,0 +1,102 @@
+[
+  {
+    "firstName": "Lucien",
+    "lastName": "Haines",
+    "username": "lucien",
+    "email": "lucien@email.com",
+    "password": "password123",
+    "photos": [],
+    "groups": [],
+    "friends": ["6472e545d2e3a3d54cf8318e"]
+  },
+  {
+    "firstName": "Shae",
+    "lastName": "Thompson",
+    "username": "shae",
+    "email": "shae@email.com",
+    "password": "password123",
+    "photos": [],
+    "groups": [],
+    "friends": ["6472e545d2e3a3d54cf8318e"]
+  },
+  {
+    "firstName": "Fred",
+    "lastName": "Smith",
+    "username": "fred",
+    "email": "fred@email.com",
+    "password": "password123",
+    "photos": [],
+    "groups": [],
+    "friends": ["6472e545d2e3a3d54cf8318e"]
+  },
+  {
+    "firstName": "Kim",
+    "lastName": "White",
+    "username": "kim",
+    "email": "kim@email.com",
+    "password": "password123",
+    "photos": [],
+    "groups": [],
+    "friends": ["6472e545d2e3a3d54cf8318e"]
+  },
+  {
+    "firstName": "Jo",
+    "lastName": "Lang",
+    "username": "jo",
+    "email": "jo@email.com",
+    "password": "password123",
+    "photos": [],
+    "groups": [],
+    "friends": ["6472e545d2e3a3d54cf8318e"]
+  },
+  {
+    "firstName": "Lewis",
+    "lastName": "Roberts",
+    "username": "lewis",
+    "email": "lewis@email.com",
+    "password": "password123",
+    "photos": [],
+    "groups": [],
+    "friends": ["6472e545d2e3a3d54cf8318e"]
+  },
+  {
+    "firstName": "Angus",
+    "lastName": "Roberts",
+    "username": "angus",
+    "email": "angus@email.com",
+    "password": "password123",
+    "photos": [],
+    "groups": [],
+    "friends": ["6472e545d2e3a3d54cf8318e"]
+  },
+  {
+    "firstName": "Rhiannon",
+    "lastName": "Roberts",
+    "username": "rhi",
+    "email": "rhiannon@email.com",
+    "password": "password123",
+    "photos": [],
+    "groups": [],
+    "friends": ["6472e545d2e3a3d54cf8318e"]
+  },
+  {
+    "firstName": "John",
+    "lastName": "Doe",
+    "username": "john",
+    "email": "john@email.com",
+    "password": "password123",
+    "photos": [],
+    "groups": [],
+    "friends": ["6472e545d2e3a3d54cf8318e"]
+  },
+  {
+    "firstName": "Peter",
+    "lastName": "Parker",
+    "username": "peter",
+    "email": "peter@email.com",
+    "password": "password123",
+    "photos": [],
+    "groups": [],
+    "friends": ["6472e545d2e3a3d54cf8318e"]
+  }
+]

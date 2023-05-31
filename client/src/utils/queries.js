@@ -15,6 +15,7 @@ export const GET_ME = gql`
         groupOwner {
           _id
         }
+        serialisedGroupName
       }
       phone
       photos {
@@ -96,6 +97,7 @@ export const GET_PHOTOS_FOR_GROUP = gql`
       serialisedGroupName
       maxPhotos
       photoCount
+      maxMembers
     }
   }
 `;

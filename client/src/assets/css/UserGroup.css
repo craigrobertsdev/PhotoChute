@@ -19,8 +19,7 @@
 .group-container {
   position: relative;
   padding: 0 2rem;
-  display: grid;
-  grid-template-columns: 1fr 5fr;
+  margin-bottom: 1rem;
 }
 
 .members-container {
@@ -30,7 +29,7 @@
 }
 
 .progress-container {
-  width: 50%;
+  width: 60%;
   margin: 1rem auto;
   text-align: center;
 }
@@ -40,12 +39,13 @@
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: #a0908d;
+  background-color: #47294c;
+  color: white;
   list-style: none;
   padding: 2rem 5rem;
 }
@@ -56,17 +56,45 @@
   left: 0;
   bottom: 0;
   z-index: 2;
-  background-color: #a0908d;
-  padding: 2rem;
+  background-color: #47294c;
+  color: white;
+  padding: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  align-items: center;
+  min-width: 250px;
+  max-width: 300px;
+  border-radius: 0 20px 0 0;
+}
+
+.add-member-pane > button {
+  width: 50%;
+  margin: auto;
+}
+
+.members-container {
+  display: flex;
+  flex-direction: column;
 }
 
 .add-member-pane ul {
   list-style-type: none;
   display: flex;
   flex-direction: column;
-  padding-left: 0; /* resets reset css file */
+  /* resets reset css file */
+  padding-left: 0;
   text-align: center;
   margin-bottom: 2rem;
+}
+
+.add-member-pane ul div {
+  padding: 0 1rem;
+  overflow-x: hidden;
+}
+
+.underline {
+  border-bottom: 1px solid #b1a4a1;
 }
 
 .add-member-pane ul li {
@@ -81,11 +109,11 @@
   padding: 0.3rem;
   padding-left: 0.75rem;
   padding-right: 0.75rem;
-  color: #faf4fc;
-  background-color: #816f7d;
+  color: white;
+  background-color: #b1a4a1;
   margin: 0.625rem 0;
-  font-size: 1.2rem;
-  border: 1px solid #816f7d;
+  font-size: 1rem;
+  border: 1px solid #b1a4a1;
   border-radius: 20px;
 }
 
@@ -97,6 +125,70 @@
 }
 
 .selected {
-  background: #c3a9b7;
+  background: #c3b9b7;
   border-radius: 20px;
+  color: black;
+}
+
+.image-preview {
+  max-width: 80%;
+  max-height: 80%;
+}
+
+.font-small {
+  font-size: 0.85rem;
+}
+
+.scrollable {
+  overflow-y: auto;
+}
+
+.add-member-pane .btn:not(:disabled) {
+  color: black;
+}
+
+@media screen and (max-width: 550px) {
+  .add-member-pane {
+    position: absolute;
+    right: 0;
+    top: 0;
+    border-bottom: 1px solid white;
+    border-radius: 0;
+  }
+
+  .upload-pane * {
+    font-size: 16px;
+  }
+
+  .upload-form {
+    flex-direction: column;
+  }
+}
+@media screen and (max-width: 440px) {
+  .upload-pane {
+    height: fit-content;
+    padding: 1rem 0;
+  }
+
+  .upload-pane * {
+    font-size: 14px;
+  }
+
+  .progress-container {
+    width: 80%;
+  }
+}
+@media screen and (max-width: 400px) {
+  .button-panel {
+    gap: 5px;
+  }
+  .button-panel * {
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 340px) {
+  .button-panel * {
+    font-size: 12px;
+  }
 }

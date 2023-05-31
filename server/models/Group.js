@@ -1,5 +1,5 @@
 const { Schema, model } = require("mongoose");
-const { dbLogger } = require("../logging/logger");
+// const { dbLogger } = require("../logging/logger");
 const { createBlobStorageContainer } = require("../utils/blobStorage");
 
 const groupSchema = new Schema(
@@ -39,6 +39,10 @@ const groupSchema = new Schema(
       type: Number,
       default: 15,
     },
+    maxMembers: {
+      type: Number,
+      default: 5,
+    },
   }, // set this to use virtual below
   {
     toJSON: {
@@ -59,7 +63,7 @@ groupSchema.pre("save", async function (next) {
       this.serialisedGroupName = this.containerUrl.slice(this.containerUrl.lastIndexOf("/") + 1);
     } catch (err) {
       console.error(JSON.stringify(err, null, 2));
-      dbLogger.error(JSON.stringify(err, null, 2));
+      // dbLogger.error(JSON.stringify(err, null, 2));
     }
   }
   next();
@@ -68,7 +72,8 @@ groupSchema.pre("save", async function (next) {
 groupSchema.pre("deleteOne", async function (next) {
   try {
   } catch (err) {
-    dbLogger.error(JSON.stringify({ err }));
+    // dbLogger.error(JSON.stringify({ err }));
+    console.error(JSON.stringify(err, null, 2));
   }
 });
 
