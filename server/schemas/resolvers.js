@@ -6,7 +6,8 @@ const {
   getSignedUrl,
   createContainerSAS,
 } = require("../utils/sasTokenGenerator");
-const { deleteBlob } = require("../utils/blobStorage");
+const { deleteBlob, deleteContainer } = require("../utils/blobStorage");
+const { AutoEncryptionLoggerLevel } = require("mongodb");
 const { ObjectId } = require("mongoose").Types;
 
 //getting stripe private key from .env file
@@ -177,8 +178,19 @@ const resolvers = {
         return new Error("Photo not found");
       }
 
-      if (context.user !== photo.owner && !group.groupOwner._id.equals(context.user._id)) {
-        return new AuthenticationError("Only the owner is authorised to delete a photo");
+      const user = await User.findById({ _id: context.user._id });
+
+      let userIsGroupMember = false;
+
+      user.groups.forEach((userGroup) => {
+        if (group._id.equals(userGroup._id)) {
+          console.log(group._id, userGroup._id);
+          userIsGroupMember = true;
+        }
+      });
+
+      if (!group.groupOwner._id.equals(context.user._id) && !userIsGroupMember) {
+        return new AuthenticationError("Only the owner is authorised to access a group's photo");
       }
 
       return { fileUrl: getSignedUrl(groupName, serialisedFileName) };
@@ -226,6 +238,54 @@ const resolvers = {
       const { name, groupOwner, photos, containerUrl, serialisedGroupName } = newGroup;
 
       return { name, groupOwner, photos, containerUrl, serialisedGroupName };
+    },
+
+    deleteGroup: async (parent, { groupName }, context) => {
+      if (!context.user) {
+        return new AuthenticationError("You must be signed in to create a group");
+      }
+
+      const groupToDelete = await Group.findOne({ serialisedGroupName: groupName });
+
+      if (!groupToDelete.groupOwner._id.equals(context.user._id)) {
+        return new AuthenticationError("Only the owner of a group can delete it");
+      }
+
+      // remove group association from members
+      const updatedMembers = await User.updateMany(
+        { _id: { $in: [...groupToDelete.members] } },
+        {
+          $pull: { groups: { _id: groupToDelete._id } },
+        },
+        { new: true }
+      );
+
+      console.log(updatedMembers);
+
+      // remove group assocation from groupOwner
+      const updatedGroupOwner = await User.findOneAndUpdate(
+        { _id: groupToDelete.groupOwner._id },
+        {
+          $pull: { groups: { _id: groupToDelete._id } },
+        },
+        { new: true }
+      );
+      console.log(updatedGroupOwner.toJSON());
+
+      // delete all photos that are associated with this group
+      const deletedPhotos = await Photo.deleteMany({ _id: { $in: [...groupToDelete.photos] } });
+
+      console.log(deletedPhotos);
+
+      // delete group
+      const deletedGroup = await Group.findOneAndDelete({ _id: groupToDelete._id });
+
+      console.log(deletedGroup);
+
+      // delete the storage container in Azure
+      await deleteContainer(groupName);
+
+      return deletedGroup;
     },
 
     savePhoto: async (
@@ -350,6 +410,12 @@ const resolvers = {
         }
       );
 
+      await User.updateMany(
+        { _id: { $in: memberIds } },
+        { $addToSet: { groups: new ObjectId(groupId) } },
+        { new: true }
+      );
+
       return updatedGroup;
     },
 
@@ -377,7 +443,24 @@ const resolvers = {
           new: true,
         }
       );
+
+      await User.updateMany(
+        { _id: { $in: memberIds } },
+        { $pull: { groups: new ObjectId(groupId) } },
+        { new: true }
+      );
+
       return updatedGroup;
+    },
+
+    deleteAccount: async (parent, args, context) => {
+      if (!context.user) {
+        return new AuthenticationError("You must be signed in to delete an account");
+      }
+
+      const deletedUser = await User.deleteOne({ _id: context.user._id });
+
+      return deletedUser;
     },
 
     //mutation for buying premium using stripe checkout

@@ -98,5 +98,15 @@
     "photos": [],
     "groups": [],
     "friends": ["6472e545d2e3a3d54cf8318e"]
+  },
+  {
+    "firstName": "Clark",
+    "lastName": "Kent",
+    "username": "clark",
+    "email": "clark@email.com",
+    "password": "password123",
+    "photos": [],
+    "groups": [],
+    "friends": ["6472e545d2e3a3d54cf8318e"]
   }
 ]

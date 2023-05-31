@@ -88,7 +88,23 @@ async function deleteBlob(containerName, blobName) {
   }
 }
 
+async function deleteContainer(containerName) {
+  const blobServiceClient = BlobServiceClient.fromConnectionString(
+    process.env.CONNECTION_STRING_SAS
+  );
+
+  // get a reference to the container
+  const containerClient = blobServiceClient.getContainerClient(containerName);
+  // delete the container
+  const deleteContainerResponse = await containerClient.delete();
+
+  console.log(
+    `Container was deleted successfully.\n\trequestId:${deleteContainerResponse.requestId}\n\tURL: ${containerClient.url}`
+  );
+}
+
 module.exports = {
   createBlobStorageContainer,
   deleteBlob,
+  deleteContainer,
 };

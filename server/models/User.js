@@ -32,6 +32,10 @@ const userSchema = new Schema(
         ref: "Photo",
       },
     ],
+    maxPhotos: {
+      type: Number,
+      default: 10,
+    },
     groups: [
       {
         type: Schema.Types.ObjectId,
@@ -45,7 +49,6 @@ const userSchema = new Schema(
       },
     ],
   },
-  // set this to use virtual below
   {
     toJSON: {
       virtuals: true,
