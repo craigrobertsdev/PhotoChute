@@ -14,14 +14,15 @@ const PhotoGrid = ({
   const newestImage = useRef();
 
   // this function repeatedly attempts to load the thumbnail for the image as there is a delay between the image upload and the thumbnail creation in Azure
-  const loadImage = async (url) => {
+  const loadImage = async (url, retries = 10) => {
+    if (retries === 0) return;
     newestImage.current.classList.add("loading");
     let fetchResponse = await fetch(url);
     if (fetchResponse.status === 200) {
       newestImage.current.classList.remove("loading");
       newestImage.current.src = url;
     } else {
-      setTimeout(() => loadImage(url), 500);
+      setTimeout(() => loadImage(url, --retries), 500);
     }
   };
 

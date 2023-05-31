@@ -126,7 +126,7 @@ const Group = () => {
         const urlData = await getFileUploadUrl({
           variables: {
             serialisedGroupName,
-            blobName: selectedFile.name,
+            blobName: selectedFile.name.toLowerCase(),
           },
         });
 
@@ -266,7 +266,7 @@ const Group = () => {
         </button>
       </div>
       <div className="progress-container">
-        <h4>Total Photos Uploaded</h4>
+        <h4 className="text-purple">Total Photos Uploaded</h4>
         <ProgressBar
           now={photoCount}
           max={maxPhotos}
@@ -353,15 +353,20 @@ const Group = () => {
             )}
           </div>
         </div>
-
-        <PhotoGrid
-          currentUser={userId}
-          thumbnails={group?.getPhotosForGroup.photos}
-          sasToken={sasTokenData.getAuthenticationToken.sasToken}
-          onPhotoDelete={handleDeletePhoto}
-          onPhotoLoad={handleLoadPhoto}
-          onPhotoDownload={handleDownloadPhoto}
-        />
+        {group?.getPhotosForGroup?.photos.length === 0 ? (
+          <h3 className="text-center text-purple no-photos">No photos yet... get sharing!</h3>
+        ) : (
+          <>
+            <PhotoGrid
+              currentUser={userId}
+              thumbnails={group?.getPhotosForGroup.photos}
+              sasToken={sasTokenData.getAuthenticationToken.sasToken}
+              onPhotoDelete={handleDeletePhoto}
+              onPhotoLoad={handleLoadPhoto}
+              onPhotoDownload={handleDownloadPhoto}
+            />
+          </>
+        )}
       </div>
     </div>
   );
