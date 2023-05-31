@@ -318,15 +318,11 @@ const resolvers = {
     },
 
     addFriend: async (parent, { username }, context) => {
-      console.log(username)
       const user = await User.findOne({ username: username });
 
       if (!user) {
         return new Error("User not found");
       }
-      console.log(user)
-      console.log("christmas")
-      console.log(context.user)
 
       const updatedFriendList = await User.findOneAndUpdate(
         { _id: context.user._id },
@@ -337,7 +333,6 @@ const resolvers = {
           new: true,
         }
       );
-        console.log(updatedFriendList)
       return { updatedFriendList };
     },
 

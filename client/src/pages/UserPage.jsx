@@ -50,11 +50,11 @@ const User = () => {
   const handleFriendFormSubmit = async (event) => {
     event.preventDefault();
     try {
-      console.log(friendInput.trim());
       const friendAdded = await addFriend({
         variables: { username: friendInput.trim() },
       })
       console.log(friendAdded)
+      window.location.reload();
     } catch (err) {
       console.error(JSON.stringify(err, null, 2));
     }
