@@ -48,39 +48,39 @@ const resolvers = {
   Query: {
     me: async (parent, { email }, context) => {
       if (context.user) {
-        const user = await User.findOne({ _id: context.user._id });
+        const user = await User.findOne({ _id: context.user._id })
         const populatedUser = await user.populate([
           {
-            path: "groups",
+            path: "groups", 
             populate: {
-              path: "groupOwner",
-            },
+              path: "groupOwner"
+            }
           },
           {
-            path: "friends",
+            path: "friends"
           },
           {
-            path: "photos",
-          },
-        ]);
-        console.log(populatedUser.toJSON());
+            path: "photos"
+          }
+        ])
+        console.log(populatedUser.toJSON())
         return populatedUser;
       } else if (email) {
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email })
         const populatedUser = await user.populate([
           {
-            path: "groups",
+            path: "groups", 
             populate: {
-              path: "groupOwner",
-            },
+              path: "groupOwner"
+            }
           },
           {
-            path: "friends",
+            path: "friends"
           },
           {
-            path: "photos",
-          },
-        ]);
+            path: "photos"
+          }
+        ])
         return populatedUser;
       }
 
@@ -224,7 +224,7 @@ const resolvers = {
       const newGroup = await (
         await Group.create({ name: groupName, groupOwner: user })
       ).populate("groupOwner");
-
+      
       const updatedUser = await User.findOneAndUpdate(
         { _id: context.user._id },
         {
@@ -377,11 +377,26 @@ const resolvers = {
       return deletedPhoto;
     },
 
-    addFriend: async (parent, { username, email, password }) => {
-      const user = await User.create({ username, phone });
-      const token = signToken(user);
-      return { token, user };
+    //add friend mutation gets username of new friend and adds that to current users friend list
+    addFriend: async (parent, { username }, context) => {
+      const user = await User.findOne({ username: username });
+
+      if (!user) {
+        return new Error("User not found");
+      }
+
+      const updatedFriendList = await User.findOneAndUpdate(
+        { _id: context.user._id },
+        {
+          $addToSet: { friends: [user] },
+        },
+        {
+          new: true,
+        }
+      );
+      return { updatedFriendList };
     },
+
     addGroupMembers: async (parent, { groupId, memberIds }, context) => {
       if (!context.user) {
         return new AuthenticationError("You must be signed in to create a group");
