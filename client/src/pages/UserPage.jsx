@@ -24,7 +24,7 @@ const User = () => {
       <div className="col-8">
         <h2 className="altHeading">My Groups</h2>
         <ul>
-          {myGroups?.length > 0 ? (
+          {myGroups?.length !== undefined ? (
             myGroups.map((group) => (
               <Link
                 to="/group"
