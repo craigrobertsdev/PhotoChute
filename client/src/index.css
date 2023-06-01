@@ -202,6 +202,16 @@ Link:hover {
 .friendBtn {
   margin-left: 25px;
 }
+
+.deleteAcc {
+  width: fit-content;
+}
+
+.deleteAccDiv {
+  display: flex;
+  justify-content: center;
+  margin-top: 50px;
+}
 *,
 *::before,
 *::after {
