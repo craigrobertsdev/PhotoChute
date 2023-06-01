@@ -42,14 +42,14 @@ const Login = (props) => {
 
   return (
     <main className="flex-row justify-center mb-4">
-      <div className="col-6">
+      <div className="col-sm-12 col-lg-6">
         <div>
           {data ? (
             <p>
               Success! You may now head <Link to="/">back to the homepage.</Link>
             </p>
           ) : (
-            <form onSubmit={handleFormSubmit}>
+            <form className="signup-form" onSubmit={handleFormSubmit}>
               <div>
                 <label htmlFor="email">Email:</label>
                 <input
@@ -89,12 +89,11 @@ const Login = (props) => {
             </form>
           )}
 
-            {error && (
-              <div className="my-3 p-3 bg-danger text-center text-white bRadius">
+          {error && (
+            <div className="my-3 p-3 bg-danger text-center text-white bRadius">
               {`Something went wrong, please try again!`}
             </div>
-            )}
-
+          )}
         </div>
       </div>
     </main>

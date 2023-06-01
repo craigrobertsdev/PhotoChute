@@ -1,7 +1,7 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
 
-import Auth from '../../utils/auth';
+import Auth from "../../utils/auth";
 
 const Header = () => {
   const logout = (event) => {
@@ -9,14 +9,16 @@ const Header = () => {
     Auth.logout();
   };
   return (
-    <header className="bg-header text-light mb-4 py-3 flex-row align-center">
+    <header className="bg-header text-light py-3 flex-row align-center">
       <div className="container flex-row justify-space-between-lg justify-center align-center">
         <div>
-          <Link className='title-link' to="/">
-            <h1 className="m-0">Photo<span style={{color:"#47294C"}}>Chute</span></h1>
+          <Link className="title-link" to="/">
+            <h1 className="m-0">
+              Photo<span style={{ color: "#47294C" }}>Chute</span>
+            </h1>
           </Link>
         </div>
-        <div>
+        <div className="nav-links">
           {Auth.loggedIn() ? (
             <>
               <Link className="navBtn m-2" to="/me">

@@ -12,7 +12,6 @@ const typeDefs = gql`
     friends: [User]
     groups: [Group]
     photos: [Photo]
-    maxPhotos: Int
   }
 
   type Group {
