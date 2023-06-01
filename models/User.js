@@ -32,10 +32,6 @@ const userSchema = new Schema(
         ref: "Photo",
       },
     ],
-    maxPhotos: {
-      type: Number,
-      default: 10,
-    },
     groups: [
       {
         type: Schema.Types.ObjectId,
