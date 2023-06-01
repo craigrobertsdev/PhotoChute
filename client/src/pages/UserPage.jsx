@@ -185,14 +185,15 @@ const User = () => {
           </form>
         </div>
       </Container>
-      <ul className="groupName">
-        {data?.me.friends?.length !== undefined ? (
-          data.me.friends.map((friend) => <li>{friend.username}</li>)
-        ) : (
-          <div>Add Friends Above!</div>
-        )}
-      </ul>
-
+      <Container className="col-8">
+        <ul className="friend-list">
+          {data?.me.friends?.length !== undefined ? (
+            data.me.friends.map((friend) => <li className="groupName">{friend.username}</li>)
+          ) : (
+            <div>Add Friends Above!</div>
+          )}
+        </ul>
+      </Container>
       <div className="deleteAccDiv">
         <button className="btn bg-danger deleteAcc" onClick={handleDeleteUserProfile}>
           Delete Account
