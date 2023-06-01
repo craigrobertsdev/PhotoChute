@@ -41,7 +41,7 @@ const groupSchema = new Schema(
     },
     maxMembers: {
       type: Number,
-      default: 5,
+      default: 10,
     },
   }, // set this to use virtual below
   {
