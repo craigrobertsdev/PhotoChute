@@ -1,86 +1,154 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ProgressBar } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { GET_ME } from "../utils/queries";
+import { CREATE_GROUP } from "../utils/mutations";
 
+import { useQuery, useMutation } from "@apollo/client";
 
-const Profile = () => {
-  const [photoCount, setPhotoCount] = useState(0);
-  const [maxPhotos, setMaxPhotos] = useState(15);
+const User = () => {
+  const { data } = useQuery(GET_ME);
+  const [myGroups, setMyGroups] = useState([]);
+  const [friendsGroups, setFriendsGroups] = useState([]);
+  console.log("first", data);
+
+  useEffect(() => {
+    if (data?.me) {
+      const myUpdatedGroups = data?.me?.groups?.filter(
+        (group) => group.groupOwner._id === data.me._id
+      );
+      setMyGroups(myUpdatedGroups);
+      const friendsGroups = data.me.groups.filter((group) => group.groupOwner._id !== data.me._id);
+      setFriendsGroups(friendsGroups);
+    }
+  }, [data]);
+
+  const [searchInput, setSearchInput] = useState("");
+  const [groupDetails, setGroupDetails] = useState();
+  const [validationError, setValidationError] = useState(false);
+  const [createGroup] = useMutation(CREATE_GROUP);
+  const groupNameRegex = /^[a-zA-Z0-9]+{3-20}$/; // can only contain letters or numbers and must be between 3 and 20 characters long
+
+  const handleFormSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      console.log(searchInput);
+      const response = await createGroup({
+        variables: { groupName: searchInput.trim() },
+      });
+
+      console.log(response.data);
+    } catch (err) {
+      console.error(JSON.stringify(err, null, 2));
+    }
+    setSearchInput("");
+    window.location.reload();
+  };
+
+  const validateGroupName = (event) => {
+    const value = event.target.value;
+
+    // regex is due to limitations of azure container naming requirements
+    if (!value || value.length < 3 || value.length > 30 || value.match(/--/)) {
+      setValidationError(true);
+    } else {
+      setValidationError(false);
+    }
+  };
   return (
-    <div className="flex-row justify-center mb-4">
-      <div className='col-8'>
-        <h2 className='altHeading'>Storage</h2>
-        <ProgressBar
-          now={photoCount}
-          max={maxPhotos}
-          label={`${photoCount ? photoCount : 0}/${maxPhotos}`}
-          className='progBar'
-        />
-      </div>
-      <div className='col-8 mt-3' >
-        <h2 className='altHeading'>Update Details</h2>
+    <>
+      <div className="flex-row justify-center mb-4">
+        <div className="col-8">
+          <h2 className="altHeading">My Groups</h2>
+          <ul>
+            {myGroups?.length !== undefined ? (
+              myGroups.map((group) => (
+                <Link
+                  to="/group"
+                  state={{ groupId: group._id, serialisedGroupName: group.serialisedGroupName }}>
+                  {group.name}
+                </Link>
+              ))
+            ) : (
+              <div>loading...</div>
+            )}
+          </ul>
         </div>
-        <div className="col-6">
-          <form>
-            <div>
-              <label htmlFor="username">Username:</label>
-              <input
-                className="form-input"
-                name="username"
+        <div className="col-8">
+          <h2 className="altHeading">Friends Groups</h2>
+          <ul>
+            {friendsGroups?.length !== undefined ? (
+              friendsGroups.map((group) => (
+                <Link
+                  to="/group"
+                  state={{ groupId: group._id, serialisedGroupName: group.serialisedGroupName }}>
+                  {group.name}
+                </Link>
+              ))
+            ) : (
+              <div>loading...</div>
+            )}
+          </ul>
+        </div>
+      </div>
+
+      <Container className="col-8">
+        <h2 className="altHeading">Create a group</h2>
+        <Form onSubmit={handleFormSubmit}>
+          <Row>
+            <Col xs={12} md={8}>
+              <Form.Control
+                name="searchInput"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
                 type="text"
-                // value={formState.name}  
-                // onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="email">Email:</label>
-              <input
+                size="lg"
+                onBlur={validateGroupName}
+                placeholder="Enter group name"
                 className="form-input"
-                name="email"
-                type="email"
-                // value={formState.email}
-                // onChange={handleChange}
               />
-            </div>
-            <div>
-              <label htmlFor="phoneNumber">Phone Number:</label>
-              <input
-                className="form-input"
-                name="phoneNumber"
-                type="number"
-                // value={formState.phoneNumber}
-                // onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="password">Password:</label>
-              <input
-                className="form-input"
-                name="password"
-                type="password"
-                // value={formState.password}
-                // onChange={handleChange}
-              />
-            </div>
-            <div className='row'>
-              <div className="submitBtn">
-                <button
-                  className="btn"
-                  style={{ cursor: 'pointer' }}
-                  type="submit"
-                  to="/User"
-                >
-                  Submit
-                </button>
-              </div>
-              <div className='submitBtn'>
-                <Link className="homeJoin m-2" to="/User">Cancel</Link>
-              </div>
-            </div>
-          </form>
+            </Col>
+            <Col xs={12} md={4}>
+              <button className="btn" type="submit" disabled={validationError}>
+                Create Group
+              </button>
+            </Col>
+          </Row>
+          {validationError && (
+            <p className="text-red">
+              Group name must be between 3 and 30 characters long and not include consecutive '-'
+              characters
+            </p>
+          )}
+        </Form>
+      </Container>
+
+      <Container>
+        <Row>
+          <p>{groupDetails && groupDetails.name}</p>
+        </Row>
+        <Row>{groupDetails && groupDetails.members?.map((member) => <p>{member.name}</p>)}</Row>
+        <Row>
+          <p>{groupDetails && groupDetails.photos}</p>
+        </Row>
+        <Row>
+          <p>{groupDetails && groupDetails.containerUrl}</p>
+        </Row>
+      </Container>
+
+      <Container className="col-8">
+        <h2 className="altHeading">My Friends</h2>
+        <div>
+          <input placeholder="Search for a friend" />
+          <button className="btn">Add a friend</button>
         </div>
-      </div>
+        <ul>
+          <li>Shae</li>
+          <li>Lucien</li>
+        </ul>
+      </Container>
+    </>
   );
 };
 
-export default Profile;
+export default User;

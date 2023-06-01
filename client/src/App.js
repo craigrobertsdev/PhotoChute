@@ -7,7 +7,6 @@ import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Signup from "./pages/Signup";
 import CreateGroupForm from "./pages/CreateGroupForm";
-import User from "./pages/UserPage";
 import UserGroup from "./pages/UserGroup";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -49,7 +48,6 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/create-group" element={<CreateGroupForm />} />
-            <Route path="/user" element={<User />} />
             <Route path="/group" element={<UserGroup />} />
             <Route path="/premium" element={<Premium />} />
             <Route path="*" element={<h1 className="display-2">Wrong page!</h1>} />
