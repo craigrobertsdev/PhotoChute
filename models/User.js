@@ -48,6 +48,10 @@ const userSchema = new Schema(
         ref: "User",
       },
     ],
+    maxPhotos: {
+      type: String,
+      default: 10,
+    },
   },
   {
     toJSON: {
