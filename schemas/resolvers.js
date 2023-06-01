@@ -393,6 +393,13 @@ const resolvers = {
           new: true,
         }
       );
+
+      const updatedFriend = await User.findOneAndUpdate(
+        { username },
+        {
+          $addToSet: { friends: context.user._id },
+        }
+      );
       return { updatedFriendList };
     },
 
