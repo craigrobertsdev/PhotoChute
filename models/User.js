@@ -49,7 +49,7 @@ const userSchema = new Schema(
       },
     ],
     maxPhotos: {
-      type: String,
+      type: Number,
       default: 10,
     },
   },
