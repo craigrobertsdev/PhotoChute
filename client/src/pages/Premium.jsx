@@ -28,27 +28,31 @@ const Premium = () => {
     }
 
     return (
-        <div>
-            <h1>
-                Upgrade to Premium
-            </h1>
-            <h2>
-                We offer 3 premium accounts to suit your photo sharing needs
-            </h2>
-            <div className='premiumSelect'>
-                <h3>Photo Enthusiast</h3>
-                <p>Up to 5 groups <br></br>Total of 20 storable photos</p>
-                <button onClick={() => placeOrder(1)} className='levelOne'>$1.99</button>
-            </div>
-            <div>
-                <h3>Social Butterfly</h3>
-                <p>Up to 10 groups <br></br>Total of 350 storable photos</p>
-                <button onClick={() => placeOrder(2)} className='levelTwo'>$5.99</button>
-            </div>
-            <div>
-                <h3>Over Sharer</h3>
-                <p>Up to 20 groups <br></br>Total of 50 storable photos</p>
-                <button  onClick={() => placeOrder(3)} className='levelThree'>$9.99</button>
+        <div className="flex-row justify-center mb-4">
+            <div className='col-8'>
+                <h2 className='altHeading'>
+                    Upgrade to Premium
+                </h2>
+                <h5>
+                    We offer 3 premium accounts to suit your photo sharing needs!
+                </h5>
+                <div className='row'>
+                    <div className='premiumSelect col-4'>
+                        <h3 className="getter">Photo Enthusiast</h3>
+                        <p className='tagline'>Up to 5 groups <br></br>Total of 20 storable photos</p>
+                        <button onClick={() => placeOrder(1)} className='levelOne btn'>$1.99</button>
+                    </div>
+                    <div className='col-4'>
+                        <h3 className="getter">Social Butterfly</h3>
+                        <p className='tagline'>Up to 10 groups <br></br>Total of 35 storable photos</p>
+                        <button onClick={() => placeOrder(2)} className='levelTwo btn'>$5.99</button>
+                    </div>
+                    <div className='col-4'>
+                        <h3 className="getter">Over Sharer</h3>
+                        <p className='tagline'>Up to 20 groups <br></br>Total of 50 storable photos</p>
+                        <button  onClick={() => placeOrder(3)} className='levelThree btn'>$9.99</button>
+                    </div>
+                </div>
             </div>
         </div>
     );
