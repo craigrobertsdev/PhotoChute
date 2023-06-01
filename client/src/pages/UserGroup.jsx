@@ -328,7 +328,7 @@ const Group = () => {
           <h4 className="text-center">
             Members{" "}
             <span className="font-small">
-              {/* +1 to account for group owner */}
+              {/* +1 to account for group owner  */}
               {group.getPhotosForGroup.members.length + 1}/{group.getPhotosForGroup.maxMembers}{" "}
             </span>
           </h4>
