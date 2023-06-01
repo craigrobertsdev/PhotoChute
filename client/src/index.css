@@ -93,6 +93,7 @@ h6 {
 
 .homeCol1 {
   margin: 20px;
+  margin-right: 4rem;
   margin-top: 15%;
 }
 
@@ -169,11 +170,15 @@ Link:hover {
   text-align: right;
 }
 
-.progBar{
+.img-sm {
+  display: none;
+}
+
+.progBar {
   height: 30px;
   border-radius: 20px;
-  background-color: #B1A4A1;
-  color: #816F7D;
+  background-color: #b1a4a1;
+  color: #816f7d;
 }
 /* Copies */
 *,
@@ -1023,6 +1028,113 @@ form [type="radio"] {
 .col-12 {
   flex: 0 0 100%;
   max-width: 100%;
+}
+
+/* GRID CONTENT */
+.home-grid {
+  display: flex;
+}
+
+.image-col {
+  flex: 1 1 auto;
+}
+
+@media screen and (max-width: 1000px) {
+  .home-grid {
+    margin: 0 !important;
+  }
+}
+
+@media screen and (max-width: 850px) {
+  .home-grid {
+    display: grid;
+    grid-template-rows: 1fr auto;
+  }
+
+  .homeCol1 {
+    grid-row: 1/2;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin: 0;
+  }
+
+  .imageCont {
+    max-height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 3rem 0 0 0;
+  }
+
+  .img-sm {
+    display: initial;
+  }
+
+  .img-lg {
+    display: none;
+  }
+  .image-col {
+    grid-row: 2/3;
+  }
+
+  header {
+    margin-bottom: 0 !important;
+  }
+}
+
+@media screen and (max-width: 650px) {
+  .img-lg {
+    display: initial;
+  }
+
+  .img-sm {
+    display: none;
+  }
+
+  .imageCont {
+    margin-top: 0;
+  }
+
+  h2 {
+    text-align: center;
+  }
+
+  .nav-links {
+    display: flex;
+    justify-content: center;
+  }
+
+  .signup-form div {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .signup-form div label {
+    text-align: center;
+    margin-bottom: 5px;
+    padding: 0;
+  }
+
+  .signup-form div input {
+    text-align: center;
+    margin: 5px 0;
+  }
+
+  form .form-input {
+    width: 90%;
+  }
+
+  label {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  form .form-input {
+    font-size: 14px;
+  }
 }
 
 /* col-sm */

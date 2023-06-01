@@ -6,6 +6,7 @@ const typeDefs = gql`
     firstName: String
     lastName: String
     username: String
+    maxPhotos: Int
     email: String
     phone: String
     friends: [User]
@@ -78,9 +79,11 @@ const typeDefs = gql`
       serialisedFileName: String!
     ): Photo
     createGroup(groupName: String!): Group
+    deleteGroup(groupName: String!): Group
     deletePhoto(groupName: String!, photoId: ID!): Photo
     addGroupMembers(groupId: ID!, memberIds: [ID]!): Group
     removeGroupMembers(groupId: ID!, memberIds: [ID]!): Group
+    deleteAccount: User
     buyPremium(premium: Int): Premium
   }
 `;
