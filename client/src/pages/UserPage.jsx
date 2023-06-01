@@ -3,6 +3,8 @@ import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { GET_ME } from "../utils/queries";
 import { CREATE_GROUP, ADD_FRIEND} from "../utils/mutations";
+import "../assets/css/UserGroup.css";
+
 
 import { useQuery, useMutation } from "@apollo/client";
 
@@ -83,7 +85,9 @@ const User = () => {
               myGroups.map((group) => (
                 <Link
                   to="/group"
-                  state={{ groupId: group._id, serialisedGroupName: group.serialisedGroupName }}>
+                  state={{ groupId: group._id, serialisedGroupName: group.serialisedGroupName }}
+                  className="groupName"
+                  >
                   {group.name}
                 </Link>
               ))
@@ -99,7 +103,9 @@ const User = () => {
               friendsGroups.map((group) => (
                 <Link
                   to="/group"
-                  state={{ groupId: group._id, serialisedGroupName: group.serialisedGroupName }}>
+                  state={{ groupId: group._id, serialisedGroupName: group.serialisedGroupName }}
+                  className="groupName"
+                  >
                   {group.name}
                 </Link>
               ))
@@ -110,25 +116,25 @@ const User = () => {
         </div>
       </div>
 
-      <Container>
-        <h1>Create a group</h1>
+      <Container className="col-8">
+        <h2 className="altHeading">Create a group</h2>
         <Form onSubmit={handleFormSubmit}>
           <Row>
             <Col xs={12} md={8}>
-              <Form.Control
+              <input
                 name="searchInput"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 type="text"
-                size="lg"
                 onBlur={validateGroupName}
                 placeholder="Enter group name"
+                className="upload-input groupInput"
               />
             </Col>
             <Col xs={12} md={4}>
-              <Button type="submit" variant="success" size="lg" disabled={validationError}>
+              <button type="submit" className="btn" disabled={validationError}>
                 Create Group
-              </Button>
+              </button>
             </Col>
           </Row>
           {validationError && (
@@ -153,8 +159,8 @@ const User = () => {
         </Row>
       </Container>
 
-      <Container>   
-      <h3 className="text-center">My Friends</h3>
+      <Container className="col-8">   
+      <h2 className="altHeading">My Friends</h2>
       <div style={{ display: "flex", justifyContent: "center", gap: "1rem" }}>
         <form onSubmit={handleFriendFormSubmit}>
           <input 
@@ -163,13 +169,14 @@ const User = () => {
             type='text'
             value={friendInput}
             onChange={(e) => setFriendInput(e.target.value)}
-            
+            className="upload-input friendInput"
+            size="lg"
           />
-          <button type='submit' className="btn">Add a friend</button>
+          <button type='submit' className="btn friendBtn">Add a friend</button>
         </form>
       </div>
       </Container>
-      <ul>
+      <ul className="groupName">
       {data?.me.friends?.length !== undefined?(
               data.me.friends.map((friend) => (
                 <li>{friend.username}</li>

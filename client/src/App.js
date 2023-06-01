@@ -4,7 +4,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from "@ap
 import { setContext } from "@apollo/client/link/context";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import Profile from "./pages/Profile";
+import Profile from "./pages/UserPage";
 import Signup from "./pages/Signup";
 import CreateGroupForm from "./pages/CreateGroupForm";
 import UserGroup from "./pages/UserGroup";
@@ -46,7 +46,6 @@ function App() {
             <Route path="/me" element={<Profile />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/profile" element={<Profile />} />
             <Route path="/create-group" element={<CreateGroupForm />} />
             <Route path="/group" element={<UserGroup />} />
             <Route path="/premium" element={<Premium />} />
