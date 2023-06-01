@@ -44,6 +44,10 @@ const userSchema = new Schema(
         ref: "User",
       },
     ],
+    maxPhotos: {
+      type: String,
+      default: 10,
+    },
   },
   // set this to use virtual below
   {
