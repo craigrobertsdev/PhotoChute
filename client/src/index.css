@@ -105,6 +105,11 @@ h6 {
   font-size: 15px;
 }
 
+.subheading {
+  color: #816f7d;
+  font-size: 15px;
+}
+
 .homeJoin {
   text-align: center;
   display: inline-block;
@@ -149,6 +154,15 @@ label {
   height: min-content;
 }
 
+.groupName {
+  display: block;
+  font-size: 20px;
+}
+
+.groupInput {
+  width: 100%;
+}
+
 Link {
   color: #47294c;
 }
@@ -180,7 +194,14 @@ Link:hover {
   background-color: #b1a4a1;
   color: #816f7d;
 }
-/* Copies */
+
+.friendInput {
+  width: 65%;
+}
+
+.friendBtn {
+  margin-left: 25px;
+}
 *,
 *::before,
 *::after {

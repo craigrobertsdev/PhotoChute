@@ -281,8 +281,12 @@ const resolvers = {
 
       console.log(deletedGroup);
 
-      // delete the storage container in Azure
-      await deleteContainer(groupName);
+      try {
+        // delete the storage container in Azure
+        await deleteContainer(groupName);
+      } catch (err) {
+        console.log(err);
+      }
 
       return deletedGroup;
     },

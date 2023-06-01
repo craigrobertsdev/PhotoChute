@@ -53,7 +53,9 @@ export const CREATE_GROUP = gql`
 
 export const DELETE_GROUP = gql`
   mutation deleteGroup($groupName: String!) {
-    _id
+    deleteGroup(groupName: $groupName) {
+      _id
+    }
   }
 `;
 
