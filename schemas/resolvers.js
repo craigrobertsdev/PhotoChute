@@ -540,8 +540,8 @@ const resolvers = {
         payment_method_types: ["card"],
         line_items,
         mode: "payment",
-        success_url: `http://localhost:3000/`,
-        cancel_url: `http://localhost:3000/premium`,
+        success_url: `https://photochute.herokuapp.com/me`,
+        cancel_url: `https://photochute.herokuapp.com/premium`,
       });
       //returns session id to be used in redirect in premium.jsx
       return { session: session.id };

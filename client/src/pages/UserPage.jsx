@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { GET_ME } from "../utils/queries";
-import { CREATE_GROUP, ADD_FRIEND } from "../utils/mutations";
+import { CREATE_GROUP, ADD_FRIEND, DELETE_ACCOUNT } from "../utils/mutations";
 import "../assets/css/UserGroup.css";
+import auth from "../utils/auth";
 
 import { useQuery, useMutation } from "@apollo/client";
 
@@ -28,6 +29,8 @@ const User = () => {
   const [validationError, setValidationError] = useState(false);
   const [createGroup] = useMutation(CREATE_GROUP);
   const groupNameRegex = /^[a-zA-Z0-9]+{3-20}$/; // can only contain letters or numbers and must be between 3 and 20 characters long
+  const [deleteProfile] = useMutation(DELETE_ACCOUNT);
+  const userId = auth.getProfile().data._id;
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
@@ -60,6 +63,12 @@ const User = () => {
     } catch (err) {
       console.error(JSON.stringify(err, null, 2));
     }
+  };
+
+  const handleDeleteUserProfile = async () => {
+    await deleteProfile();
+    auth.logout();
+    window.location.assign("/");
   };
 
   const validateGroupName = (event) => {
@@ -127,7 +136,10 @@ const User = () => {
               />
             </Col>
             <Col xs={12} md={4}>
-              <button type="submit" className="btn" disabled={validationError}>
+              <button
+                type="submit"
+                className="btn"
+                disabled={validationError && searchInput?.length !== 0}>
                 Create Group
               </button>
             </Col>
@@ -175,11 +187,17 @@ const User = () => {
       </Container>
       <ul className="groupName">
         {data?.me.friends?.length !== undefined ? (
-          data.me.friends.map((friend) => <li key={friend.username}>{friend.username}</li>)
+          data.me.friends.map((friend) => <li>{friend.username}</li>)
         ) : (
           <div>Add Friends Above!</div>
         )}
       </ul>
+
+      <div className="deleteAccDiv">
+        <button className="btn bg-danger deleteAcc" onClick={handleDeleteUserProfile}>
+          Delete Account
+        </button>
+      </div>
     </>
   );
 };
