@@ -4,6 +4,7 @@ import {
   SAVE_PHOTO,
   ADD_GROUP_MEMBERS,
   REMOVE_GROUP_MEMBERS,
+  DELETE_GROUP,
 } from "../utils/mutations";
 import {
   GET_PHOTOS_FOR_GROUP,
@@ -44,6 +45,7 @@ const Group = () => {
   const [deletePhoto] = useMutation(DELETE_PHOTO);
   const [addGroupMembers] = useMutation(ADD_GROUP_MEMBERS);
   const [deleteGroupMembers] = useMutation(REMOVE_GROUP_MEMBERS);
+  const [deleteGroup] = useMutation(DELETE_GROUP);
   const { data: sasTokenData, error: tokenDataError } = useQuery(GET_AUTHENTICATION_TOKEN, {
     variables: {
       groupName: serialisedGroupName,
@@ -61,6 +63,7 @@ const Group = () => {
 
   useEffect(() => {
     if (group?.getPhotosForGroup) {
+      console.log(group.getPhotosForGroup);
       setPhotoCount(group.getPhotosForGroup.photos.length);
       setMaxPhotos(group.getPhotosForGroup.maxPhotos);
 
@@ -74,8 +77,7 @@ const Group = () => {
         userMaxPhotos = user.maxPhotos;
         userPhotoCount = user.photos.length;
       }
-
-      setUserAtMaxPhotos(userMaxPhotos >= userPhotoCount);
+      setUserAtMaxPhotos(userPhotoCount >= userMaxPhotos);
 
       // filter out the group owner's friends who are already in the group by their id
       const groupMemberIds = group.getPhotosForGroup.members.map((member) => member._id);
@@ -264,6 +266,15 @@ const Group = () => {
     setMemberPaneOpen(!memberPaneOpen);
   };
 
+  const handleDeleteGroup = async () => {
+    console.log(serialisedGroupName);
+    const deletedGroup = await deleteGroup({
+      variables: { groupName: serialisedGroupName },
+    });
+
+    window.location.assign("/me");
+  };
+
   if (loadingGroup) {
     return "Loading...";
   }
@@ -282,6 +293,11 @@ const Group = () => {
           {group.getPhotosForGroup.groupOwner._id === userId
             ? "Add/Remove Member"
             : "View Group Members"}
+        </button>
+        <button
+          className={`btn ${group.getPhotosForGroup.groupOwner._id === userId ? "" : "hidden"}`}
+          onClick={handleDeleteGroup}>
+          Delete Group
         </button>
       </div>
       <div className="progress-container">

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import "../assets/css/PhotoGrid.css";
 import { formatDate } from "../utils/helpers";
 
@@ -13,6 +13,12 @@ const PhotoGrid = ({
 }) => {
   // attaches to the last element of the thumbnails array (which is where the photo that has just been uploaded is)
   const newestImage = useRef();
+  // const [abortController, setAbortController] = useState(new AbortController());
+  // useEffect(() => {
+  //   return () => {
+  //     abortController.abort();
+  //   };
+  // }, []);
 
   // this function repeatedly attempts to load the thumbnail for the image as there is a delay between the image upload and the thumbnail creation in Azure. tries for 10 seconds - this should be more than enough time for the thumbnail to be generated
   const loadImage = async (url, retries = 20) => {
