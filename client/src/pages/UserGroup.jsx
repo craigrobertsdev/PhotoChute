@@ -64,10 +64,6 @@ const Group = () => {
 
   const [getSignedUrl] = useLazyQuery(GET_SIGNED_URL);
 
-  // useEffect(() => {
-  //   setThumbnailLoading(false);
-  // }, [thumbnailCreated])
-
   useEffect(() => {
     if (group?.getPhotosForGroup) {
       console.log(group.getPhotosForGroup);
@@ -105,6 +101,7 @@ const Group = () => {
 
     await deletePhoto({
       variables: {
+        groupId,
         groupName: serialisedGroupName,
         photoId: thumbnail._id,
       },

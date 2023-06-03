@@ -331,9 +331,10 @@ const resolvers = {
       );
 
       const groupPhotos = await (await Photo.find({ group: groupId })).populate("owner");
-      return newPhoto;
+
+      return groupPhotos;
     },
-    deletePhoto: async (parent, { groupName, photoId }, context) => {
+    deletePhoto: async (parent, { groupId, groupName, photoId }, context) => {
       if (!context.user) {
         return new AuthenticationError("You must be signed in to create a group");
       }
@@ -378,7 +379,9 @@ const resolvers = {
         { new: true }
       );
 
-      return deletedPhoto;
+      const groupPhotos = await (await Photo.find({ group: groupId })).populate("owner");
+
+      return groupPhotos;
     },
 
     // add friend mutation gets username of new friend and adds that to current users friend list

@@ -80,6 +80,7 @@ export const SAVE_PHOTO = gql`
       fileName
       url
       owner {
+        _id
         firstName
       }
     }
@@ -97,9 +98,15 @@ export const GET_FILE_UPLOAD_URL = gql`
 `;
 
 export const DELETE_PHOTO = gql`
-  mutation deleteSinglePhoto($groupName: String!, $photoId: ID!) {
-    deletePhoto(groupName: $groupName, photoId: $photoId) {
+  mutation deleteSinglePhoto($groupId: ID!, $groupName: String!, $photoId: ID!) {
+    deletePhoto(groupId: $groupId, groupName: $groupName, photoId: $photoId) {
       _id
+      fileName
+      url
+      owner {
+        _id
+        firstName
+      }
     }
   }
 `;
