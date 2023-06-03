@@ -330,6 +330,7 @@ const resolvers = {
         { new: true }
       );
 
+      const groupPhotos = await (await Photo.find({ group: groupId })).populate("owner");
       return newPhoto;
     },
     deletePhoto: async (parent, { groupName, photoId }, context) => {

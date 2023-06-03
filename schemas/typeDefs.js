@@ -83,7 +83,7 @@ const typeDefs = gql`
       ownerId: ID!
       groupId: ID!
       serialisedFileName: String!
-    ): Photo
+    ): [Photo]
     createGroup(groupName: String!): Group
     deleteGroup(groupName: String!): Group
     deletePhoto(groupName: String!, photoId: ID!): Photo

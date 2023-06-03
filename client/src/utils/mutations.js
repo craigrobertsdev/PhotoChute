@@ -79,6 +79,9 @@ export const SAVE_PHOTO = gql`
       _id
       fileName
       url
+      owner {
+        firstName
+      }
     }
   }
 `;

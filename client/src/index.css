@@ -1113,6 +1113,10 @@ form [type="radio"] {
   header {
     margin-bottom: 0 !important;
   }
+
+  .tagline {
+    text-align: center;
+  }
 }
 
 @media screen and (max-width: 650px) {

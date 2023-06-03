@@ -20,6 +20,7 @@ import "../assets/css/UserGroup.css";
 import auth from "../utils/auth";
 import { ProgressBar } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
+import loadingSpinner from "../assets/images/loading.gif";
 
 const Group = () => {
   const { groupId, serialisedGroupName } = useLocation().state;
@@ -36,6 +37,8 @@ const Group = () => {
   const [uploadPaneOpen, setUploadPaneOpen] = useState(false);
   const [memberPaneOpen, setMemberPaneOpen] = useState(false);
   const [thumbnailLoading, setThumbnailLoading] = useState(false);
+  const [thumbnailCreated, setThumbnailCreated] = useState();
+  const [photos, setPhotos] = useState(null);
 
   const MAX_FILE_SIZE = 5242880; // 5MB
 
@@ -61,9 +64,14 @@ const Group = () => {
 
   const [getSignedUrl] = useLazyQuery(GET_SIGNED_URL);
 
+  // useEffect(() => {
+  //   setThumbnailLoading(false);
+  // }, [thumbnailCreated])
+
   useEffect(() => {
     if (group?.getPhotosForGroup) {
       console.log(group.getPhotosForGroup);
+      setPhotos(group.getPhotosForGroup.photos);
       setPhotoCount(group.getPhotosForGroup.photos.length);
       setMaxPhotos(group.getPhotosForGroup.maxPhotos);
 
@@ -102,7 +110,9 @@ const Group = () => {
       },
     });
 
-    window.location.reload();
+    setPhotos(photos.filter((photo) => photo._id !== thumbnail._id));
+    console.log(photos);
+    // window.location.reload();
   };
 
   const onFileChange = (event) => {
@@ -132,8 +142,7 @@ const Group = () => {
 
   const onFileUpload = async (event) => {
     event.preventDefault();
-
-    if (selectedFile && selectedFile?.name) {
+    if (!fileValidationError && selectedFile && selectedFile?.name) {
       // prepare UI
       setUploading(true);
       try {
@@ -148,7 +157,7 @@ const Group = () => {
         // *** UPLOAD TO AZURE STORAGE ***
         await uploadFileToBlob(selectedFile, fileUrl);
 
-        await savePhoto({
+        const updatedPhotos = await savePhoto({
           variables: {
             fileName: selectedFile.name,
             url: fileUrl,
@@ -160,10 +169,11 @@ const Group = () => {
         });
 
         // reset state/formgroup
+        setPhotos(updatedPhotos);
         setUploading(false);
         setSelectedFile(null);
-
-        window.location.reload();
+        setThumbnailLoading(true);
+        // window.location.reload();
       } catch (err) {
         console.log(JSON.stringify(err, null, 2));
       }
@@ -206,6 +216,7 @@ const Group = () => {
         var a = document.createElement("a");
         a.href = url;
         a.download = serialisedFileName;
+        a.setAttribute("download", "");
         document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
         a.click();
         a.remove(); //afterwards we remove the element again
@@ -273,6 +284,18 @@ const Group = () => {
     });
 
     window.location.assign("/me");
+  };
+
+  const getLoadingThumbnails = () => {
+    const loadingThumbnails = group?.getPhotosForGroup.photos.map((photo, index) => {
+      if (index === group.getPhotosForGroup.photos.length - 1) {
+        return { ...photo, thumbnailUrl: loadingSpinner };
+      } else {
+        return photo;
+      }
+    });
+
+    return loadingThumbnails;
   };
 
   if (loadingGroup) {
@@ -426,7 +449,9 @@ const Group = () => {
           <>
             <PhotoGrid
               currentUser={userId}
-              thumbnails={group?.getPhotosForGroup.photos}
+              thumbnails={
+                thumbnailLoading ? getLoadingThumbnails() : group?.getPhotosForGroup.photos
+              }
               sasToken={sasTokenData.getAuthenticationToken.sasToken}
               onPhotoDelete={handleDeletePhoto}
               onPhotoLoad={handleLoadPhoto}

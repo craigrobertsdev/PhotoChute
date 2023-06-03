@@ -21,6 +21,7 @@
     "react-dom": "^16.13.1",
     "react-router-dom": "^6.2.1",
     "react-scripts": "^5.0.1",
+    "socket.io-client": "^4.6.2",
     "stripe": "^12.7.0",
     "uuid": "9.0.0"
   },
