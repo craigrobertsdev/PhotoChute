@@ -22,7 +22,7 @@ import { ProgressBar } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
 import loadingSpinner from "../assets/images/loading.gif";
 
-const Group = () => {
+const Group = ({ socket }) => {
   const { groupId, serialisedGroupName } = useLocation().state;
   const userId = auth.getProfile().data._id;
   const [selectedFile, setSelectedFile] = useState();
@@ -39,6 +39,7 @@ const Group = () => {
   const [thumbnailLoading, setThumbnailLoading] = useState(false);
   const [thumbnailCreated, setThumbnailCreated] = useState();
   const [photos, setPhotos] = useState(null);
+  const photoGridRef = useRef();
 
   const MAX_FILE_SIZE = 5242880; // 5MB
 
@@ -92,6 +93,17 @@ const Group = () => {
     }
   }, [group]);
 
+  useEffect(() => {
+    console.log(photos);
+  }, [photos]);
+
+  socket.on("thumbnail-created", (data) => {
+    console.log("thumbnail created");
+    console.log(data.thumbnailUrl);
+    // getLoadingThumbnails();
+    setThumbnailLoading(false);
+  });
+
   /**
    * Deletes a photo from the group's container. Only available if the user has permission to perform this action
    * @param {Event} event
@@ -99,7 +111,7 @@ const Group = () => {
   const handleDeletePhoto = async (event, thumbnail) => {
     event.preventDefault();
 
-    await deletePhoto({
+    const updatedPhotos = await deletePhoto({
       variables: {
         groupId,
         groupName: serialisedGroupName,
@@ -108,7 +120,7 @@ const Group = () => {
     });
 
     setPhotos(photos.filter((photo) => photo._id !== thumbnail._id));
-    console.log(photos);
+    console.log(updatedPhotos);
     // window.location.reload();
   };
 
@@ -166,10 +178,12 @@ const Group = () => {
         });
 
         // reset state/formgroup
-        setPhotos(updatedPhotos);
+        setPhotos({ ...updatedPhotos });
+
         setUploading(false);
         setSelectedFile(null);
         setThumbnailLoading(true);
+        photoGridRef.current.forceUpdate();
         // window.location.reload();
       } catch (err) {
         console.log(JSON.stringify(err, null, 2));
@@ -445,7 +459,7 @@ const Group = () => {
         ) : (
           <>
             <PhotoGrid
-              currentUser={userId}
+              ref={photoGridRef}
               thumbnails={
                 thumbnailLoading ? getLoadingThumbnails() : group?.getPhotosForGroup.photos
               }

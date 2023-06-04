@@ -265,7 +265,7 @@ const resolvers = {
       const updatedGroupOwner = await User.findOneAndUpdate(
         { _id: groupToDelete.groupOwner._id },
         {
-          $pull: { groups: { _id: groupToDelete._id } },
+          $pull: { groups: { _id: groupToDelete._id }, photos: { group: groupToDelete._id } },
         },
         { new: true }
       );
@@ -330,9 +330,11 @@ const resolvers = {
         { new: true }
       );
 
-      const groupPhotos = await (await Photo.find({ group: groupId })).populate("owner");
+      const photos = await Photo.find({ group: groupId });
 
-      return groupPhotos;
+      const populatedPhotos = await Photo.populate(photos, { path: "owner" });
+
+      return populatedPhotos;
     },
     deletePhoto: async (parent, { groupId, groupName, photoId }, context) => {
       if (!context.user) {
@@ -379,9 +381,9 @@ const resolvers = {
         { new: true }
       );
 
-      const groupPhotos = await (await Photo.find({ group: groupId })).populate("owner");
+      const updatedPhotos = await (await Photo.find({ group: groupId })).populate("owner");
 
-      return groupPhotos;
+      return updatedPhotos;
     },
 
     // add friend mutation gets username of new friend and adds that to current users friend list

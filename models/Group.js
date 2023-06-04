@@ -1,6 +1,7 @@
 const { Schema, model } = require("mongoose");
 // const { dbLogger } = require("../logging/logger");
 const { createBlobStorageContainer } = require("../utils/blobStorage");
+const { removeSpecialCharacters } = require("../utils/helpers");
 
 const groupSchema = new Schema(
   {
@@ -59,10 +60,11 @@ groupSchema.virtual("photoCount").get(function () {
 groupSchema.pre("save", async function (next) {
   if (this.isNew) {
     try {
-      this.containerUrl = await createBlobStorageContainer(this.name);
+      this.containerUrl = await createBlobStorageContainer(removeSpecialCharacters(this.name));
+
       this.serialisedGroupName = this.containerUrl.slice(this.containerUrl.lastIndexOf("/") + 1);
     } catch (err) {
-      console.error(JSON.stringify(err, null, 2));
+      console.error(err);
       // dbLogger.error(JSON.stringify(err, null, 2));
     }
   }
@@ -72,7 +74,7 @@ groupSchema.pre("save", async function (next) {
 groupSchema.pre("deleteOne", async function (next) {
   try {
   } catch (err) {
-    // dbLogger.error(JSON.stringify({ err }));
+    // dbLogger.error(JSON.stringify({ err }));x
     console.error(JSON.stringify(err, null, 2));
   }
 });
@@ -84,8 +86,6 @@ groupSchema.pre("deleteOne", async function (next) {
  */
 function validateGroupName(name) {
   if (name.length < 3 || name.length > 30) return false;
-  // TODO
-  // implement regex to determine 2 consecutive '-' characters.
 
   return !name.match(/--/);
 }

@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { io } from "socket.io-client";
-
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Profile from "./pages/UserPage";
@@ -39,13 +38,6 @@ const client = new ApolloClient({
 // adds websocket connection to listen for confirmation of thumbnail being uploaded
 const socket = io("http://localhost:3001");
 
-socket.on("thumbnail-created", (data) => {
-  console.log("thumbnail created");
-  console.log(data.thumbnailUrl);
-  // getLoadingThumbnails();
-  // setThumbnailLoading(false);
-});
-
 function App() {
   return (
     <ApolloProvider client={client}>
@@ -57,7 +49,7 @@ function App() {
             <Route path="/me" element={<Profile />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/group" element={<UserGroup />} />
+            <Route path="/group" element={<UserGroup socket={socket} />} />
             <Route path="/premium" element={<Premium />} />
             <Route path="*" element={<h1 className="display-2">Wrong page!</h1>} />
           </Routes>

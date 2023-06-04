@@ -3,6 +3,7 @@ import "../assets/css/PhotoGrid.css";
 import { formatDate } from "../utils/helpers";
 
 const PhotoGrid = ({
+  photoGridRef,
   currentUser,
   thumbnails,
   sasToken,
@@ -33,7 +34,7 @@ const PhotoGrid = ({
   };
 
   return (
-    <div className="photo-grid">
+    <div className="photo-grid" ref={photoGridRef}>
       {thumbnails.map((thumbnail, index) => (
         <div className="thumbnail-container" key={"thumbnail-" + index}>
           <button
