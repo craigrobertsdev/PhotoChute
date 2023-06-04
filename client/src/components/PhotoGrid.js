@@ -3,7 +3,6 @@ import "../assets/css/PhotoGrid.css";
 import { formatDate } from "../utils/helpers";
 
 const PhotoGrid = ({
-  photoGridRef,
   currentUser,
   thumbnails,
   sasToken,
@@ -34,49 +33,53 @@ const PhotoGrid = ({
   };
 
   return (
-    <div className="photo-grid" ref={photoGridRef}>
-      {thumbnails.map((thumbnail, index) => (
-        <div className="thumbnail-container" key={"thumbnail-" + index}>
-          <button
-            className="thumbnail-button"
-            onClick={(event) => onPhotoLoad(event, thumbnail.serialisedFileName)}>
-            {/* {thumbnailLoading ? (
+    <div className="photo-grid">
+      {thumbnails.length > 0 ? (
+        thumbnails.map((thumbnail, index) => (
+          <div className="thumbnail-container" key={"thumbnail-" + index}>
+            <button
+              className="thumbnail-button"
+              onClick={(event) => onPhotoLoad(event, thumbnail.serialisedFileName)}>
+              {/* {thumbnailLoading ? (
               <div className="loading"></div>
             ) : ( */}
-            <img
-              className="thumbnail"
-              ref={index === thumbnails.length - 1 ? newestImage : null}
-              src={thumbnail.thumbnailUrl + sasToken}
-              crossOrigin="anonymous"
-              alt="thumbnail"
-              // onError={async () => await loadImage(thumbnail.thumbnailUrl + sasToken)}
-            />
-            {/* )} */}
-          </button>
-          <div>
-            <p className="text-center">
-              Uploaded by {thumbnail.owner.firstName} on {formatDate(thumbnail.uploadDate)}
-            </p>
-            <div className="button-row">
-              <button
-                className="btn"
-                onClick={(event) => onPhotoDownload(event, thumbnail.serialisedFileName)}>
-                Download
-              </button>
-              <button
-                className={`btn ${
-                  thumbnail.owner._id === currentUser || // the user is the person who uploaded the photo
-                  thumbnail.group.groupOwner._id === currentUser // the user is the owner of the group
-                    ? ""
-                    : "hidden"
-                }`}
-                onClick={(event) => onPhotoDelete(event, thumbnail)}>
-                Delete
-              </button>
+              <img
+                className="thumbnail"
+                ref={index === thumbnails.length - 1 ? newestImage : null}
+                src={thumbnail.thumbnailUrl + sasToken}
+                crossOrigin="anonymous"
+                alt="thumbnail"
+                // onError={async () => await loadImage(thumbnail.thumbnailUrl + sasToken)}
+              />
+              {/* )} */}
+            </button>
+            <div>
+              <p className="text-center">
+                Uploaded by {thumbnail.owner.firstName} on {formatDate(thumbnail.uploadDate)}
+              </p>
+              <div className="button-row">
+                <button
+                  className="btn"
+                  onClick={(event) => onPhotoDownload(event, thumbnail.serialisedFileName)}>
+                  Download
+                </button>
+                <button
+                  className={`btn ${
+                    thumbnail.owner._id === currentUser || // the user is the person who uploaded the photo
+                    thumbnail.group.groupOwner._id === currentUser // the user is the owner of the group
+                      ? ""
+                      : "hidden"
+                  }`}
+                  onClick={(event) => onPhotoDelete(event, thumbnail)}>
+                  Delete
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        ))
+      ) : (
+        <div>Loading</div>
+      )}
     </div>
   );
 };

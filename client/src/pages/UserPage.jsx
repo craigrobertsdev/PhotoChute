@@ -90,6 +90,7 @@ const User = () => {
             {myGroups?.length !== undefined ? (
               myGroups.map((group) => (
                 <Link
+                  key={group.serialisedGroupName}
                   to="/group"
                   state={{ groupId: group._id, serialisedGroupName: group.serialisedGroupName }}
                   className="groupName">
@@ -107,6 +108,7 @@ const User = () => {
             {friendsGroups?.length !== undefined ? (
               friendsGroups.map((group) => (
                 <Link
+                  key={group.serialisedGroupName}
                   to="/group"
                   state={{ groupId: group._id, serialisedGroupName: group.serialisedGroupName }}
                   className="groupName">
@@ -188,7 +190,11 @@ const User = () => {
       <Container className="col-8">
         <ul className="friend-list">
           {data?.me.friends?.length !== undefined ? (
-            data.me.friends.map((friend) => <li className="groupName">{friend.username}</li>)
+            data.me.friends.map((friend) => (
+              <li className="groupName" key={friend.username}>
+                {friend.username}
+              </li>
+            ))
           ) : (
             <div>Add Friends Above!</div>
           )}

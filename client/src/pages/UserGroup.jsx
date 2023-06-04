@@ -38,7 +38,7 @@ const Group = ({ socket }) => {
   const [memberPaneOpen, setMemberPaneOpen] = useState(false);
   const [thumbnailLoading, setThumbnailLoading] = useState(false);
   const [thumbnailCreated, setThumbnailCreated] = useState();
-  const [photos, setPhotos] = useState(null);
+  const [photos, setPhotos] = useState([]);
   const photoGridRef = useRef();
 
   const MAX_FILE_SIZE = 5242880; // 5MB
@@ -97,13 +97,15 @@ const Group = ({ socket }) => {
     console.log(photos);
   }, [photos]);
 
-  socket.on("thumbnail-created", (data) => {
+  const thumbnailCreatedListener = (data) => {
     console.log("thumbnail created");
     console.log(data.thumbnailUrl);
     // getLoadingThumbnails();
     setThumbnailLoading(false);
-  });
+  };
 
+  socket.on("thumbnail-created", thumbnailCreatedListener);
+  socket.off("thumbnail-created", thumbnailCreatedListener);
   /**
    * Deletes a photo from the group's container. Only available if the user has permission to perform this action
    * @param {Event} event
@@ -178,12 +180,12 @@ const Group = ({ socket }) => {
         });
 
         // reset state/formgroup
-        setPhotos({ ...updatedPhotos });
+
+        setPhotos({ ...photos, ...updatedPhotos.data.savePhoto });
 
         setUploading(false);
         setSelectedFile(null);
         setThumbnailLoading(true);
-        photoGridRef.current.forceUpdate();
         // window.location.reload();
       } catch (err) {
         console.log(JSON.stringify(err, null, 2));
@@ -459,10 +461,8 @@ const Group = ({ socket }) => {
         ) : (
           <>
             <PhotoGrid
-              ref={photoGridRef}
-              thumbnails={
-                thumbnailLoading ? getLoadingThumbnails() : group?.getPhotosForGroup.photos
-              }
+              currentUser={userId}
+              thumbnails={thumbnailLoading ? getLoadingThumbnails() : photos}
               sasToken={sasTokenData.getAuthenticationToken.sasToken}
               onPhotoDelete={handleDeletePhoto}
               onPhotoLoad={handleLoadPhoto}
