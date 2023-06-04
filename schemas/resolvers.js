@@ -244,46 +244,36 @@ const resolvers = {
         return new AuthenticationError("You must be signed in to create a group");
       }
 
-      const groupToDelete = await Group.findOne({ serialisedGroupName: groupName });
+      const groupToDelete = await (
+        await Group.findOne({ serialisedGroupName: groupName })
+      ).populate("photos");
+
+      const blobNames = groupToDelete.photos.map((photo) => photo.serialisedFileName);
 
       if (!groupToDelete.groupOwner._id.equals(context.user._id)) {
         return new AuthenticationError("Only the owner of a group can delete it");
       }
 
       // remove group association from members
-      const updatedMembers = await User.updateMany(
-        { _id: { $in: [...groupToDelete.members] } },
+      await User.updateMany(
+        { _id: { $in: [...groupToDelete.members, groupToDelete.groupOwner] } },
         {
-          $pull: { groups: { _id: groupToDelete._id } },
+          $pull: { groups: groupToDelete._id, photos: { $in: groupToDelete.photos } },
         },
         { new: true }
       );
-
-      console.log(updatedMembers);
-
-      // remove group assocation from groupOwner
-      const updatedGroupOwner = await User.findOneAndUpdate(
-        { _id: groupToDelete.groupOwner._id },
-        {
-          $pull: { groups: { _id: groupToDelete._id }, photos: { group: groupToDelete._id } },
-        },
-        { new: true }
-      );
-      console.log(updatedGroupOwner.toJSON());
-
-      // delete all photos that are associated with this group
-      const deletedPhotos = await Photo.deleteMany({ _id: { $in: [...groupToDelete.photos] } });
-
-      console.log(deletedPhotos);
 
       // delete group
       const deletedGroup = await Group.findOneAndDelete({ _id: groupToDelete._id });
 
-      console.log(deletedGroup);
+      // delete all photos that are associated with this group
+      await Photo.deleteMany({ _id: { $in: groupToDelete.photos } });
+
+      console.log(groupToDelete.toJSON());
 
       try {
         // delete the storage container in Azure
-        await deleteContainer(groupName);
+        await deleteContainer(groupName, blobNames);
       } catch (err) {
         console.log(err);
       }
@@ -381,9 +371,11 @@ const resolvers = {
         { new: true }
       );
 
-      const updatedPhotos = await (await Photo.find({ group: groupId })).populate("owner");
+      const photos = await Photo.find({ group: groupId });
 
-      return updatedPhotos;
+      const populatedPhotos = await Photo.populate(photos, { path: "owner" });
+
+      return populatedPhotos;
     },
 
     // add friend mutation gets username of new friend and adds that to current users friend list

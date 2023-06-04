@@ -67,11 +67,11 @@ async function deleteBlob(containerName, blobName) {
   const containerClient = blobServiceClient.getContainerClient(containerName);
 
   // Create blob client from container client
-  const blockBlobClient = await containerClient.getBlockBlobClient(blobName);
+  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
   const thumbnailClient = blobServiceClient.getContainerClient("thumbnails");
 
-  const thumbnailBlobClient = await thumbnailClient.getBlockBlobClient(blobName);
+  const thumbnailBlobClient = thumbnailClient.getBlockBlobClient(blobName);
   try {
     const deletePhoto = blockBlobClient.delete({
       deleteSnapshots: "include",
@@ -88,19 +88,30 @@ async function deleteBlob(containerName, blobName) {
   }
 }
 
-async function deleteContainer(containerName) {
+async function deleteContainer(containerName, blobNames) {
   const blobServiceClient = BlobServiceClient.fromConnectionString(
     process.env.CONNECTION_STRING_SAS
   );
 
   // get a reference to the container
   const containerClient = blobServiceClient.getContainerClient(containerName);
+  const thumbnailClient = blobServiceClient.getContainerClient("thumbnails");
   // delete the container
   const deleteContainerResponse = await containerClient.delete();
 
   console.log(
     `Container was deleted successfully.\n\trequestId:${deleteContainerResponse.requestId}\n\tURL: ${containerClient.url}`
   );
+
+  const thumbnailsToDelete = [];
+
+  for (const blobName of blobNames) {
+    thumbnailsToDelete.push(
+      thumbnailClient.deleteBlob(blobName, {
+        deleteSnapshots: "include",
+      })
+    );
+  }
 }
 
 module.exports = {
