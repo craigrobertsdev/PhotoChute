@@ -67,6 +67,7 @@ export const SAVE_PHOTO = gql`
     $ownerId: ID!
     $groupId: ID!
     $serialisedFileName: String!
+    $serialisedGroupName: String!
   ) {
     savePhoto(
       fileName: $fileName
@@ -75,14 +76,57 @@ export const SAVE_PHOTO = gql`
       ownerId: $ownerId
       groupId: $groupId
       serialisedFileName: $serialisedFileName
+      serialisedGroupName: $serialisedGroupName
     ) {
       _id
-      fileName
-      url
-      owner {
+      name
+      members {
         _id
         firstName
+        lastName
+        maxPhotos
+        photos {
+          _id
+        }
       }
+      groupOwner {
+        _id
+        firstName
+        lastName
+        friends {
+          _id
+          firstName
+          lastName
+          maxPhotos
+        }
+        photos {
+          _id
+        }
+        maxPhotos
+      }
+      photos {
+        _id
+        fileName
+        url
+        uploadDate
+        fileSize
+        owner {
+          _id
+          firstName
+        }
+        group {
+          groupOwner {
+            _id
+          }
+        }
+        serialisedFileName
+        thumbnailUrl
+      }
+      containerUrl
+      serialisedGroupName
+      maxPhotos
+      photoCount
+      maxMembers
     }
   }
 `;
@@ -98,15 +142,67 @@ export const GET_FILE_UPLOAD_URL = gql`
 `;
 
 export const DELETE_PHOTO = gql`
-  mutation deleteSinglePhoto($groupId: ID!, $groupName: String!, $photoId: ID!) {
-    deletePhoto(groupId: $groupId, groupName: $groupName, photoId: $photoId) {
+  mutation deleteSinglePhoto(
+    $groupId: ID!
+    $groupName: String!
+    $photoId: ID!
+    $serialisedGroupName: String!
+  ) {
+    deletePhoto(
+      groupId: $groupId
+      groupName: $groupName
+      photoId: $photoId
+      serialisedGroupName: $serialisedGroupName
+    ) {
       _id
-      fileName
-      url
-      owner {
+      name
+      members {
         _id
         firstName
+        lastName
+        maxPhotos
+        photos {
+          _id
+        }
       }
+      groupOwner {
+        _id
+        firstName
+        lastName
+        friends {
+          _id
+          firstName
+          lastName
+          maxPhotos
+        }
+        photos {
+          _id
+        }
+        maxPhotos
+      }
+      photos {
+        _id
+        fileName
+        url
+        uploadDate
+        fileSize
+        owner {
+          _id
+          firstName
+        }
+        group {
+          groupOwner {
+            _id
+          }
+        }
+        serialisedFileName
+        thumbnailUrl
+      }
+      containerUrl
+      serialisedGroupName
+      maxPhotos
+      photoCount
+      maxMembers
     }
   }
 `;

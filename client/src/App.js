@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
@@ -18,7 +18,7 @@ const httpLink = createHttpLink({
   uri: "/graphql",
 });
 
-// Constructs the request middleware for attaching a JWT to every request as an authorization header
+// Constructs the request middleware forXattaching a JWT to every request as an authorization header
 const authLink = setContext((_, { headers }) => {
   const token = localStorage.getItem("id_token");
 
@@ -39,6 +39,20 @@ const client = new ApolloClient({
 const socket = io("http://localhost:3001");
 
 function App() {
+  const [thumbnailLoading, setThumbnailLoading] = useState(false);
+
+  useEffect(() => {
+    socket.on("thumbnail-created", thumbnailCreatedListener);
+    return () => {
+      socket.off("thumbnail-loading", thumbnailCreatedListener);
+    };
+  }, []);
+
+  const thumbnailCreatedListener = (data) => {
+    console.log(data.thumbnailUrl);
+    setThumbnailLoading(false);
+  };
+
   return (
     <ApolloProvider client={client}>
       <Router>
@@ -49,7 +63,15 @@ function App() {
             <Route path="/me" element={<Profile />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/group" element={<UserGroup socket={socket} />} />
+            <Route
+              path="/group"
+              element={
+                <UserGroup
+                  thumbnailLoading={thumbnailLoading}
+                  setThumbnailLoading={setThumbnailLoading}
+                />
+              }
+            />
             <Route path="/premium" element={<Premium />} />
             <Route path="*" element={<h1 className="display-2">Wrong page!</h1>} />
           </Routes>

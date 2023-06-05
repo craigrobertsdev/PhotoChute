@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import "../assets/css/PhotoGrid.css";
 import { formatDate } from "../utils/helpers";
+import loadingSpinner from "../assets/images/loading.gif";
 
 const PhotoGrid = ({
   currentUser,
@@ -9,28 +10,17 @@ const PhotoGrid = ({
   onPhotoDelete,
   onPhotoLoad,
   onPhotoDownload,
-  setThumbnailLoading,
+  thumbnailLoading,
 }) => {
+  const [thumbnailCreated, setThumbnailCreated] = useState();
+
+  useEffect(() => {
+    // dummy state change to force thumbnail to be loaded when the thumbnail-loaded event is received from the server
+    setThumbnailCreated(!thumbnailCreated);
+  }, [thumbnailLoading]);
+
   // attaches to the last element of the thumbnails array (which is where the photo that has just been uploaded is)
   const newestImage = useRef();
-
-  // this function repeatedly attempts to load the thumbnail for the image as there is a delay between the image upload and the thumbnail creation in Azure. tries for 10 seconds - this should be more than enough time for the thumbnail to be generated
-  const loadImage = async (url, retries = 20) => {
-    if (retries === 0) {
-      return;
-    }
-    setThumbnailLoading(true);
-    newestImage.current.classList.add("loading");
-    let fetchResponse = await fetch(url);
-    if (fetchResponse.status === 200) {
-      setThumbnailLoading(false);
-      newestImage.current.classList.remove("loading");
-      newestImage.current.src = url;
-    } else {
-      setThumbnailLoading(true);
-      setTimeout(() => loadImage(url, --retries), 500);
-    }
-  };
 
   return (
     <div className="photo-grid">
@@ -46,7 +36,11 @@ const PhotoGrid = ({
               <img
                 className="thumbnail"
                 ref={index === thumbnails.length - 1 ? newestImage : null}
-                src={thumbnail.thumbnailUrl + sasToken}
+                src={
+                  thumbnailLoading && index === thumbnails.length - 1
+                    ? loadingSpinner
+                    : thumbnail.thumbnailUrl + sasToken
+                }
                 crossOrigin="anonymous"
                 alt="thumbnail"
                 // onError={async () => await loadImage(thumbnail.thumbnailUrl + sasToken)}

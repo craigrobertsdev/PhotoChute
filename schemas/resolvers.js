@@ -43,6 +43,43 @@ const premiumAccounts = new Map([
   ],
 ]);
 
+async function getPhotosForGroup(parent, { serialisedGroupName }, context) {
+  const userGroup = await (
+    await Group.findOne({ serialisedGroupName })
+  ).populate([
+    {
+      path: "photos",
+      populate: [
+        {
+          path: "owner",
+        },
+        {
+          path: "group",
+        },
+      ],
+    },
+    {
+      path: "groupOwner",
+      populate: {
+        path: "friends",
+      },
+    },
+    { path: "members" },
+  ]);
+
+  if (!userGroup) {
+    return new Error("No group could be found with that name");
+  }
+
+  const groupMemberIds = userGroup.members.map((member) => member._id);
+  const memberInGroup = groupMemberIds.filter((id) => id.equals(context.user._id));
+
+  if (!memberInGroup.length && !userGroup.groupOwner._id.equals(context.user._id)) {
+    return new AuthenticationError("You are not a member of this group");
+  }
+
+  return userGroup;
+}
 const resolvers = {
   Query: {
     me: async (parent, { email }, context) => {
@@ -111,39 +148,7 @@ const resolvers = {
         return new AuthenticationError("You must be signed in to access a group's photos");
       }
 
-      const userGroup = await (
-        await Group.findOne({ serialisedGroupName })
-      ).populate([
-        {
-          path: "photos",
-          populate: [
-            {
-              path: "owner",
-            },
-            {
-              path: "group",
-            },
-          ],
-        },
-        {
-          path: "groupOwner",
-          populate: {
-            path: "friends",
-          },
-        },
-        { path: "members" },
-      ]);
-
-      if (!userGroup) {
-        return new Error("No group could be found with that name");
-      }
-
-      const groupMemberIds = userGroup.members.map((member) => member._id);
-      const memberInGroup = groupMemberIds.filter((id) => id.equals(context.user._id));
-
-      if (!memberInGroup.length && !userGroup.groupOwner._id.equals(context.user._id)) {
-        return new AuthenticationError("You are not a member of this group");
-      }
+      const userGroup = await getPhotosForGroup(parent, { serialisedGroupName }, context);
 
       return userGroup;
     },
@@ -283,7 +288,7 @@ const resolvers = {
 
     savePhoto: async (
       parent,
-      { fileName, url, fileSize, ownerId, groupId, serialisedFileName },
+      { fileName, url, fileSize, ownerId, groupId, serialisedFileName, serialisedGroupName },
       context
     ) => {
       if (!context.user) {
@@ -320,13 +325,14 @@ const resolvers = {
         { new: true }
       );
 
-      const photos = await Photo.find({ group: groupId });
+      // const photos = await Photo.find({ group: groupId });
 
-      const populatedPhotos = await Photo.populate(photos, { path: "owner" });
+      // const populatedPhotos = await Photo.populate(photos, { path: "owner" });
 
-      return populatedPhotos;
+      // return populatedPhotos;
+      return await getPhotosForGroup(parent, { serialisedGroupName }, context);
     },
-    deletePhoto: async (parent, { groupId, groupName, photoId }, context) => {
+    deletePhoto: async (parent, { groupId, groupName, photoId, serialisedGroupName }, context) => {
       if (!context.user) {
         return new AuthenticationError("You must be signed in to create a group");
       }
@@ -371,11 +377,11 @@ const resolvers = {
         { new: true }
       );
 
-      const photos = await Photo.find({ group: groupId });
+      // const photos = await Photo.find({ group: groupId });
 
-      const populatedPhotos = await Photo.populate(photos, { path: "owner" });
+      // const populatedPhotos = await Photo.populate(photos, { path: "owner" });
 
-      return populatedPhotos;
+      return await getPhotosForGroup(parent, { serialisedGroupName }, context);
     },
 
     // add friend mutation gets username of new friend and adds that to current users friend list

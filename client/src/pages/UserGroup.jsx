@@ -22,7 +22,7 @@ import { ProgressBar } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
 import loadingSpinner from "../assets/images/loading.gif";
 
-const Group = ({ socket }) => {
+const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
   const { groupId, serialisedGroupName } = useLocation().state;
   const userId = auth.getProfile().data._id;
   const [selectedFile, setSelectedFile] = useState();
@@ -36,11 +36,9 @@ const Group = ({ socket }) => {
   const [userAtMaxPhotos, setUserAtMaxPhotos] = useState();
   const [uploadPaneOpen, setUploadPaneOpen] = useState(false);
   const [memberPaneOpen, setMemberPaneOpen] = useState(false);
-  const [thumbnailLoading, setThumbnailLoading] = useState(false);
-  const [thumbnailCreated, setThumbnailCreated] = useState();
+  // const [thumbnailLoading, setThumbnailLoading] = useState(false);
   const [photos, setPhotos] = useState([]);
-  const photoGridRef = useRef();
-
+  const uploadInput = useRef();
   const MAX_FILE_SIZE = 5242880; // 5MB
 
   // query and mutation declarations
@@ -82,6 +80,7 @@ const Group = ({ socket }) => {
         userMaxPhotos = user.maxPhotos;
         userPhotoCount = user.photos.length;
       }
+
       setUserAtMaxPhotos(userPhotoCount >= userMaxPhotos);
 
       // filter out the group owner's friends who are already in the group by their id
@@ -97,15 +96,6 @@ const Group = ({ socket }) => {
     console.log(photos);
   }, [photos]);
 
-  const thumbnailCreatedListener = (data) => {
-    console.log("thumbnail created");
-    console.log(data.thumbnailUrl);
-    // getLoadingThumbnails();
-    setThumbnailLoading(false);
-  };
-
-  socket.on("thumbnail-created", thumbnailCreatedListener);
-  socket.off("thumbnail-created", thumbnailCreatedListener);
   /**
    * Deletes a photo from the group's container. Only available if the user has permission to perform this action
    * @param {Event} event
@@ -118,6 +108,7 @@ const Group = ({ socket }) => {
         groupId,
         groupName: serialisedGroupName,
         photoId: thumbnail._id,
+        serialisedGroupName,
       },
     });
 
@@ -168,7 +159,7 @@ const Group = ({ socket }) => {
         // *** UPLOAD TO AZURE STORAGE ***
         await uploadFileToBlob(selectedFile, fileUrl);
 
-        const updatedPhotos = await savePhoto({
+        await savePhoto({
           variables: {
             fileName: selectedFile.name,
             url: fileUrl,
@@ -176,19 +167,17 @@ const Group = ({ socket }) => {
             ownerId: userId,
             groupId,
             serialisedFileName,
+            serialisedGroupName,
           },
         });
 
-        // reset state/formgroup
-
-        setPhotos({ ...photos, ...updatedPhotos.data.savePhoto });
-
         setUploading(false);
+        toggleUploadPane();
         setSelectedFile(null);
+        uploadInput.current.value = "";
         setThumbnailLoading(true);
-        // window.location.reload();
       } catch (err) {
-        console.log(JSON.stringify(err, null, 2));
+        console.log(err);
       }
     }
   };
@@ -428,7 +417,12 @@ const Group = ({ socket }) => {
         {/* pop up pane with upload photo form */}
         <div className={`upload-pane ${uploadPaneOpen ? "" : "hidden"}`}>
           <form className="upload-form">
-            <input type="file" onChange={onFileChange} className=" upload-input" />
+            <input
+              type="file"
+              onChange={onFileChange}
+              className=" upload-input"
+              ref={uploadInput}
+            />
             <button
               className="btn"
               disabled={
@@ -467,7 +461,7 @@ const Group = ({ socket }) => {
               onPhotoDelete={handleDeletePhoto}
               onPhotoLoad={handleLoadPhoto}
               onPhotoDownload={handleDownloadPhoto}
-              setThumbnailLoading={setThumbnailLoading}
+              thumbnailLoading={thumbnailLoading}
             />
           </>
         )}
