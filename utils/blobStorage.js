@@ -32,8 +32,6 @@ async function createBlobStorageContainer(groupName) {
     `Container was created successfully.\n\trequestId:${createContainerResponse.requestId}\n\tURL: ${containerClient.url}`
   );
 
-  console.log(containerClient.url.split("?")[0]);
-
   return containerClient.url.split("?")[0];
 }
 
@@ -81,8 +79,7 @@ async function deleteBlob(containerName, blobName) {
       deleteSnapshots: "include",
     });
 
-    const result = await Promise.all([deletePhoto, deleteThumbnail]);
-    console.log(result);
+    await Promise.all([deletePhoto, deleteThumbnail]);
   } catch (err) {
     console.error(err);
   }

@@ -99,7 +99,6 @@ const resolvers = {
             path: "photos",
           },
         ]);
-        console.log(populatedUser.toJSON());
         return populatedUser;
       } else if (email) {
         const user = await User.findOne({ email });
@@ -188,7 +187,6 @@ const resolvers = {
 
       user.groups.forEach((userGroup) => {
         if (group._id.equals(userGroup._id)) {
-          console.log(group._id, userGroup._id);
           userIsGroupMember = true;
         }
       });
@@ -273,8 +271,6 @@ const resolvers = {
 
       // delete all photos that are associated with this group
       await Photo.deleteMany({ _id: { $in: groupToDelete.photos } });
-
-      console.log(groupToDelete.toJSON());
 
       try {
         // delete the storage container in Azure
@@ -495,8 +491,6 @@ const resolvers = {
 
       const friendsToUpdate = await User.find({ _id: { $in: [...userToDelete.friends] } });
 
-      console.log(friendsToUpdate);
-
       const updatedUsers = await User.updateMany(
         { _id: { $in: [...userToDelete.friends] } },
         {
@@ -504,8 +498,6 @@ const resolvers = {
         },
         { new: true }
       );
-
-      console.log(updatedUsers);
 
       const deletedUser = await User.deleteOne({ _id: context.user._id });
 

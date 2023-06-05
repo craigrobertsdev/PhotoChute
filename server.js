@@ -18,17 +18,6 @@ const { Server } = require("socket.io");
 const httpServer = createServer(app);
 const io = new Server(httpServer, { cors: { origin: "http://localhost:3000" } });
 
-io.on("connection", function (socket) {
-  console.log("User ID", socket.id);
-  socket.emit("greeting-from-server", {
-    greeting: "Hello Client",
-  });
-});
-
-io.on("greeting-from-client", function ({ message }) {
-  console.log(message);
-});
-
 // configure our GraphQL server with our authentication middleware as the context
 const gqlServer = new ApolloServer({
   typeDefs,
@@ -50,23 +39,19 @@ app.post("/", (req, res) => {
   res.json({ thumbnailUrl });
 });
 
-app.get("/", (req, res) => {
-  console.log("hello");
-});
-
 // if we're in production, serve client/build as static assets
-// if (process.env.NODE_ENV === "production") {
-//   app.use(express.static(path.join(__dirname, "client", "build")));
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "client", "build")));
 
-//   // wildcard used in production to handle requests to different endpoints created by react-router
-//   app.get("*", (req, res) => {
-//     res.sendFile(path.join(__dirname, "client", "build", "index.html"));
-//   });
-// } else {
-//   app.get("/", (req, res) => {
-//     res.sendFile(path.join(__dirname, "client", "build", "index.html"));
-//   });
-// }
+  // wildcard used in production to handle requests to different endpoints created by react-router
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+  });
+} else {
+  app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+  });
+}
 
 // Create a new instance of Apollo server with the GraphQL schema and express middleware
 const startApolloServer = async (typeDefs, resolvers) => {

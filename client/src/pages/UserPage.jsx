@@ -35,12 +35,9 @@ const User = () => {
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     try {
-      console.log(searchInput);
       const response = await createGroup({
         variables: { groupName: searchInput.trim() },
       });
-
-      console.log(response.data);
     } catch (err) {
       console.error(JSON.stringify(err, null, 2));
     }
@@ -58,7 +55,6 @@ const User = () => {
       const friendAdded = await addFriend({
         variables: { username: friendInput.trim() },
       });
-      console.log(friendAdded);
       window.location.reload();
     } catch (err) {
       console.error(JSON.stringify(err, null, 2));

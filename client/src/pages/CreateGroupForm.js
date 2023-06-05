@@ -15,12 +15,9 @@ const CreateGroupForm = (groupName) => {
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     try {
-      console.log(searchInput);
       const response = await createGroup({
         variables: { groupName: searchInput.trim() },
       });
-
-      console.log(response.data);
     } catch (err) {
       console.error(JSON.stringify(err, null, 2));
     }

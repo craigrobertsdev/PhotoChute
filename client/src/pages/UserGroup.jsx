@@ -65,7 +65,6 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
 
   useEffect(() => {
     if (group?.getPhotosForGroup) {
-      console.log(group.getPhotosForGroup);
       setPhotos(group.getPhotosForGroup.photos);
       setPhotoCount(group.getPhotosForGroup.photos.length);
       setMaxPhotos(group.getPhotosForGroup.maxPhotos);
@@ -92,10 +91,6 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
     }
   }, [group]);
 
-  useEffect(() => {
-    console.log(photos);
-  }, [photos]);
-
   /**
    * Deletes a photo from the group's container. Only available if the user has permission to perform this action
    * @param {Event} event
@@ -103,7 +98,7 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
   const handleDeletePhoto = async (event, thumbnail) => {
     event.preventDefault();
 
-    const updatedPhotos = await deletePhoto({
+    await deletePhoto({
       variables: {
         groupId,
         groupName: serialisedGroupName,
@@ -111,14 +106,9 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
         serialisedGroupName,
       },
     });
-
-    setPhotos(photos.filter((photo) => photo._id !== thumbnail._id));
-    console.log(updatedPhotos);
-    // window.location.reload();
   };
 
   const onFileChange = (event) => {
-    console.log(event);
     const file = event.target.files[0];
     // capture file into state
     setSelectedFile(file);
@@ -280,7 +270,6 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
   };
 
   const handleDeleteGroup = async () => {
-    console.log(serialisedGroupName);
     const deletedGroup = await deleteGroup({
       variables: { groupName: serialisedGroupName },
     });
