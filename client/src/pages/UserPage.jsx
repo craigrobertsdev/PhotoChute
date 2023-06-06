@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import { Container, Row, Col, Form } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { GET_ME } from "../utils/queries";
-import { CREATE_GROUP, ADD_FRIEND, DELETE_ACCOUNT } from "../utils/mutations";
+import { CREATE_GROUP, ADD_FRIEND, DELETE_FRIEND, DELETE_ACCOUNT } from "../utils/mutations";
 import "../assets/css/UserGroup.css";
+import "../assets/css/UserPage.css";
+
 import auth from "../utils/auth";
 
 import { useQuery, useMutation } from "@apollo/client";
@@ -28,9 +30,12 @@ const User = () => {
   const [groupDetails, setGroupDetails] = useState();
   const [validationError, setValidationError] = useState(false);
   const [createGroup] = useMutation(CREATE_GROUP);
+  const [deleteFriend] = useMutation(DELETE_FRIEND);
   const groupNameRegex = /^[a-zA-Z0-9]+{3-20}$/; // can only contain letters or numbers and must be between 3 and 20 characters long
   const [deleteProfile] = useMutation(DELETE_ACCOUNT);
   const userId = auth.getProfile().data._id;
+  const [friendSearchError, setFriendSearchError] = useState();
+  const [selectedFriends, setSelectedFriends] = useState([]);
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
@@ -55,8 +60,10 @@ const User = () => {
       const friendAdded = await addFriend({
         variables: { username: friendInput.trim() },
       });
+      setFriendSearchError("");
       window.location.reload();
     } catch (err) {
+      setFriendSearchError(err.message);
       console.error(JSON.stringify(err, null, 2));
     }
   };
@@ -77,19 +84,38 @@ const User = () => {
       setValidationError(false);
     }
   };
+
+  const handleSelectFriend = (event, friendId) => {
+    console.log(friendId);
+    if (selectedFriends.includes(friendId)) {
+      setSelectedFriends(selectedFriends.filter((member) => member !== friendId));
+    } else {
+      setSelectedFriends((prev) => [...prev, friendId]);
+    }
+  };
+
+  const handleRemoveFriend = () => {
+    deleteFriend({
+      variables: {
+        memberIds: selectedFriends,
+      },
+    });
+    setSelectedFriends([]);
+  };
+
   return (
     <>
       <div className="flex-row justify-center mb-4">
-        <div className="col-8">
-          <h2 className="altHeading">My Groups</h2>
-          <ul>
+        <div className="col-8 mb-2">
+          <h2 className="altHeading text-center">My Groups</h2>
+          <ul className="text-center p-0 display-flex justify-center flex-wrap">
             {myGroups?.length !== undefined ? (
               myGroups.map((group) => (
                 <Link
                   key={group.serialisedGroupName}
                   to="/group"
                   state={{ groupId: group._id, serialisedGroupName: group.serialisedGroupName }}
-                  className="groupName">
+                  className="groupName mx-2">
                   {group.name}
                 </Link>
               ))
@@ -98,9 +124,9 @@ const User = () => {
             )}
           </ul>
         </div>
-        <div className="col-8">
-          <h2 className="altHeading">Friends Groups</h2>
-          <ul>
+        <div className="col-8 mb-2">
+          <h2 className="altHeading text-center">Friends' Groups</h2>
+          <ul className="text-center p-0 display-flex justify-center flex-wrap">
             {friendsGroups?.length !== undefined ? (
               friendsGroups.map((group) => (
                 <Link
@@ -118,11 +144,11 @@ const User = () => {
         </div>
       </div>
 
-      <Container className="col-8">
-        <h2 className="altHeading">Create a group</h2>
+      <Container className="col-8 mb-2">
+        <h2 className="altHeading text-center">Create a group</h2>
         <Form onSubmit={handleFormSubmit}>
-          <Row>
-            <Col xs={12} md={8}>
+          <Row className="align-items-center mb-2">
+            <Col xs={12} md={9}>
               <input
                 name="searchInput"
                 value={searchInput}
@@ -133,7 +159,7 @@ const User = () => {
                 className="upload-input groupInput"
               />
             </Col>
-            <Col xs={12} md={4}>
+            <Col xs={12} md={3} className="">
               <button
                 type="submit"
                 className="btn"
@@ -143,58 +169,78 @@ const User = () => {
             </Col>
           </Row>
           {validationError && (
-            <p className="text-red">
+            <p className="p-1 text-center bg-danger text-white bRadius">
               Group name must be between 3 and 30 characters long and not include consecutive '-'
               characters
             </p>
           )}
         </Form>
       </Container>
-
       <Container>
-        <Row>
-          <p>{groupDetails && groupDetails.name}</p>
-        </Row>
+        <Row>{groupDetails && <p>groupDetails.name</p>}</Row>
         <Row>{groupDetails && groupDetails.members?.map((member) => <p>{member.name}</p>)}</Row>
-        <Row>
-          <p>{groupDetails && groupDetails.photos}</p>
-        </Row>
-        <Row>
-          <p>{groupDetails && groupDetails.containerUrl}</p>
-        </Row>
+        <Row>{groupDetails && <p> groupDetails.photos</p>}</Row>
+        <Row>{groupDetails && <p>groupDetails.containerUrl</p>}</Row>
       </Container>
 
-      <Container className="col-8">
-        <h2 className="altHeading">My Friends</h2>
-        <div style={{ display: "flex", justifyContent: "center", gap: "1rem" }}>
-          <form onSubmit={handleFriendFormSubmit}>
-            <input
-              placeholder="Search for a friend"
-              name="friend"
-              type="text"
-              value={friendInput}
-              onChange={(e) => setFriendInput(e.target.value)}
-              className="upload-input friendInput"
-              size="lg"
-            />
-            <button type="submit" className="btn friendBtn">
-              Add a friend
+      <Container className="col-8 mb-2">
+        <h2 className="altHeading text-center">My Friends</h2>
+        <Row className="align-items-center mb-2">
+          <Col xs={12} md={9}>
+            {data?.me.friends.length !== 0 ? (
+              <div className="members-container border bRadius">
+                <ul>
+                  {data?.me.friends.map((friend, index) => (
+                    <div
+                      key={`groupMember-${friend._id}`}
+                      className={`mb-2 bRadius ${
+                        selectedFriends?.includes(friend._id) ? "selected-friend" : "border"
+                      }`}
+                      onClick={(event) => handleSelectFriend(event, friend._id)}>
+                      <li className="px-1 m-1">
+                        {friend.firstName} {friend.lastName}
+                      </li>
+                    </div>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <div>Add Friends Above!</div>
+            )}
+          </Col>
+
+          <Col xs={12} md={3} className="">
+            <button
+              className="btn delete-button"
+              disabled={selectedFriends.length === 0}
+              onClick={handleRemoveFriend}>
+              Remove Friend
             </button>
-          </form>
-        </div>
-      </Container>
-      <Container className="col-8">
-        <ul className="friend-list">
-          {data?.me.friends?.length !== undefined ? (
-            data.me.friends.map((friend) => (
-              <li className="groupName" key={friend.username}>
-                {friend.username}
-              </li>
-            ))
-          ) : (
-            <div>Add Friends Above!</div>
-          )}
-        </ul>
+          </Col>
+        </Row>
+        <Form onSubmit={handleFriendFormSubmit}>
+          <Row className="align-items-center">
+            <Col xs={12} md={9}>
+              <input
+                placeholder="Search for a friend"
+                name="friend"
+                type="text"
+                value={friendInput}
+                onChange={(e) => setFriendInput(e.target.value)}
+                className="upload-input friendInput"
+                size="lg"
+              />
+            </Col>
+            <Col xs={12} md={3} className="justify-center">
+              <button type="submit" className="btn friendBtn">
+                Add Friend
+              </button>
+            </Col>
+          </Row>
+        </Form>
+        {friendSearchError && (
+          <p className="p-1 text-center bg-danger text-white bRadius">{friendSearchError}</p>
+        )}
       </Container>
       <div className="deleteAccDiv">
         <button className="btn bg-danger deleteAcc" onClick={handleDeleteUserProfile}>

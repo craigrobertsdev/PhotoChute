@@ -321,11 +321,6 @@ const resolvers = {
         { new: true }
       );
 
-      // const photos = await Photo.find({ group: groupId });
-
-      // const populatedPhotos = await Photo.populate(photos, { path: "owner" });
-
-      // return populatedPhotos;
       return await getPhotosForGroup(parent, { serialisedGroupName }, context);
     },
     deletePhoto: async (parent, { groupId, groupName, photoId, serialisedGroupName }, context) => {
@@ -373,10 +368,6 @@ const resolvers = {
         { new: true }
       );
 
-      // const photos = await Photo.find({ group: groupId });
-
-      // const populatedPhotos = await Photo.populate(photos, { path: "owner" });
-
       return await getPhotosForGroup(parent, { serialisedGroupName }, context);
     },
 
@@ -405,6 +396,34 @@ const resolvers = {
         }
       );
       return { updatedFriendList };
+    },
+
+    deleteFriend: async (parent, { username }, context) => {
+      if (!context.user) {
+        return new AuthenticationError("You must be signed in to remove a friend");
+      }
+
+      const friendToRemove = await User.findOne({ username });
+
+      if (!friendToRemove) {
+        return new Error("No friend found with that username");
+      }
+
+      const updatedUser = await User.findOneAndUpdate(
+        { _id: context.user._id },
+        { $pull: { friends: new ObjectId(friendToRemove._id) } },
+        { new: true }
+      );
+
+      const updatedFriend = await User.findOneAndUpdate(
+        { username },
+        { $pull: { friends: { _id: context.user._id } } },
+        { new: true }
+      );
+
+      console.log(updatedUser, updatedFriend);
+
+      return await User.findById(context.user._id);
     },
 
     addGroupMembers: async (parent, { groupId, memberIds }, context) => {

@@ -196,11 +196,7 @@ Link:hover {
 }
 
 .friendInput {
-  width: 65%;
-}
-
-.friendBtn {
-  margin-left: 25px;
+  width: 100%;
 }
 
 .deleteAcc {

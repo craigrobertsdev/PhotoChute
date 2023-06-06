@@ -1,0 +1,12 @@
+.members-container ul {
+  list-style: none;
+  display: flex;
+  justify-content: start;
+  padding-left: 0;
+}
+
+.selected-friend {
+  user-select: none;
+  background: #47294c;
+  color: white;
+}

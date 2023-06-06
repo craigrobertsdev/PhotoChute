@@ -76,6 +76,8 @@ const typeDefs = gql`
       password: String!
     ): Auth
     addFriend(username: String, phone: String): User
+    deleteFriend(username: String!): User
+
     savePhoto(
       fileName: String!
       url: String!

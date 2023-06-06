@@ -7,6 +7,8 @@ export const GET_ME = gql`
       email
       friends {
         username
+        firstName
+        lastName
         _id
       }
       groups {
