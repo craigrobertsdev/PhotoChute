@@ -51,7 +51,6 @@ const Signup = () => {
                 <label htmlFor="firstName">First Name:</label>
                 <input
                   className="form-input"
-                  // placeholder="Username"
                   name="firstName"
                   type="text"
                   value={formState.firstName}
@@ -62,7 +61,6 @@ const Signup = () => {
                 <label htmlFor="lastName">Last Name:</label>
                 <input
                   className="form-input"
-                  // placeholder="Username"
                   name="lastName"
                   type="text"
                   value={formState.lastName}
@@ -73,7 +71,6 @@ const Signup = () => {
                 <label htmlFor="username">Username:</label>
                 <input
                   className="form-input"
-                  // placeholder="Username"
                   name="username"
                   type="text"
                   value={formState.name}
@@ -84,7 +81,6 @@ const Signup = () => {
                 <label htmlFor="email">Email:</label>
                 <input
                   className="form-input"
-                  // placeholder="email"
                   name="email"
                   type="email"
                   value={formState.email}
@@ -95,7 +91,6 @@ const Signup = () => {
                 <label htmlFor="phoneNumber">Phone Number:</label>
                 <input
                   className="form-input"
-                  // placeholder="phone number"
                   name="phoneNumber"
                   type="number"
                   value={formState.phoneNumber}
@@ -106,7 +101,6 @@ const Signup = () => {
                 <label htmlFor="password">Password:</label>
                 <input
                   className="form-input"
-                  // placeholder="********"
                   name="password"
                   type="password"
                   value={formState.password}
@@ -130,38 +124,8 @@ const Signup = () => {
           )}
 
           {error && (
-            <form>
-              <div className="my-3 p-3 bg-danger text-center text-white bRadius">
-                {`Something went wrong, please try again!`}
-              </div>
-              <div>
-                <label for="password">Password:</label>
-                <input
-                  className="form-input"
-                  // placeholder="********"
-                  name="password"
-                  type="password"
-                  value={formState.password}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="submitBtn">
-                <button className="btn" style={{ cursor: "pointer" }} type="submit">
-                  Submit
-                </button>
-              </div>
-              <div className="loginLink">
-                <p>
-                  Already have an account?
-                  <Link className="m-2" to="/login">
-                    Login Here!
-                  </Link>
-                </p>
-              </div>
-            </form>
+            <div className="my-3 p-3 bg-danger text-white bRadius text-center">{error.message}</div>
           )}
-
-          {error && <div className="my-3 p-3 bg-danger text-white">{error.message}</div>}
         </div>
       </div>
     </main>

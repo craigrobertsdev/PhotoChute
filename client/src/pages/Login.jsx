@@ -28,15 +28,15 @@ const Login = (props) => {
       });
 
       Auth.login(data.login.token);
+
+      // clear form values
+      setFormState({
+        email: "",
+        password: "",
+      });
     } catch (e) {
       console.error(e);
     }
-
-    // clear form values
-    setFormState({
-      email: "",
-      password: "",
-    });
   };
 
   return (
@@ -53,7 +53,6 @@ const Login = (props) => {
                 <label htmlFor="email">Email:</label>
                 <input
                   className="form-input"
-                  // placeholder="email"
                   name="email"
                   type="email"
                   value={formState.email}
@@ -64,7 +63,6 @@ const Login = (props) => {
                 <label htmlFor="password">Password:</label>
                 <input
                   className="form-input"
-                  // placeholder="********"
                   name="password"
                   type="password"
                   value={formState.password}
@@ -89,9 +87,7 @@ const Login = (props) => {
           )}
 
           {error && (
-            <div className="my-3 p-3 bg-danger text-center text-white bRadius">
-              {`Something went wrong, please try again!`}
-            </div>
+            <div className="my-3 p-3 bg-danger text-center text-white bRadius">{error.message}</div>
           )}
         </div>
       </div>
