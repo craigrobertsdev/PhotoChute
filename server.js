@@ -16,7 +16,8 @@ app.use(express.json());
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const httpServer = createServer(app);
-const io = new Server(httpServer, { cors: { origin: "http://localhost:3000" } });
+// const io = new Server(httpServer, { cors: { origin: "http://localhost:3000" } });
+const io = new Server(httpServer);
 
 // configure our GraphQL server with our authentication middleware as the context
 const gqlServer = new ApolloServer({
@@ -29,7 +30,7 @@ const gqlServer = new ApolloServer({
 
 app.post("/", (req, res) => {
   if (!req.headers.apiKey === process.env.API_SECRET) {
-    return res.status(401).send("Incorrect api key");
+    return res.status(401).json({ message: "Incorrect api key" });
   }
   console.log(req.body);
   const thumbnailUrl = req.body.thumbnailUrl;

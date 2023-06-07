@@ -37,7 +37,8 @@ const client = new ApolloClient({
 });
 
 // adds websocket connection to listen for confirmation of thumbnail being uploaded
-const socket = io("http://localhost:3001");
+// const socket = io("http://localhost:3001");
+const socket = io();
 
 function App() {
   const [thumbnailLoading, setThumbnailLoading] = useState(false);
