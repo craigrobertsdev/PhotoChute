@@ -1,7 +1,17 @@
+/* .user-page-container {
+  width: 60%;
+  margin: auto;
+} */
+
+.button-container {
+  display: flex;
+  justify-content: center;
+}
+
 .members-container ul {
   list-style: none;
   display: flex;
-  justify-content: start;
+  justify-content: center;
   padding-left: 0;
 }
 

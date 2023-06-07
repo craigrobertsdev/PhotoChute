@@ -206,7 +206,7 @@ Link:hover {
 .deleteAccDiv {
   display: flex;
   justify-content: center;
-  margin-top: 50px;
+  margin: 2rem 0;
 }
 
 *,
@@ -1134,6 +1134,7 @@ form [type="radio"] {
 
   .nav-links {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
   }
 

@@ -265,6 +265,11 @@ export const REMOVE_FRIEND = gql`
       _id
       firstName
       lastName
+      friends {
+        _id
+        firstName
+        lastName
+      }
     }
   }
 `;

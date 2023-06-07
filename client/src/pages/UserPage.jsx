@@ -14,6 +14,7 @@ const User = () => {
   const { data } = useQuery(GET_ME);
   const [myGroups, setMyGroups] = useState([]);
   const [friendsGroups, setFriendsGroups] = useState([]);
+  const [friends, setFriends] = useState([]);
 
   useEffect(() => {
     if (data?.me) {
@@ -23,6 +24,7 @@ const User = () => {
       setMyGroups(myUpdatedGroups);
       const friendsGroups = data.me.groups.filter((group) => group.groupOwner._id !== data.me._id);
       setFriendsGroups(friendsGroups);
+      setFriends(data.me.friends);
     }
   }, [data]);
 
@@ -96,12 +98,13 @@ const User = () => {
 
   const handleRemoveFriend = async () => {
     try {
-      await removeFriend({
+      const updatedUser = await removeFriend({
         variables: {
           friendId: selectedFriend,
         },
       });
 
+      setFriends(updatedUser.data.removeFriend.friends);
       setSelectedFriend("");
     } catch (err) {
       console.error(err);
@@ -109,39 +112,47 @@ const User = () => {
   };
 
   return (
-    <>
+    <div className="user-page-container">
       <div className="flex-row justify-center mb-4">
-        <div className="col-8 mb-2">
+        <div className="col-xs-12 col-sm-10 col-md-8 col-lg-6  mb-2">
           <h2 className="altHeading text-center">My Groups</h2>
-          <ul className="text-center p-0 display-flex justify-center flex-wrap">
+          <ul className="text-center p-0 display-flex justify-center flex-wrap border bRadius p-1">
             {myGroups?.length !== undefined ? (
-              myGroups.map((group) => (
-                <Link
-                  key={group.serialisedGroupName}
-                  to="/group"
-                  state={{ groupId: group._id, serialisedGroupName: group.serialisedGroupName }}
-                  className="groupName mx-2">
-                  {group.name}
-                </Link>
-              ))
+              myGroups?.length > 0 ? (
+                myGroups.map((group) => (
+                  <Link
+                    key={group.serialisedGroupName}
+                    to="/group"
+                    state={{ groupId: group._id, serialisedGroupName: group.serialisedGroupName }}
+                    className="groupName mx-2">
+                    {group.name}
+                  </Link>
+                ))
+              ) : (
+                <div>Create a group and get sharing!</div>
+              )
             ) : (
               <div>loading...</div>
             )}
           </ul>
         </div>
-        <div className="col-8 mb-2">
+        <div className="col-xs-12 col-sm-10 col-md-8 col-lg-6 mb-2">
           <h2 className="altHeading text-center">Friends' Groups</h2>
-          <ul className="text-center p-0 display-flex justify-center flex-wrap">
+          <ul className="text-center p-0 display-flex justify-center flex-wrap border bRadius p-1">
             {friendsGroups?.length !== undefined ? (
-              friendsGroups.map((group) => (
-                <Link
-                  key={group.serialisedGroupName}
-                  to="/group"
-                  state={{ groupId: group._id, serialisedGroupName: group.serialisedGroupName }}
-                  className="groupName">
-                  {group.name}
-                </Link>
-              ))
+              friendsGroups?.length > 0 ? (
+                friendsGroups.map((group) => (
+                  <Link
+                    key={group.serialisedGroupName}
+                    to="/group"
+                    state={{ groupId: group._id, serialisedGroupName: group.serialisedGroupName }}
+                    className="groupName">
+                    {group.name}
+                  </Link>
+                ))
+              ) : (
+                <div>Nothing to see here...</div>
+              )
             ) : (
               <div>loading...</div>
             )}
@@ -149,7 +160,7 @@ const User = () => {
         </div>
       </div>
 
-      <Container className="col-8 mb-2">
+      <Container className="col-xs-12 col-sm-10 col-md-8 col-lg-6 mb-2">
         <h2 className="altHeading text-center">Create a group</h2>
         <Form onSubmit={handleFormSubmit}>
           <Row className="align-items-center mb-2">
@@ -163,8 +174,14 @@ const User = () => {
                 placeholder="Enter group name"
                 className="upload-input groupInput"
               />
+              {validationError && (
+                <p className="p-1 text-center bg-danger text-white bRadius ">
+                  Group name must be between 3 and 30 characters long and not include consecutive
+                  '-' characters
+                </p>
+              )}
             </Col>
-            <Col xs={12} md={3} className="">
+            <Col xs={12} md={3} className="button-container">
               <button
                 type="submit"
                 className="btn"
@@ -173,12 +190,6 @@ const User = () => {
               </button>
             </Col>
           </Row>
-          {validationError && (
-            <p className="p-1 text-center bg-danger text-white bRadius">
-              Group name must be between 3 and 30 characters long and not include consecutive '-'
-              characters
-            </p>
-          )}
         </Form>
       </Container>
       <Container>
@@ -188,14 +199,14 @@ const User = () => {
         <Row>{groupDetails && <p>groupDetails.containerUrl</p>}</Row>
       </Container>
 
-      <Container className="col-8 mb-2">
+      <Container className="col-xs-12 col-sm-10 col-md-8 col-lg-6 mb-2">
         <h2 className="altHeading text-center">My Friends</h2>
         <Row className="align-items-center mb-2">
-          <Col xs={12} md={9}>
-            {data?.me.friends.length !== 0 ? (
-              <div className="members-container border bRadius">
+          <Col xs={12} md={9} className="mb-2">
+            <div className="members-container border bRadius">
+              {friends?.length !== 0 ? (
                 <ul>
-                  {data?.me.friends.map((friend, index) => (
+                  {friends?.map((friend, index) => (
                     <div
                       key={`groupMember-${friend._id}`}
                       className={`mb-2 bRadius ${
@@ -208,13 +219,13 @@ const User = () => {
                     </div>
                   ))}
                 </ul>
-              </div>
-            ) : (
-              <div className="text-center">Add Friends Below!</div>
-            )}
+              ) : (
+                <div className="text-center">Add Friends Below!</div>
+              )}
+            </div>
           </Col>
 
-          <Col xs={12} md={3}>
+          <Col xs={12} md={3} className="button-container">
             <button
               className="btn delete-button"
               disabled={!selectedFriend}
@@ -236,24 +247,24 @@ const User = () => {
                 className="upload-input friendInput"
                 size="lg"
               />
+              {friendSearchError && (
+                <p className="p-1 text-center bg-danger text-white bRadius">{friendSearchError}</p>
+              )}
             </Col>
-            <Col xs={12} md={3} className="justify-center">
+            <Col xs={12} md={3} className="button-container">
               <button type="submit" className="btn friendBtn">
                 Add Friend
               </button>
             </Col>
           </Row>
         </Form>
-        {friendSearchError && (
-          <p className="p-1 text-center bg-danger text-white bRadius">{friendSearchError}</p>
-        )}
       </Container>
       <div className="deleteAccDiv">
         <button className="btn bg-danger deleteAcc" onClick={handleDeleteUserProfile}>
           Delete Account
         </button>
       </div>
-    </>
+    </div>
   );
 };
 
