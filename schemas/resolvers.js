@@ -398,12 +398,12 @@ const resolvers = {
       return { updatedFriendList };
     },
 
-    deleteFriend: async (parent, { username }, context) => {
+    removeFriend: async (parent, { friendId }, context) => {
       if (!context.user) {
         return new AuthenticationError("You must be signed in to remove a friend");
       }
 
-      const friendToRemove = await User.findOne({ username });
+      const friendToRemove = await User.findById(friendId);
 
       if (!friendToRemove) {
         return new Error("No friend found with that username");
@@ -416,14 +416,12 @@ const resolvers = {
       );
 
       const updatedFriend = await User.findOneAndUpdate(
-        { username },
-        { $pull: { friends: { _id: context.user._id } } },
+        { _id: friendId },
+        { $pull: { friends: context.user._id } },
         { new: true }
       );
 
-      console.log(updatedUser, updatedFriend);
-
-      return await User.findById(context.user._id);
+      return updatedFriend;
     },
 
     addGroupMembers: async (parent, { groupId, memberIds }, context) => {

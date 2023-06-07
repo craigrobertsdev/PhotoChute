@@ -12,6 +12,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Premium from "./pages/Premium";
+import AuthChecker from "./components/AuthChecker";
 
 // construct the GraphQL endpoint
 const httpLink = createHttpLink({
@@ -49,7 +50,7 @@ function App() {
   }, []);
 
   const thumbnailCreatedListener = (data) => {
-    console.log(data.thumbnailUrl);
+    console.log("data", data);
     setThumbnailLoading(false);
   };
 
@@ -60,16 +61,26 @@ function App() {
           <Header />
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/me" element={<Profile />} />
+
+            <Route
+              path="/me"
+              element={
+                <AuthChecker>
+                  <Profile />
+                </AuthChecker>
+              }
+            />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route
               path="/group"
               element={
-                <UserGroup
-                  thumbnailLoading={thumbnailLoading}
-                  setThumbnailLoading={setThumbnailLoading}
-                />
+                <AuthChecker>
+                  <UserGroup
+                    thumbnailLoading={thumbnailLoading}
+                    setThumbnailLoading={setThumbnailLoading}
+                  />
+                </AuthChecker>
               }
             />
             <Route path="/premium" element={<Premium />} />

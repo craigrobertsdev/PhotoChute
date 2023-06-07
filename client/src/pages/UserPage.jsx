@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Form } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { GET_ME } from "../utils/queries";
-import { CREATE_GROUP, ADD_FRIEND, DELETE_FRIEND, DELETE_ACCOUNT } from "../utils/mutations";
+import { CREATE_GROUP, ADD_FRIEND, REMOVE_FRIEND, DELETE_ACCOUNT } from "../utils/mutations";
 import "../assets/css/UserGroup.css";
 import "../assets/css/UserPage.css";
 
@@ -30,12 +30,12 @@ const User = () => {
   const [groupDetails, setGroupDetails] = useState();
   const [validationError, setValidationError] = useState(false);
   const [createGroup] = useMutation(CREATE_GROUP);
-  const [deleteFriend] = useMutation(DELETE_FRIEND);
+  const [removeFriend] = useMutation(REMOVE_FRIEND);
   const groupNameRegex = /^[a-zA-Z0-9]+{3-20}$/; // can only contain letters or numbers and must be between 3 and 20 characters long
   const [deleteProfile] = useMutation(DELETE_ACCOUNT);
   const userId = auth.getProfile().data._id;
   const [friendSearchError, setFriendSearchError] = useState();
-  const [selectedFriends, setSelectedFriends] = useState([]);
+  const [selectedFriend, setSelectedFriend] = useState("");
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
@@ -87,20 +87,25 @@ const User = () => {
 
   const handleSelectFriend = (event, friendId) => {
     console.log(friendId);
-    if (selectedFriends.includes(friendId)) {
-      setSelectedFriends(selectedFriends.filter((member) => member !== friendId));
+    if (selectedFriend === friendId) {
+      setSelectedFriend("");
     } else {
-      setSelectedFriends((prev) => [...prev, friendId]);
+      setSelectedFriend(friendId);
     }
   };
 
-  const handleRemoveFriend = () => {
-    deleteFriend({
-      variables: {
-        memberIds: selectedFriends,
-      },
-    });
-    setSelectedFriends([]);
+  const handleRemoveFriend = async () => {
+    try {
+      await removeFriend({
+        variables: {
+          friendId: selectedFriend,
+        },
+      });
+
+      setSelectedFriend("");
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -194,7 +199,7 @@ const User = () => {
                     <div
                       key={`groupMember-${friend._id}`}
                       className={`mb-2 bRadius ${
-                        selectedFriends?.includes(friend._id) ? "selected-friend" : "border"
+                        selectedFriend === friend._id ? "selected-friend" : "border"
                       }`}
                       onClick={(event) => handleSelectFriend(event, friend._id)}>
                       <li className="px-1 m-1">
@@ -205,14 +210,15 @@ const User = () => {
                 </ul>
               </div>
             ) : (
-              <div>Add Friends Above!</div>
+              <div className="text-center">Add Friends Below!</div>
             )}
           </Col>
 
-          <Col xs={12} md={3} className="">
+          <Col xs={12} md={3}>
             <button
               className="btn delete-button"
-              disabled={selectedFriends.length === 0}
+              disabled={!selectedFriend}
+              z
               onClick={handleRemoveFriend}>
               Remove Friend
             </button>

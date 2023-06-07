@@ -5,8 +5,12 @@
   padding-left: 0;
 }
 
-.selected-friend {
+.members-container ul li {
   user-select: none;
+}
+
+.selected-friend {
   background: #47294c;
   color: white;
+  border: 1px solid transparent;
 }
