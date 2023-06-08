@@ -91,6 +91,14 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
     }
   }, [group]);
 
+  useEffect(() => {
+    if (!thumbnailLoading && uploading) {
+      setUploading(false);
+
+      window.location.reload();
+    }
+  }, [thumbnailLoading]);
+
   /**
    * Deletes a photo from the group's container. Only available if the user has permission to perform this action
    * @param {Event} event
@@ -135,7 +143,6 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
   const onFileUpload = async (event) => {
     event.preventDefault();
     if (!fileValidationError && selectedFile && selectedFile?.name) {
-      // prepare UI
       setUploading(true);
       try {
         const urlData = await getFileUploadUrl({
@@ -146,7 +153,7 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
         });
 
         let { fileUrl, serialisedFileName } = urlData.data.getFileUploadUrl;
-        // *** UPLOAD TO AZURE STORAGE ***
+        //  upload to Azure storage
         await uploadFileToBlob(selectedFile, fileUrl);
 
         await savePhoto({
@@ -161,7 +168,6 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
           },
         });
 
-        setUploading(false);
         toggleUploadPane();
         setSelectedFile(null);
         uploadInput.current.value = "";

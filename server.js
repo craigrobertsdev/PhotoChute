@@ -32,12 +32,11 @@ app.post("/", (req, res) => {
   if (!req.headers.apiKey === process.env.API_SECRET) {
     return res.status(401).json({ message: "Incorrect api key" });
   }
-  console.log(req.body);
+
   const thumbnailUrl = req.body.thumbnailUrl;
-  console.log(thumbnailUrl);
   io.emit("thumbnail-created", { thumbnailUrl });
 
-  res.json({ thumbnailUrl });
+  res.status(200).send("received");
 });
 
 // if we're in production, serve client/build as static assets
