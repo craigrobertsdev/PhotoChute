@@ -147,12 +147,14 @@ export const DELETE_PHOTO = gql`
     $groupName: String!
     $photoId: ID!
     $serialisedGroupName: String!
+    $serialisedFileName: String!
   ) {
     deletePhoto(
       groupId: $groupId
       groupName: $groupName
       photoId: $photoId
       serialisedGroupName: $serialisedGroupName
+      serialisedFileName: $serialisedFileName
     ) {
       _id
       name

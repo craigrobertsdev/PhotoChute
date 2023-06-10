@@ -89,7 +89,13 @@ const typeDefs = gql`
     ): Group
     createGroup(groupName: String!): Group
     deleteGroup(groupName: String!): Group
-    deletePhoto(groupId: ID!, groupName: String!, photoId: ID!, serialisedGroupName: String!): Group
+    deletePhoto(
+      groupId: ID!
+      groupName: String!
+      photoId: ID!
+      serialisedGroupName: String!
+      serialisedFileName: String!
+    ): Group
     addGroupMembers(groupId: ID!, memberIds: [ID]!): Group
     removeGroupMembers(groupId: ID!, memberIds: [ID]!): Group
     deleteAccount: User

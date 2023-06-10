@@ -32,7 +32,7 @@ app.post("/", (req, res) => {
   if (!req.headers.apiKey === process.env.API_SECRET) {
     return res.status(401).json({ message: "Incorrect api key" });
   }
-
+  console.log("Request recieved");
   const thumbnailUrl = req.body.thumbnailUrl;
   io.emit("thumbnail-created", { thumbnailUrl });
 

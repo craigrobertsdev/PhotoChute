@@ -229,7 +229,6 @@ const User = () => {
             <button
               className="btn delete-button"
               disabled={!selectedFriend}
-              z
               onClick={handleRemoveFriend}>
               Remove Friend
             </button>

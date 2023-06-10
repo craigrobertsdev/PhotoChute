@@ -112,6 +112,7 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
         groupName: serialisedGroupName,
         photoId: thumbnail._id,
         serialisedGroupName,
+        serialisedFileName: thumbnail.serialisedFileName,
       },
     });
   };
