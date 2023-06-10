@@ -93,8 +93,6 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
 
   useEffect(() => {
     if (!thumbnailLoading && uploading) {
-      // setUploading(false);
-
       window.location.reload();
     }
   }, [thumbnailLoading]);
@@ -169,7 +167,7 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
           },
         });
 
-        toggleUploadPane();
+        // toggleUploadPane();
         setSelectedFile(null);
         uploadInput.current.value = "";
         setThumbnailLoading(true);
@@ -211,11 +209,11 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
     })
       .then((response) => response.blob())
       .then((blob) => {
-        var url = window.URL.createObjectURL(blob);
-        var a = document.createElement("a");
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
         a.href = url;
-        a.download = serialisedFileName;
         a.setAttribute("download", "");
+        a.download = serialisedFileName;
         document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
         a.click();
         a.remove(); //afterwards we remove the element again
@@ -284,16 +282,21 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
     window.location.assign("/me");
   };
 
+  // only called when thumbnailLoading === true
   const getLoadingThumbnails = () => {
-    const loadingThumbnails = group?.getPhotosForGroup.photos.map((photo, index) => {
-      if (index === group.getPhotosForGroup.photos.length - 1) {
-        return { ...photo, thumbnailUrl: loadingSpinner };
-      } else {
-        return photo;
-      }
-    });
+    // const loadingThumbnails = group?.getPhotosForGroup.photos.map((photo, index) => {
+    //   if (index === group.getPhotosForGroup.photos.length - 1) {
+    //     return { ...photo, thumbnailUrl: loadingSpinner };
+    //   } else {
+    //     return photo;
+    //   }
+    // });
 
-    return loadingThumbnails;
+    // return loadingThumbnails;
+    return group?.getPhotosForGroup.photos.slice(
+      0,
+      group?.getPhotosForGroup.photos[group?.getPhotosForGroup.photos.length - 1]
+    );
   };
 
   if (loadingGroup) {
@@ -433,9 +436,6 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
               Upload!
             </button>
           </form>
-          {thumbnailLoading && (
-            <p>Please wait for your upload to complete before uploading another</p>
-          )}
           {userAtMaxPhotos && (
             <p>You have reached your upload capacity. Upgrade to premium to increase this limit!</p>
           )}
