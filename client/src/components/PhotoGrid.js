@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import "../assets/css/PhotoGrid.css";
 import { formatDate } from "../utils/helpers";
-import loadingSpinner from "../assets/images/loading.gif";
 
 const PhotoGrid = ({
   currentUser,
@@ -19,9 +18,6 @@ const PhotoGrid = ({
     setThumbnailCreated(!thumbnailCreated);
   }, [thumbnailLoading]);
 
-  // attaches to the last element of the thumbnails array (which is where the photo that has just been uploaded is)
-  const newestImage = useRef();
-
   return (
     <div className="photo-grid">
       {thumbnails.length > 0 ? (
@@ -30,20 +26,11 @@ const PhotoGrid = ({
             <button
               className="thumbnail-button"
               onClick={(event) => onPhotoLoad(event, thumbnail.serialisedFileName)}>
-              {/* {thumbnailLoading ? (
-              <div className="loading"></div>
-            ) : ( */}
               <img
                 className="thumbnail"
-                ref={index === thumbnails.length - 1 ? newestImage : null}
-                src={
-                  thumbnailLoading && index === thumbnails.length - 1
-                    ? loadingSpinner
-                    : thumbnail.thumbnailUrl + sasToken
-                }
+                src={thumbnail.thumbnailUrl + sasToken}
                 crossOrigin="anonymous"
                 alt="thumbnail"
-                // onError={async () => await loadImage(thumbnail.thumbnailUrl + sasToken)}
               />
               {/* )} */}
             </button>

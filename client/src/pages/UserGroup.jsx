@@ -20,7 +20,6 @@ import "../assets/css/UserGroup.css";
 import auth from "../utils/auth";
 import { ProgressBar } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
-import loadingSpinner from "../assets/images/loading.gif";
 
 const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
   const { groupId, serialisedGroupName } = useLocation().state;
@@ -93,7 +92,9 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
 
   useEffect(() => {
     if (!thumbnailLoading && uploading) {
-      window.location.reload();
+      setThumbnailLoading(false);
+      setUploading(false);
+      closeUploadPane();
     }
   }, [thumbnailLoading]);
 
@@ -269,6 +270,11 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
     setMemberPaneOpen(false);
     setUploadPaneOpen(!uploadPaneOpen);
   };
+
+  function closeUploadPane() {
+    setUploadPaneOpen(false);
+  }
+
   const toggleMemberPane = () => {
     setUploadPaneOpen(false);
     setMemberPaneOpen(!memberPaneOpen);

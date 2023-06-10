@@ -50,8 +50,7 @@ function App() {
     };
   }, []);
 
-  const thumbnailCreatedListener = (data) => {
-    console.log("data", data);
+  const thumbnailCreatedListener = () => {
     setThumbnailLoading(false);
   };
 
