@@ -32,7 +32,6 @@ const PhotoGrid = ({
                 crossOrigin="anonymous"
                 alt="thumbnail"
               />
-              {/* )} */}
             </button>
             <div>
               <p className="text-center">

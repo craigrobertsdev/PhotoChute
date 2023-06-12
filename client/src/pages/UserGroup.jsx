@@ -37,9 +37,9 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
   const [memberPaneOpen, setMemberPaneOpen] = useState(false);
   // const [thumbnailLoading, setThumbnailLoading] = useState(false);
   const [photos, setPhotos] = useState([]);
+  const [uploadError, setUploadError] = useState(false);
   const uploadInput = useRef();
   const MAX_FILE_SIZE = 5242880; // 5MB
-
   // query and mutation declarations
   const [getFileUploadUrl] = useLazyQuery(GET_FILE_UPLOAD_URL);
   const [savePhoto] = useMutation(SAVE_PHOTO);
@@ -67,6 +67,8 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
       setPhotos(group.getPhotosForGroup.photos);
       setPhotoCount(group.getPhotosForGroup.photos.length);
       setMaxPhotos(group.getPhotosForGroup.maxPhotos);
+
+      console.log(group);
 
       // determine the current user's total photos uploaded and whether this is greater than or equal to their maximum upload count
       let userMaxPhotos, userPhotoCount;
@@ -144,17 +146,39 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
     event.preventDefault();
     if (!fileValidationError && selectedFile && selectedFile?.name) {
       setUploading(true);
+      setUploadError(false);
       try {
-        const urlData = await getFileUploadUrl({
-          variables: {
-            serialisedGroupName,
-            blobName: selectedFile.name.toLowerCase(),
-          },
+        // const urlData = await getFileUploadUrl({
+        //   variables: {
+        //     serialisedGroupName,
+        //     blobName: selectedFile.name.toLowerCase(),
+        //   },
+        // });
+
+        // let { fileUrl, serialisedFileName } = urlData.data.getFileUploadUrl;
+        // //  upload to Azure storage
+        // await uploadFileToBlob(selectedFile, fileUrl);
+
+        const formData = new FormData();
+
+        formData.append("selectedFile", selectedFile);
+        formData.append("containerName", serialisedGroupName);
+        console.log(selectedFile.name);
+        console.log(formData.get("selectedFile"));
+
+        const authToken = window.localStorage.getItem("id_token");
+        const response = await fetch("http://localhost:3001/upload", {
+          method: "POST",
+          headers: JSON.stringify({ authorization: `Bearer ${authToken}` }),
+          body: formData,
         });
 
-        let { fileUrl, serialisedFileName } = urlData.data.getFileUploadUrl;
-        //  upload to Azure storage
-        await uploadFileToBlob(selectedFile, fileUrl);
+        const uploadResponse = await response.json();
+        const { serialisedFileName, fileUrl } = uploadResponse;
+        if (!response.ok) {
+          setUploading(false);
+          setUploadError(true);
+        }
 
         await savePhoto({
           variables: {
@@ -290,15 +314,6 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
 
   // only called when thumbnailLoading === true
   const getLoadingThumbnails = () => {
-    // const loadingThumbnails = group?.getPhotosForGroup.photos.map((photo, index) => {
-    //   if (index === group.getPhotosForGroup.photos.length - 1) {
-    //     return { ...photo, thumbnailUrl: loadingSpinner };
-    //   } else {
-    //     return photo;
-    //   }
-    // });
-
-    // return loadingThumbnails;
     return group?.getPhotosForGroup.photos.slice(
       0,
       group?.getPhotosForGroup.photos[group?.getPhotosForGroup.photos.length - 1]
@@ -422,12 +437,7 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
         {/* pop up pane with upload photo form */}
         <div className={`upload-pane ${uploadPaneOpen ? "" : "hidden"}`}>
           <form className="upload-form">
-            <input
-              type="file"
-              onChange={onFileChange}
-              className=" upload-input"
-              ref={uploadInput}
-            />
+            <input type="file" onChange={onFileChange} className="upload-input" ref={uploadInput} />
             <button
               className="btn"
               disabled={
@@ -450,6 +460,7 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
             {fileValidationError && (
               <div>File must be of type jpg, jpeg or png and less than 5MB </div>
             )}
+            {uploadError && <div>Error uploading file</div>}
           </div>
         </div>
         {group?.getPhotosForGroup?.photos.length === 0 ? (
