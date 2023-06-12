@@ -39,7 +39,7 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
   // const [thumbnailLoading, setThumbnailLoading] = useState(false);
   const [photos, setPhotos] = useState([]);
   const [uploadError, setUploadError] = useState(false);
-  const [displayedPhoto, setDisplayedPhoto] = useState(null);
+
   const uploadInput = useRef();
   const MAX_FILE_SIZE = 5242880; // 5MB
   // query and mutation declarations
