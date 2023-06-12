@@ -18,6 +18,23 @@ const PhotoGrid = ({
     setThumbnailCreated(!thumbnailCreated);
   }, [thumbnailLoading]);
 
+  const isMobileDevice = () => {
+    const mobileDevices = [
+      /Android/i,
+      /webOS/i,
+      /iPhone/i,
+      /iPad/i,
+      /iPod/i,
+      /BlackBerry/i,
+      /Windows Phone/i,
+    ];
+
+    return mobileDevices.some((device) => {
+      console.log(window.navigator.userAgent);
+      return window.navigator.userAgent.match(device);
+    });
+  };
+
   return (
     <div className="photo-grid">
       {thumbnails.length > 0 ? (
@@ -38,11 +55,13 @@ const PhotoGrid = ({
                 Uploaded by {thumbnail.owner.firstName} on {formatDate(thumbnail.uploadDate)}
               </p>
               <div className="button-row">
-                <button
-                  className="btn"
-                  onClick={(event) => onPhotoDownload(event, thumbnail.serialisedFileName)}>
-                  Download
-                </button>
+                {!isMobileDevice() && (
+                  <button
+                    className="btn"
+                    onClick={(event) => onPhotoDownload(event, thumbnail.serialisedFileName)}>
+                    Download
+                  </button>
+                )}
                 <button
                   className={`btn ${
                     thumbnail.owner._id === currentUser || // the user is the person who uploaded the photo
