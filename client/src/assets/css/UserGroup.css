@@ -3,6 +3,14 @@
   flex-grow: 1;
 }
 
+#photo-display-container {
+  display: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
 .header-container {
   display: flex;
   gap: 2rem;
