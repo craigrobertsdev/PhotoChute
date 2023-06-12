@@ -26,11 +26,7 @@ async function createBlobStorageContainer(groupName) {
   // get a reference to the container
   const containerClient = blobServiceClient.getContainerClient(containerName);
   // create the container
-  const createContainerResponse = await containerClient.create();
-
-  console.log(
-    `Container was created successfully.\n\trequestId:${createContainerResponse.requestId}\n\tURL: ${containerClient.url}`
-  );
+  await containerClient.create();
 
   return containerClient.url.split("?")[0];
 }
@@ -94,11 +90,7 @@ async function deleteContainer(containerName, blobNames) {
   const containerClient = blobServiceClient.getContainerClient(containerName);
   const thumbnailClient = blobServiceClient.getContainerClient("thumbnails");
   // delete the container
-  const deleteContainerResponse = await containerClient.delete();
-
-  console.log(
-    `Container was deleted successfully.\n\trequestId:${deleteContainerResponse.requestId}\n\tURL: ${containerClient.url}`
-  );
+  await containerClient.delete();
 
   const thumbnailsToDelete = [];
 

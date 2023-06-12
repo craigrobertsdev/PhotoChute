@@ -20,7 +20,6 @@ import "../assets/css/UserGroup.css";
 import auth from "../utils/auth";
 import { ProgressBar } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
-import loadingSpinner from "../assets/images/loading.gif";
 
 const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
   const { groupId, serialisedGroupName } = useLocation().state;
@@ -36,12 +35,11 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
   const [userAtMaxPhotos, setUserAtMaxPhotos] = useState();
   const [uploadPaneOpen, setUploadPaneOpen] = useState(false);
   const [memberPaneOpen, setMemberPaneOpen] = useState(false);
-  // const [thumbnailLoading, setThumbnailLoading] = useState(false);
   const [photos, setPhotos] = useState([]);
   const [uploadError, setUploadError] = useState(false);
-
   const uploadInput = useRef();
   const MAX_FILE_SIZE = 5242880; // 5MB
+
   // query and mutation declarations
   const [getFileUploadUrl] = useLazyQuery(GET_FILE_UPLOAD_URL);
   const [savePhoto] = useMutation(SAVE_PHOTO);
@@ -49,7 +47,6 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
   const [addGroupMembers] = useMutation(ADD_GROUP_MEMBERS);
   const [deleteGroupMembers] = useMutation(REMOVE_GROUP_MEMBERS);
   const [deleteGroup] = useMutation(DELETE_GROUP);
-  const photoDisplayImg = useRef();
   const { data: sasTokenData, error: tokenDataError } = useQuery(GET_AUTHENTICATION_TOKEN, {
     variables: {
       groupName: serialisedGroupName,
@@ -70,8 +67,6 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
       setPhotos(group.getPhotosForGroup.photos);
       setPhotoCount(group.getPhotosForGroup.photos.length);
       setMaxPhotos(group.getPhotosForGroup.maxPhotos);
-
-      console.log(group);
 
       // determine the current user's total photos uploaded and whether this is greater than or equal to their maximum upload count
       let userMaxPhotos, userPhotoCount;
@@ -100,14 +95,6 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
       window.location.reload();
     }
   }, [thumbnailLoading]);
-
-  useEffect(() => {
-    if (displayedPhoto && photoDisplayImg) {
-      photoDisplayImg.current.src = displayedPhoto;
-    } else if (photoDisplayImg) {
-      photoDisplayImg.current.src = "";
-    }
-  }, [displayedPhoto]);
 
   /**
    * Deletes a photo from the group's container. Only available if the user has permission to perform this action
@@ -157,37 +144,16 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
       setUploading(true);
       setUploadError(false);
       try {
-        // const urlData = await getFileUploadUrl({
-        //   variables: {
-        //     serialisedGroupName,
-        //     blobName: selectedFile.name.toLowerCase(),
-        //   },
-        // });
-
-        // let { fileUrl, serialisedFileName } = urlData.data.getFileUploadUrl;
-        // //  upload to Azure storage
-        // await uploadFileToBlob(selectedFile, fileUrl);
-
-        const formData = new FormData();
-
-        formData.append("selectedFile", selectedFile);
-        formData.append("containerName", serialisedGroupName);
-
-        const authToken = window.localStorage.getItem("id_token");
-        const response = await fetch("http://localhost:3001/upload", {
-          method: "POST",
-          headers: {
-            authorization: `Bearer ${authToken}`,
+        const urlData = await getFileUploadUrl({
+          variables: {
+            serialisedGroupName,
+            blobName: selectedFile.name.toLowerCase(),
           },
-          body: formData,
         });
 
-        const uploadResponse = await response.json();
-        const { serialisedFileName, fileUrl } = uploadResponse;
-        if (!response.ok) {
-          setUploading(false);
-          setUploadError(true);
-        }
+        let { fileUrl, serialisedFileName } = urlData.data.getFileUploadUrl;
+        //  upload to Azure storage
+        await uploadFileToBlob(selectedFile, fileUrl);
 
         await savePhoto({
           variables: {
@@ -224,9 +190,7 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
         variables: { groupName: serialisedGroupName, serialisedFileName },
       });
 
-      setDisplayedPhoto(signedUrl);
-
-      // window.location.assign(signedUrl.data.getSignedUrl.fileUrl);
+      window.location.assign(signedUrl.data.getSignedUrl.fileUrl);
     } catch (err) {
       console.log(JSON.stringify(err, null, 2));
     }
@@ -256,9 +220,6 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
       });
   };
 
-  const closeDisplayPhoto = () => {
-    setDisplayedPhoto(null);
-  };
   const handleAddGroupMember = () => {
     addGroupMembers({
       variables: {
@@ -335,12 +296,6 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
 
   return (
     <div id="group">
-      <div id="photo-display-container">
-        <button className="btn mx-1 mb-2" onClick={closeDisplayPhoto}>
-          Close
-        </button>
-        <img ref={photoDisplayImg} src={displayedPhoto ? displayedPhoto : ""} />
-      </div>
       <div className="header-container">
         <h1 className="text-center">{group?.getPhotosForGroup.name}</h1>
       </div>

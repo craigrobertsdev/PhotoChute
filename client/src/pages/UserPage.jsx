@@ -88,7 +88,6 @@ const User = () => {
   };
 
   const handleSelectFriend = (event, friendId) => {
-    console.log(friendId);
     if (selectedFriend === friendId) {
       setSelectedFriend("");
     } else {
