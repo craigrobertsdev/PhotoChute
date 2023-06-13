@@ -44,11 +44,12 @@ const User = () => {
       const response = await createGroup({
         variables: { groupName: searchInput.trim() },
       });
+
+      setMyGroups((prev) => [...prev, response.data.createGroup]);
     } catch (err) {
       console.error(JSON.stringify(err, null, 2));
     }
     setSearchInput("");
-    // window.location.reload();
   };
 
   const [addFriend] = useMutation(ADD_FRIEND);
@@ -79,17 +80,6 @@ const User = () => {
     await deleteProfile();
     auth.logout();
     window.location.assign("/");
-  };
-
-  const validateGroupName = (event) => {
-    const value = event.target.value;
-
-    // regex is due to limitations of azure container naming requirements
-    if (!value || !value.match(groupNameRegex)) {
-      setValidationError(true);
-    } else {
-      setValidationError(false);
-    }
   };
 
   const handleSelectFriend = (event, friendId) => {

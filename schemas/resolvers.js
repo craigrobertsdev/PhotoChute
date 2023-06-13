@@ -222,24 +222,29 @@ const resolvers = {
       }
 
       const user = await User.findById(context.user._id);
+      try {
+        const newGroup = await Group.create({ name: groupName, groupOwner: user });
 
-      const newGroup = await (
-        await Group.create({ name: groupName, groupOwner: user })
-      ).populate("groupOwner");
+        const populatedGroup = await newGroup.populate("groupOwner");
 
-      const updatedUser = await User.findOneAndUpdate(
-        { _id: context.user._id },
-        {
-          $addToSet: {
-            groups: newGroup,
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: context.user._id },
+          {
+            $addToSet: {
+              groups: newGroup,
+            },
           },
-        },
-        { new: true }
-      );
+          { new: true }
+        );
 
-      const { name, groupOwner, photos, containerUrl, serialisedGroupName } = newGroup;
+        const { name, groupOwner, photos, containerUrl, serialisedGroupName } = populatedGroup;
 
-      return { name, groupOwner, photos, containerUrl, serialisedGroupName };
+        return { name, groupOwner, photos, containerUrl, serialisedGroupName };
+      } catch (err) {
+        throw new Error(
+          "Failed to create group. Ensure group name is between 3 and 30 characters and doesn't contain consecutive '-' characters."
+        );
+      }
     },
 
     deleteGroup: async (parent, { groupName }, context) => {
