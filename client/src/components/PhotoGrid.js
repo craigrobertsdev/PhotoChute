@@ -30,7 +30,6 @@ const PhotoGrid = ({
     ];
 
     return mobileDevices.some((device) => {
-      console.log(window.navigator.userAgent);
       return window.navigator.userAgent.match(device);
     });
   };

@@ -29,9 +29,8 @@ const User = () => {
   }, [data]);
 
   const [searchInput, setSearchInput] = useState("");
-  const [groupDetails, setGroupDetails] = useState();
   const [validationError, setValidationError] = useState(false);
-  const [createGroup] = useMutation(CREATE_GROUP);
+  const [createGroup, { error }] = useMutation(CREATE_GROUP);
   const [removeFriend] = useMutation(REMOVE_FRIEND);
   const groupNameRegex = /^[a-zA-Z0-9]+{3-20}$/; // can only contain letters or numbers and must be between 3 and 20 characters long
   const [deleteProfile] = useMutation(DELETE_ACCOUNT);
@@ -49,11 +48,17 @@ const User = () => {
       console.error(JSON.stringify(err, null, 2));
     }
     setSearchInput("");
-    window.location.reload();
+    // window.location.reload();
   };
 
   const [addFriend] = useMutation(ADD_FRIEND);
   const [friendInput, setFriendInput] = useState("");
+
+  useEffect(() => {
+    if (error) {
+      setValidationError(true);
+    }
+  }, [error]);
 
   //function to handle addFriend mutation and input into friend search box
   const handleFriendFormSubmit = async (event) => {
@@ -80,7 +85,7 @@ const User = () => {
     const value = event.target.value;
 
     // regex is due to limitations of azure container naming requirements
-    if (!value || value.length < 3 || value.length > 30 || value.match(/--/)) {
+    if (!value || !value.match(groupNameRegex)) {
       setValidationError(true);
     } else {
       setValidationError(false);
@@ -103,10 +108,6 @@ const User = () => {
         },
       });
 
-      console.log(updatedUser.data.removeFriend.friends);
-      // setFriends(prev => {
-      //   prev.filter(friend => {updatedUser.data.removeFriend.friends })
-      // })
       setFriends(updatedUser.data.removeFriend.friends);
       setSelectedFriend("");
     } catch (err) {
@@ -172,34 +173,22 @@ const User = () => {
                 name="searchInput"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
+                onFocus={() => setValidationError(false)}
                 type="text"
-                onBlur={validateGroupName}
                 placeholder="Enter group name"
                 className="upload-input groupInput"
               />
-              {validationError && (
-                <p className="p-1 text-center bg-danger text-white bRadius ">
-                  Group name must be between 3 and 30 characters long and not include consecutive
-                  '-' characters
-                </p>
+              {validationError && error && (
+                <p className="p-1 text-center bg-danger text-white bRadius ">{error.message}</p>
               )}
             </Col>
             <Col xs={12} md={3} className="button-container">
-              <button
-                type="submit"
-                className="btn"
-                disabled={validationError && searchInput?.length !== 0}>
+              <button type="submit" className="btn" disabled={validationError}>
                 Create Group
               </button>
             </Col>
           </Row>
         </Form>
-      </Container>
-      <Container>
-        <Row>{groupDetails && <p>groupDetails.name</p>}</Row>
-        <Row>{groupDetails && groupDetails.members?.map((member) => <p>{member.name}</p>)}</Row>
-        <Row>{groupDetails && <p> groupDetails.photos</p>}</Row>
-        <Row>{groupDetails && <p>groupDetails.containerUrl</p>}</Row>
       </Container>
 
       <Container className="col-xs-12 col-sm-10 col-md-8 col-lg-6 mb-2">
@@ -246,6 +235,7 @@ const User = () => {
                 type="text"
                 value={friendInput}
                 onChange={(e) => setFriendInput(e.target.value)}
+                onFocus={() => setFriendSearchError(false)}
                 className="upload-input friendInput"
                 size="lg"
               />
