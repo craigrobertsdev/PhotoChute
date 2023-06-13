@@ -103,6 +103,10 @@ const User = () => {
         },
       });
 
+      console.log(updatedUser.data.removeFriend.friends);
+      // setFriends(prev => {
+      //   prev.filter(friend => {updatedUser.data.removeFriend.friends })
+      // })
       setFriends(updatedUser.data.removeFriend.friends);
       setSelectedFriend("");
     } catch (err) {

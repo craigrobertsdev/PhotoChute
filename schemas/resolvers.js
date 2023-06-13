@@ -415,13 +415,15 @@ const resolvers = {
         { new: true }
       );
 
-      const updatedFriend = await User.findOneAndUpdate(
+      const populatedUser = await updatedUser.populate("friends");
+
+      await User.findOneAndUpdate(
         { _id: friendId },
         { $pull: { friends: context.user._id } },
         { new: true }
       );
 
-      return updatedFriend;
+      return populatedUser;
     },
 
     addGroupMembers: async (parent, { groupId, memberIds }, context) => {
