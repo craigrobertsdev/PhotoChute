@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Form } from "react-bootstrap";
+import { Container, Row, Col, Form, ProgressBar } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { GET_ME } from "../utils/queries";
 import { CREATE_GROUP, ADD_FRIEND, REMOVE_FRIEND, DELETE_ACCOUNT } from "../utils/mutations";
@@ -18,6 +18,7 @@ const User = () => {
 
   useEffect(() => {
     if (data?.me) {
+      console.log(data);
       const myUpdatedGroups = data?.me?.groups?.filter(
         (group) => group.groupOwner._id === data.me._id
       );
@@ -107,6 +108,26 @@ const User = () => {
 
   return (
     <div className="user-page-container">
+      {data && (
+        <>
+          <h1 className="text-center text-purple">Welcome Back {data.me.firstName}</h1>
+          <div className="progress-container">
+            <h4 className="text-purple">Total Photos Uploaded</h4>
+            {data.me.photos.length > 0 ? (
+              <ProgressBar
+                now={data?.me.photos.length}
+                max={data?.me.maxPhotos}
+                label={`${data?.me.photos.length ? data?.me.photos.length : 0}/${
+                  data?.me.maxPhotos
+                }`}
+                variant="photochute"
+              />
+            ) : (
+              <h5 className="text-center">None yet!</h5>
+            )}
+          </div>
+        </>
+      )}
       <div className="flex-row justify-center mb-4">
         <div className="col-xs-12 col-sm-10 col-md-8 col-lg-6  mb-2">
           <h2 className="altHeading text-center">My Groups</h2>

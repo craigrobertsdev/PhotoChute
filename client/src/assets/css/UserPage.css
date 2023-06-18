@@ -1,3 +1,7 @@
+h1 {
+  color: #47294c;
+}
+
 .button-container {
   display: flex;
   justify-content: center;

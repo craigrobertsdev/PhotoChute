@@ -5,6 +5,8 @@ export const GET_ME = gql`
     me(email: $email) {
       _id
       email
+      username
+      firstName
       friends {
         username
         firstName
@@ -23,7 +25,7 @@ export const GET_ME = gql`
       photos {
         _id
       }
-      username
+      maxPhotos
     }
   }
 `;
