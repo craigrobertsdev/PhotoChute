@@ -18,7 +18,6 @@ const User = () => {
 
   useEffect(() => {
     if (data?.me) {
-      console.log(data);
       const myUpdatedGroups = data?.me?.groups?.filter(
         (group) => group.groupOwner._id === data.me._id
       );
