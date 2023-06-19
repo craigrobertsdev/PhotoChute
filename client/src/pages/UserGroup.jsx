@@ -92,7 +92,9 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
 
   useEffect(() => {
     if (!thumbnailLoading && uploading) {
-      window.location.reload();
+      // window.location.reload();
+      setUploading(false);
+      setUploadPaneOpen(false);
     }
   }, [thumbnailLoading]);
 
@@ -269,6 +271,7 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
     setMemberPaneOpen(false);
     setUploadPaneOpen(!uploadPaneOpen);
   };
+
   const toggleMemberPane = () => {
     setUploadPaneOpen(false);
     setMemberPaneOpen(!memberPaneOpen);
@@ -412,7 +415,7 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
               className="btn"
               disabled={
                 !selectedFile ||
-                photoCount > maxPhotos ||
+                photoCount >= maxPhotos ||
                 fileValidationError ||
                 thumbnailLoading ||
                 userAtMaxPhotos
