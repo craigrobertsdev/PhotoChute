@@ -92,9 +92,7 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
 
   useEffect(() => {
     if (!thumbnailLoading && uploading) {
-      // window.location.reload();
-      setUploading(false);
-      setUploadPaneOpen(false);
+      window.location.reload();
     }
   }, [thumbnailLoading]);
 
