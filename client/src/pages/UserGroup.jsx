@@ -249,6 +249,7 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
     setMemberPaneOpen(false);
     setUploadPaneOpen(!uploadPaneOpen);
   };
+
   const toggleMemberPane = () => {
     setUploadPaneOpen(false);
     setMemberPaneOpen(!memberPaneOpen);
@@ -371,7 +372,7 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
             <input type="file" onChange={onFileChange} className="upload-input" ref={uploadInput} />
             <button
               className="btn"
-              disabled={!selectedFile || photoCount > maxPhotos || fileValidationError || thumbnailLoading || userAtMaxPhotos}
+              disabled={!selectedFile || photoCount >= maxPhotos || fileValidationError || thumbnailLoading || userAtMaxPhotos}
               type="submit"
               onClick={onFileUpload}>
               Upload!
