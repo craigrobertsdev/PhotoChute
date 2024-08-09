@@ -1,11 +1,7 @@
 const { User, Photo, Group } = require("../models");
 const { AuthenticationError } = require("apollo-server-express");
 const { signToken } = require("../utils/auth");
-const {
-  generateFileUploadUrlData,
-  getSignedUrl,
-  createContainerSAS,
-} = require("../utils/sasTokenGenerator");
+const { generateFileUploadUrlData, getSignedUrl, createContainerSAS } = require("../utils/sasTokenGenerator");
 const { deleteBlob, deleteContainer } = require("../utils/blobStorage");
 const { ObjectId } = require("mongoose").Types;
 
@@ -158,10 +154,7 @@ const resolvers = {
 
       const group = await Group.findOne({ serialisedGroupName: groupName });
 
-      if (
-        !group.members?.includes(context.user._id) &&
-        !group.groupOwner._id.equals(context.user._id)
-      ) {
+      if (!group.members?.includes(context.user._id) && !group.groupOwner._id.equals(context.user._id)) {
         return new AuthenticationError("You are not a member of this group");
       }
 
@@ -241,9 +234,7 @@ const resolvers = {
 
         return { name, groupOwner, photos, containerUrl, serialisedGroupName };
       } catch (err) {
-        throw new Error(
-          "Failed to create group. Ensure group name is between 3 and 30 characters and doesn't contain consecutive '-' characters."
-        );
+        throw new Error("Failed to create group. Ensure group name is between 3 and 30 characters and doesn't contain consecutive '-' characters.");
       }
     },
 
@@ -252,9 +243,7 @@ const resolvers = {
         return new AuthenticationError("You must be signed in to create a group");
       }
 
-      const groupToDelete = await (
-        await Group.findOne({ serialisedGroupName: groupName })
-      ).populate("photos");
+      const groupToDelete = await (await Group.findOne({ serialisedGroupName: groupName })).populate("photos");
 
       const blobNames = groupToDelete.photos.map((photo) => photo.serialisedFileName);
 
@@ -287,11 +276,7 @@ const resolvers = {
       return deletedGroup;
     },
 
-    savePhoto: async (
-      parent,
-      { fileName, url, fileSize, ownerId, groupId, serialisedFileName, serialisedGroupName },
-      context
-    ) => {
+    savePhoto: async (parent, { fileName, url, fileSize, ownerId, groupId, serialisedFileName, serialisedGroupName }, context) => {
       if (!context.user) {
         return new AuthenticationError("You must be signed in to create a group");
       }
@@ -335,10 +320,7 @@ const resolvers = {
 
       const group = await Group.findOne({ serialisedGroupName: groupName });
 
-      if (
-        !group.members?.includes(context.user._id) &&
-        !group.groupOwner._id.equals(context.user._id)
-      ) {
+      if (!group.members?.includes(context.user._id) && !group.groupOwner._id.equals(context.user._id)) {
         return new AuthenticationError("You are not authorised to delete this photo");
       }
 
@@ -422,11 +404,7 @@ const resolvers = {
 
       const populatedUser = await updatedUser.populate("friends");
 
-      await User.findOneAndUpdate(
-        { _id: friendId },
-        { $pull: { friends: context.user._id } },
-        { new: true }
-      );
+      await User.findOneAndUpdate({ _id: friendId }, { $pull: { friends: context.user._id } }, { new: true });
 
       return populatedUser;
     },
@@ -459,11 +437,7 @@ const resolvers = {
         }
       );
 
-      await User.updateMany(
-        { _id: { $in: memberIds } },
-        { $addToSet: { groups: new ObjectId(groupId) } },
-        { new: true }
-      );
+      await User.updateMany({ _id: { $in: memberIds } }, { $addToSet: { groups: new ObjectId(groupId) } }, { new: true });
 
       return updatedGroup;
     },
@@ -493,11 +467,7 @@ const resolvers = {
         }
       );
 
-      await User.updateMany(
-        { _id: { $in: memberIds } },
-        { $pull: { groups: new ObjectId(groupId) } },
-        { new: true }
-      );
+      await User.updateMany({ _id: { $in: memberIds } }, { $pull: { groups: new ObjectId(groupId) } }, { new: true });
 
       return updatedGroup;
     },

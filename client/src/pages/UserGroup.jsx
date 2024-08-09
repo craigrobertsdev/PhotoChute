@@ -1,17 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  DELETE_PHOTO,
-  SAVE_PHOTO,
-  ADD_GROUP_MEMBERS,
-  REMOVE_GROUP_MEMBERS,
-  DELETE_GROUP,
-} from "../utils/mutations";
-import {
-  GET_PHOTOS_FOR_GROUP,
-  GET_FILE_UPLOAD_URL,
-  GET_AUTHENTICATION_TOKEN,
-  GET_SIGNED_URL,
-} from "../utils/queries";
+import { DELETE_PHOTO, SAVE_PHOTO, ADD_GROUP_MEMBERS, REMOVE_GROUP_MEMBERS, DELETE_GROUP } from "../utils/mutations";
+import { GET_PHOTOS_FOR_GROUP, GET_FILE_UPLOAD_URL, GET_AUTHENTICATION_TOKEN, GET_SIGNED_URL } from "../utils/queries";
 import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
 import { sizeInMb } from "../utils/helpers";
 import uploadFileToBlob from "../utils/blobStorage";
@@ -38,7 +27,7 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
   const [photos, setPhotos] = useState([]);
   const [uploadError, setUploadError] = useState(false);
   const uploadInput = useRef();
-  const MAX_FILE_SIZE = 5242880; // 5MB
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
   // query and mutation declarations
   const [getFileUploadUrl] = useLazyQuery(GET_FILE_UPLOAD_URL);
@@ -47,16 +36,12 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
   const [addGroupMembers] = useMutation(ADD_GROUP_MEMBERS);
   const [deleteGroupMembers] = useMutation(REMOVE_GROUP_MEMBERS);
   const [deleteGroup] = useMutation(DELETE_GROUP);
-  const { data: sasTokenData, error: tokenDataError } = useQuery(GET_AUTHENTICATION_TOKEN, {
+  const { data: sasTokenData } = useQuery(GET_AUTHENTICATION_TOKEN, {
     variables: {
       groupName: serialisedGroupName,
     },
   });
-  const {
-    loading: loadingGroup,
-    error: errorLoadingGroup,
-    data: group,
-  } = useQuery(GET_PHOTOS_FOR_GROUP, {
+  const { loading: loadingGroup, data: group } = useQuery(GET_PHOTOS_FOR_GROUP, {
     variables: { serialisedGroupName },
   });
 
@@ -126,12 +111,7 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
   };
 
   function validateFile(file) {
-    if (
-      ((file && file.type === "image/jpeg") ||
-        file.type === "image/jpg" ||
-        file.type === "image/png") &&
-      file.size < MAX_FILE_SIZE
-    ) {
+    if (((file && file.type === "image/jpeg") || file.type === "image/jpg" || file.type === "image/png") && file.size < MAX_FILE_SIZE) {
       setFileValidationError(false);
     } else {
       setFileValidationError(true);
@@ -284,10 +264,7 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
 
   // only called when thumbnailLoading === true
   const getLoadingThumbnails = () => {
-    return group?.getPhotosForGroup.photos.slice(
-      0,
-      group?.getPhotosForGroup.photos[group?.getPhotosForGroup.photos.length - 1]
-    );
+    return group?.getPhotosForGroup.photos.slice(0, group?.getPhotosForGroup.photos[group?.getPhotosForGroup.photos.length - 1]);
   };
 
   if (loadingGroup) {
@@ -305,24 +282,15 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
           Add Photos
         </button>
         <button className={"btn"} onClick={toggleMemberPane}>
-          {group.getPhotosForGroup.groupOwner._id === userId
-            ? "Add/Remove Member"
-            : "View Group Members"}
+          {group.getPhotosForGroup.groupOwner._id === userId ? "Add/Remove Member" : "View Group Members"}
         </button>
-        <button
-          className={`btn ${group.getPhotosForGroup.groupOwner._id === userId ? "" : "hidden"}`}
-          onClick={handleDeleteGroup}>
+        <button className={`btn ${group.getPhotosForGroup.groupOwner._id === userId ? "" : "hidden"}`} onClick={handleDeleteGroup}>
           Delete Group
         </button>
       </div>
       <div className="progress-container">
         <h4 className="text-purple">Total Photos Uploaded</h4>
-        <ProgressBar
-          now={photoCount}
-          max={maxPhotos}
-          label={`${photoCount ? photoCount : 0}/${maxPhotos}`}
-          variant="photochute"
-        />
+        <ProgressBar now={photoCount} max={maxPhotos} label={`${photoCount ? photoCount : 0}/${maxPhotos}`} variant="photochute" />
       </div>
       {/* flyout pane with list of friends to add to group */}
       <div className={`add-member-pane ${memberPaneOpen ? "" : "hidden"}`}>
@@ -331,13 +299,9 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
         </button>
         <div className="flex">
           <h4 className="text-center">Group Owner</h4>
-          <div
-            className={`mb-2 text-center ${
-              userId === group.getPhotosForGroup.groupOwner._id ? "underline" : ""
-            }`}>
+          <div className={`mb-2 text-center ${userId === group.getPhotosForGroup.groupOwner._id ? "underline" : ""}`}>
             <p>
-              {group.getPhotosForGroup.groupOwner.firstName}{" "}
-              {group.getPhotosForGroup.groupOwner.lastName}
+              {group.getPhotosForGroup.groupOwner.firstName} {group.getPhotosForGroup.groupOwner.lastName}
             </p>
           </div>
           <h4 className="text-center">
@@ -350,9 +314,7 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
           {/* Current group members list */}
           <div className="members-container">
             <button
-              className={`btn mx-1 mb-2 ${
-                group.getPhotosForGroup.groupOwner._id === userId ? "" : "hidden"
-              }`}
+              className={`btn mx-1 mb-2 ${group.getPhotosForGroup.groupOwner._id === userId ? "" : "hidden"}`}
               disabled={selectedFriends.length > 0 || selectedMembers.length === 0}
               onClick={handleRemoveGroupMember}>
               Remove member from group
@@ -381,8 +343,7 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
               disabled={
                 selectedMembers.length > 0 ||
                 selectedFriends.length === 0 ||
-                selectedFriends.length + group.getPhotosForGroup.members.length + 1 >
-                  group.getPhotosForGroup.maxMembers
+                selectedFriends.length + group.getPhotosForGroup.members.length + 1 > group.getPhotosForGroup.maxMembers
               }>
               Add member to group
             </button>
@@ -410,26 +371,16 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
             <input type="file" onChange={onFileChange} className="upload-input" ref={uploadInput} />
             <button
               className="btn"
-              disabled={
-                !selectedFile ||
-                photoCount > maxPhotos ||
-                fileValidationError ||
-                thumbnailLoading ||
-                userAtMaxPhotos
-              }
+              disabled={!selectedFile || photoCount > maxPhotos || fileValidationError || thumbnailLoading || userAtMaxPhotos}
               type="submit"
               onClick={onFileUpload}>
               Upload!
             </button>
           </form>
-          {userAtMaxPhotos && (
-            <p>You have reached your upload capacity. Upgrade to premium to increase this limit!</p>
-          )}
+          {userAtMaxPhotos && <p>You have reached your upload capacity. Upgrade to premium to increase this limit!</p>}
           <div>
             {uploading && <div>Uploading</div>}
-            {fileValidationError && (
-              <div>File must be of type jpg, jpeg or png and less than 5MB </div>
-            )}
+            {fileValidationError && <div>File must be of type jpg, jpeg or png and less than 5MB </div>}
             {uploadError && <div>Error uploading file</div>}
           </div>
         </div>

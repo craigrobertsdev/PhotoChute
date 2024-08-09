@@ -18,9 +18,7 @@ const User = () => {
 
   useEffect(() => {
     if (data?.me) {
-      const myUpdatedGroups = data?.me?.groups?.filter(
-        (group) => group.groupOwner._id === data.me._id
-      );
+      const myUpdatedGroups = data?.me?.groups?.filter((group) => group.groupOwner._id === data.me._id);
       setMyGroups(myUpdatedGroups);
       const friendsGroups = data.me.groups.filter((group) => group.groupOwner._id !== data.me._id);
       setFriendsGroups(friendsGroups);
@@ -168,9 +166,7 @@ const User = () => {
                 placeholder="Enter group name"
                 className="upload-input groupInput"
               />
-              {validationError && error && (
-                <p className="p-1 text-center bg-danger text-white bRadius ">{error.message}</p>
-              )}
+              {validationError && error && <p className="p-1 text-center bg-danger text-white bRadius ">{error.message}</p>}
             </Col>
             <Col xs={12} md={3} className="button-container">
               <button type="submit" className="btn" disabled={validationError}>
@@ -191,9 +187,7 @@ const User = () => {
                   {friends?.map((friend, index) => (
                     <div
                       key={`groupMember-${friend._id}`}
-                      className={`mb-2 bRadius ${
-                        selectedFriend === friend._id ? "selected-friend" : "border"
-                      }`}
+                      className={`mb-2 bRadius ${selectedFriend === friend._id ? "selected-friend" : "border"}`}
                       onClick={(event) => handleSelectFriend(event, friend._id)}>
                       <li className="px-1 m-1">
                         {friend.firstName} {friend.lastName}
@@ -208,10 +202,7 @@ const User = () => {
           </Col>
 
           <Col xs={12} md={3} className="button-container">
-            <button
-              className="btn delete-button"
-              disabled={!selectedFriend}
-              onClick={handleRemoveFriend}>
+            <button className="btn delete-button" disabled={!selectedFriend} onClick={handleRemoveFriend}>
               Remove Friend
             </button>
           </Col>
@@ -229,9 +220,7 @@ const User = () => {
                 className="upload-input friendInput"
                 size="lg"
               />
-              {friendSearchError && (
-                <p className="p-1 text-center bg-danger text-white bRadius">{friendSearchError}</p>
-              )}
+              {friendSearchError && <p className="p-1 text-center bg-danger text-white bRadius">{friendSearchError}</p>}
             </Col>
             <Col xs={12} md={3} className="button-container">
               <button type="submit" className="btn friendBtn">

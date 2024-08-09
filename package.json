@@ -10,7 +10,7 @@
     "develop": "concurrently \"npm run watch\" \"cd client && npm start\""
   },
   "engines": {
-    "node": "16.20.0"
+    "node": "20.11.0"
   },
   "keywords": [],
   "author": "",
