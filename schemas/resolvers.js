@@ -124,20 +124,6 @@ const resolvers = {
       }
     },
 
-    getFileUploadUrl: async (parent, { serialisedGroupName, blobName }, context) => {
-      // if user exists on context, they are assumed to be logged in
-      if (!context.user) {
-        throw new AuthenticationError("You need to be signed in to upload images");
-      }
-
-      const group = await Group.findOne({ serialisedGroupName });
-
-      if (group.photos.length >= group.maxPhotos) {
-        return new Error("Cannot exceed maximum number of photos for the group.");
-      }
-
-      return await generateFileUploadUrlData(serialisedGroupName, blobName, "rw");
-    },
     getPhotosForGroup: async (parent, { serialisedGroupName }, context) => {
       if (!context.user) {
         return new AuthenticationError("You must be signed in to access a group's photos");

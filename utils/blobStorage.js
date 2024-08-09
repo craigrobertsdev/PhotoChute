@@ -1,9 +1,6 @@
-const {
-  BlobServiceClient,
-  BlockBlobClient,
-  StorageSharedKeyCredential,
-} = require("@azure/storage-blob");
-const { v1: uuidv1 } = require("uuid");
+const { BlobServiceClient, BlockBlobClient, StorageSharedKeyCredential } = require("@azure/storage-blob");
+const Jimp = require("jimp");
+const stream = require("stream");
 // may need this in prod when server is running from my Azure details, rather than a SAS key
 // const { DefaultAzureCredential } = require("@azure/identity");
 
@@ -18,9 +15,7 @@ const { v1: uuidv1 } = require("uuid");
  */
 
 async function createBlobStorageContainer(groupName) {
-  const blobServiceClient = BlobServiceClient.fromConnectionString(
-    process.env.CONNECTION_STRING_SAS
-  );
+  const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.CONNECTION_STRING_SAS);
   // create a unique name for the container
   const containerName = serialiseGroupName(groupName);
   // get a reference to the container
@@ -53,10 +48,7 @@ async function deleteBlob(containerName, blobName) {
 
   const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
 
-  const blobServiceClient = new BlobServiceClient(
-    "https://photochute.blob.core.windows.net",
-    sharedKeyCredential
-  );
+  const blobServiceClient = new BlobServiceClient(`https://${accountName}.blob.core.windows.net`, sharedKeyCredential);
 
   const containerClient = blobServiceClient.getContainerClient(containerName);
 
@@ -82,9 +74,7 @@ async function deleteBlob(containerName, blobName) {
 }
 
 async function deleteContainer(containerName, blobNames) {
-  const blobServiceClient = BlobServiceClient.fromConnectionString(
-    process.env.CONNECTION_STRING_SAS
-  );
+  const blobServiceClient = BlobServiceClient.fromConnectionString(process.env.CONNECTION_STRING_SAS);
 
   // get a reference to the container
   const containerClient = blobServiceClient.getContainerClient(containerName);
@@ -103,8 +93,74 @@ async function deleteContainer(containerName, blobNames) {
   }
 }
 
+/**
+ * @description Uploads the provided file to the blob storage account via a temporarily signed URL
+ * @param {Buffer} fileBuffer The actual file or Stream to be uploaded
+ * @param {string} fileName
+ */
+async function uploadFileToBlob(fileBuffer, containerName, fileName) {
+  const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
+  const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
+
+  const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
+  const baseUrl = `https://${accountName}.blob.core.windows.net`;
+
+  const blockBlobClient = new BlockBlobClient(`${baseUrl}/${containerName}/${fileName}`, sharedKeyCredential);
+  const extension = fileName.split(".").pop();
+  const mimetype = `image/${extension}`;
+  try {
+    await blockBlobClient.uploadData(fileBuffer, {
+      blobHTTPHeaders: {
+        blobContentType: mimetype,
+      },
+    });
+
+    return {
+      serialisedFileName: fileName,
+      fileUrl: `${baseUrl}/${containerName}/${fileName}`,
+    };
+  } catch (err) {
+    console.log(JSON.stringify(err, null, 2));
+  }
+}
+
+async function uploadThumbnail(fileBuffer, fileName) {
+  const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
+  const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
+  const ONE_MEGABYTE = 1024 * 1024;
+  const uploadOptions = { bufferSize: 4 * ONE_MEGABYTE, maxBuffers: 20 };
+  const containerName = "thumbnails";
+
+  const widthInPixels = 250;
+  Jimp.read(fileBuffer).then((thumbnail) => {
+    thumbnail.resize(widthInPixels, Jimp.AUTO).quality(80);
+
+    thumbnail.getBuffer(Jimp.MIME_PNG, async (err, buffer) => {
+      const readStream = stream.PassThrough();
+      readStream.end(buffer);
+
+      const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
+      const baseUrl = `https://${accountName}.blob.core.windows.net`;
+
+      const blockBlobClient = new BlockBlobClient(`${baseUrl}/${containerName}/${fileName}`, sharedKeyCredential);
+
+      try {
+        const uploadResponse = await blockBlobClient.uploadStream(readStream, uploadOptions.bufferSize, uploadOptions.maxBuffers, {
+          blobHTTPHeaders: { blobContentType: "image/jpeg" },
+        });
+
+        return `https://photochute.blob.core.windows.net/thumbnails/${fileBuffer.name}`;
+      } catch (err) {
+        context.log(err.message);
+      }
+    });
+  });
+}
+
 module.exports = {
   createBlobStorageContainer,
   deleteBlob,
   deleteContainer,
+  uploadFileToBlob,
+  uploadThumbnail,
 };

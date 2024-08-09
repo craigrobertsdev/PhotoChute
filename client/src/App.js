@@ -36,24 +36,7 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-// adds websocket connection to listen for confirmation of thumbnail being uploaded
-// const socket = io("http://localhost:3001");
-const socket = io();
-
 function App() {
-  const [thumbnailLoading, setThumbnailLoading] = useState(false);
-
-  useEffect(() => {
-    socket.on("thumbnail-created", thumbnailCreatedListener);
-    return () => {
-      socket.off("thumbnail-loading", thumbnailCreatedListener);
-    };
-  }, []);
-
-  const thumbnailCreatedListener = (data) => {
-    setThumbnailLoading(false);
-  };
-
   return (
     <ApolloProvider client={client}>
       <Router>
@@ -76,10 +59,7 @@ function App() {
               path="/group"
               element={
                 <AuthChecker>
-                  <UserGroup
-                    thumbnailLoading={thumbnailLoading}
-                    setThumbnailLoading={setThumbnailLoading}
-                  />
+                  <UserGroup />
                 </AuthChecker>
               }
             />

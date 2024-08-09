@@ -2,32 +2,9 @@ import React, { useRef, useState, useEffect } from "react";
 import "../assets/css/PhotoGrid.css";
 import { formatDate } from "../utils/helpers";
 
-const PhotoGrid = ({
-  currentUser,
-  thumbnails,
-  sasToken,
-  onPhotoDelete,
-  onPhotoLoad,
-  onPhotoDownload,
-  thumbnailLoading,
-}) => {
-  const [thumbnailCreated, setThumbnailCreated] = useState();
-
-  useEffect(() => {
-    // dummy state change to force thumbnail to be loaded when the thumbnail-loaded event is received from the server
-    setThumbnailCreated(!thumbnailCreated);
-  }, [thumbnailLoading]);
-
+const PhotoGrid = ({ currentUser, thumbnails, sasToken, onPhotoDelete, onPhotoLoad, onPhotoDownload }) => {
   const isMobileDevice = () => {
-    const mobileDevices = [
-      /Android/i,
-      /webOS/i,
-      /iPhone/i,
-      /iPad/i,
-      /iPod/i,
-      /BlackBerry/i,
-      /Windows Phone/i,
-    ];
+    const mobileDevices = [/Android/i, /webOS/i, /iPhone/i, /iPad/i, /iPod/i, /BlackBerry/i, /Windows Phone/i];
 
     return mobileDevices.some((device) => {
       return window.navigator.userAgent.match(device);
@@ -39,15 +16,8 @@ const PhotoGrid = ({
       {thumbnails.length > 0 ? (
         thumbnails.map((thumbnail, index) => (
           <div className="thumbnail-container" key={"thumbnail-" + index}>
-            <button
-              className="thumbnail-button"
-              onClick={(event) => onPhotoLoad(event, thumbnail.serialisedFileName)}>
-              <img
-                className="thumbnail"
-                src={thumbnail.thumbnailUrl + sasToken}
-                crossOrigin="anonymous"
-                alt="thumbnail"
-              />
+            <button className="thumbnail-button" onClick={(event) => onPhotoLoad(event, thumbnail.serialisedFileName)}>
+              <img className="thumbnail" src={thumbnail.thumbnailUrl + sasToken} crossOrigin="anonymous" alt="thumbnail" />
             </button>
             <div>
               <p className="text-center">
@@ -55,9 +25,7 @@ const PhotoGrid = ({
               </p>
               <div className="button-row">
                 {!isMobileDevice() && (
-                  <button
-                    className="btn"
-                    onClick={(event) => onPhotoDownload(event, thumbnail.serialisedFileName)}>
+                  <button className="btn" onClick={(event) => onPhotoDownload(event, thumbnail.serialisedFileName)}>
                     Download
                   </button>
                 )}

@@ -2,22 +2,17 @@ const express = require("express");
 const path = require("path");
 require("dotenv").config();
 const db = require("./config/connection");
+const fs = require("fs");
 const { ApolloServer } = require("apollo-server-express");
 const { typeDefs, resolvers } = require("./schemas/index");
 const { authMiddleware } = require("./utils/auth");
+const { upload, handleUpload } = require("./utils/upload");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-// set up socket.io for handling POST requests from Azure
-const { createServer } = require("http");
-const { Server } = require("socket.io");
-const httpServer = createServer(app);
-// const io = new Server(httpServer, { cors: { origin: "http://localhost:3000" } });
-const io = new Server(httpServer);
 
 // configure our GraphQL server with our authentication middleware as the context
 const gqlServer = new ApolloServer({
@@ -37,6 +32,12 @@ app.post("/", (req, res) => {
   io.emit("thumbnail-created", { thumbnailUrl });
 
   res.status(200).send("received");
+});
+
+app.post("/upload", upload.single("file"), async (req, res) => {
+  const file = req.file;
+  const fileData = await handleUpload(file.buffer, req.body.containerName, file.size, file.originalname);
+  res.status(200).send(JSON.stringify(fileData));
 });
 
 // if we're in production, serve client/build as static assets
@@ -60,13 +61,10 @@ const startApolloServer = async (typeDefs, resolvers) => {
 };
 
 db.once("open", () => {
-  httpServer.listen(PORT, () => {
-    console.log(httpServer.address());
+  app.listen(PORT, () => {
     console.log(`🌍 Now listening on http://localhost:${PORT}`);
     console.log(`Use GraphQL at http://localhost:${PORT}${gqlServer.graphqlPath}`);
   });
 });
 
 startApolloServer(typeDefs, resolvers);
-
-module.exports = { io };

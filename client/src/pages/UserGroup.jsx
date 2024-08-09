@@ -3,14 +3,13 @@ import { DELETE_PHOTO, SAVE_PHOTO, ADD_GROUP_MEMBERS, REMOVE_GROUP_MEMBERS, DELE
 import { GET_PHOTOS_FOR_GROUP, GET_FILE_UPLOAD_URL, GET_AUTHENTICATION_TOKEN, GET_SIGNED_URL } from "../utils/queries";
 import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
 import { sizeInMb } from "../utils/helpers";
-import uploadFileToBlob from "../utils/blobStorage";
 import PhotoGrid from "../components/PhotoGrid";
 import "../assets/css/UserGroup.css";
 import auth from "../utils/auth";
 import { ProgressBar } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
 
-const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
+const Group = () => {
   const { groupId, serialisedGroupName } = useLocation().state;
   const userId = auth.getProfile().data._id;
   const [selectedFile, setSelectedFile] = useState();
@@ -30,7 +29,6 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
   // query and mutation declarations
-  const [getFileUploadUrl] = useLazyQuery(GET_FILE_UPLOAD_URL);
   const [savePhoto] = useMutation(SAVE_PHOTO);
   const [deletePhoto] = useMutation(DELETE_PHOTO);
   const [addGroupMembers] = useMutation(ADD_GROUP_MEMBERS);
@@ -46,6 +44,10 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
   });
 
   const [getSignedUrl] = useLazyQuery(GET_SIGNED_URL);
+
+  useEffect(() => {
+    console.log(photos);
+  }, [photos]);
 
   useEffect(() => {
     if (group?.getPhotosForGroup) {
@@ -74,12 +76,6 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
       setAvailableFriends(friendsNotInGroup);
     }
   }, [group]);
-
-  useEffect(() => {
-    if (!thumbnailLoading && uploading) {
-      window.location.reload();
-    }
-  }, [thumbnailLoading]);
 
   /**
    * Deletes a photo from the group's container. Only available if the user has permission to perform this action
@@ -124,16 +120,25 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
       setUploading(true);
       setUploadError(false);
       try {
-        const urlData = await getFileUploadUrl({
-          variables: {
-            serialisedGroupName,
-            blobName: selectedFile.name.toLowerCase(),
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+        formData.append("containerName", serialisedGroupName);
+
+        const response = await fetch("/upload", {
+          method: "POST",
+          headers: {
+            authentication: auth.getToken(),
           },
+          body: formData,
         });
 
-        let { fileUrl, serialisedFileName } = urlData.data.getFileUploadUrl;
-        //  upload to Azure storage
-        await uploadFileToBlob(selectedFile, fileUrl);
+        if (!response.ok) {
+          console.log("An error occurred uploading your file");
+          return;
+        }
+
+        const json = await response.json();
+        const { serialisedFileName, fileUrl } = json;
 
         await savePhoto({
           variables: {
@@ -147,10 +152,7 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
           },
         });
 
-        // toggleUploadPane();
-        setSelectedFile(null);
-        uploadInput.current.value = "";
-        setThumbnailLoading(true);
+        window.location.reload();
       } catch (err) {
         console.log(err);
       }
@@ -170,7 +172,8 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
         variables: { groupName: serialisedGroupName, serialisedFileName },
       });
 
-      window.location.assign(signedUrl.data.getSignedUrl.fileUrl);
+      const url = signedUrl.data.getSignedUrl.fileUrl;
+      window.location.href = url;
     } catch (err) {
       console.log(JSON.stringify(err, null, 2));
     }
@@ -261,11 +264,6 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
     });
 
     window.location.assign("/me");
-  };
-
-  // only called when thumbnailLoading === true
-  const getLoadingThumbnails = () => {
-    return group?.getPhotosForGroup.photos.slice(0, group?.getPhotosForGroup.photos[group?.getPhotosForGroup.photos.length - 1]);
   };
 
   if (loadingGroup) {
@@ -372,7 +370,7 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
             <input type="file" onChange={onFileChange} className="upload-input" ref={uploadInput} />
             <button
               className="btn"
-              disabled={!selectedFile || photoCount >= maxPhotos || fileValidationError || thumbnailLoading || userAtMaxPhotos}
+              disabled={!selectedFile || photoCount >= maxPhotos || fileValidationError || userAtMaxPhotos}
               type="submit"
               onClick={onFileUpload}>
               Upload!
@@ -391,12 +389,11 @@ const Group = ({ thumbnailLoading, setThumbnailLoading }) => {
           <>
             <PhotoGrid
               currentUser={userId}
-              thumbnails={thumbnailLoading ? getLoadingThumbnails() : photos}
+              thumbnails={photos}
               sasToken={sasTokenData.getAuthenticationToken.sasToken}
               onPhotoDelete={handleDeletePhoto}
               onPhotoLoad={handleLoadPhoto}
               onPhotoDownload={handleDownloadPhoto}
-              thumbnailLoading={thumbnailLoading}
             />
           </>
         )}

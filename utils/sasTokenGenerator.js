@@ -14,42 +14,27 @@ const { v1: uuidv1 } = require("uuid");
 const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
 const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
 
-const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
-
 /**
  *
  * @returns An object containing the storage account name, container name, blob name and the SAS token for the file upload
  */
 async function generateFileUploadUrlData(containerName, blobName, permissions) {
+  const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
   // const sasToken = await createAccountSas(permissions);
-  const fileUrlData = await getBlobSasUri(
-    containerName,
-    blobName,
-    sharedKeyCredential,
-    permissions
-  );
+  const fileUrlData = await getBlobSasUri(containerName, blobName, sharedKeyCredential, permissions);
 
   return fileUrlData;
 }
 
 // information about sasOptions is located here: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-account-delegation-sas-create-javascript?tabs=blob-service-client
-
-/**
- *
- * @param {String} permissions A string with the necessary permissions for the action the token is being generated for. For example, "rwu" = read, write and update permissions
- * @returns
- */
 async function createContainerSAS(containerName) {
+  const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
   const TEN_MINUTES = 10 * 60 * 1000;
   const NOW = new Date();
 
   // set start time a little before current time to make sure any clock issues are avoided
   const TEN_MINUTES_BEFORE_NOW = new Date(NOW.valueOf() - TEN_MINUTES);
   const TEN_MINUTES_AFTER_NOW = new Date(NOW.valueOf() + TEN_MINUTES);
-
-  const blobServiceClient = BlobServiceClient.fromConnectionString(
-    process.env.CONNECTION_STRING_SAS
-  );
 
   const sasOptions = {
     containerName,
@@ -94,15 +79,18 @@ async function getBlobSasUri(containerName, blobName, sharedKeyCredential, permi
     permissions: BlobSASPermissions.parse(permissions),
   };
 
+  const blobServiceClient = new BlobServiceClient(`https://${accountName}/blob.core.windows.net`, sharedKeyCredential);
+  const containerClient = blobServiceClient.getContainerClient(containerName);
   const sasToken = generateBlobSASQueryParameters(sasOptions, sharedKeyCredential).toString();
 
   return {
-    fileUrl: `https://photochute.blob.core.windows.net/${containerName}/${serialisedBlobName}?${sasToken}`,
+    fileUrl: `https://${accountName}.blob.core.windows.net/${containerName}/${serialisedBlobName}?${sasToken}`,
     serialisedFileName: serialisedBlobName,
   };
 }
 
 function getSignedUrl(containerName, fileName) {
+  const sharedKeyCredential = new StorageSharedKeyCredential(accountName, accountKey);
   const TEN_MINUTES = 10 * 60 * 1000;
   const NOW = new Date();
   const TEN_MINUTES_BEFORE_NOW = new Date(NOW.valueOf() - TEN_MINUTES);
