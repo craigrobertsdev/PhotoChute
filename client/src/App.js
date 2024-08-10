@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
-import { io } from "socket.io-client";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Profile from "./pages/UserPage";
@@ -16,7 +15,7 @@ import AuthChecker from "./components/AuthChecker";
 
 // construct the GraphQL endpoint
 const httpLink = createHttpLink({
-  uri: "/graphql",
+  uri: "http://localhost:3001/graphql",
 });
 
 // Constructs the request middleware forXattaching a JWT to every request as an authorization header

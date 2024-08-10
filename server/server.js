@@ -2,7 +2,6 @@ const express = require("express");
 const path = require("path");
 require("dotenv").config();
 const db = require("./config/connection");
-const fs = require("fs");
 const { ApolloServer } = require("apollo-server-express");
 const { typeDefs, resolvers } = require("./schemas/index");
 const { authMiddleware } = require("./utils/auth");
@@ -23,18 +22,7 @@ const gqlServer = new ApolloServer({
   persistedQueries: false,
 });
 
-app.post("/", (req, res) => {
-  if (!req.headers.apiKey === process.env.API_SECRET) {
-    return res.status(401).json({ message: "Incorrect api key" });
-  }
-
-  const thumbnailUrl = req.body.thumbnailUrl;
-  io.emit("thumbnail-created", { thumbnailUrl });
-
-  res.status(200).send("received");
-});
-
-app.post("/upload", upload.single("file"), async (req, res) => {
+app.post("/api/upload", upload.single("file"), async (req, res) => {
   const file = req.file;
   const fileData = await handleUpload(file.buffer, req.body.containerName, file.size, file.originalname);
   res.status(200).send(JSON.stringify(fileData));
@@ -42,15 +30,15 @@ app.post("/upload", upload.single("file"), async (req, res) => {
 
 // if we're in production, serve client/build as static assets
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "client", "build")));
+  app.use(express.static("dist"));
 
   // wildcard used in production to handle requests to different endpoints created by react-router
   app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+    res.sendFile(path.join(__dirname, "dist", "index.html"));
   });
 } else {
   app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+    res.sendFile(path.join(__dirname, "client", "index.html"));
   });
 }
 
@@ -61,6 +49,7 @@ const startApolloServer = async (typeDefs, resolvers) => {
 };
 
 db.once("open", () => {
+  // app.listen(PORT, "0.0.0.0", () => {
   app.listen(PORT, () => {
     console.log(`🌍 Now listening on http://localhost:${PORT}`);
     console.log(`Use GraphQL at http://localhost:${PORT}${gqlServer.graphqlPath}`);

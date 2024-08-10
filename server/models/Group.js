@@ -10,8 +10,7 @@ const groupSchema = new Schema(
       required: true,
       validate: {
         validator: validateGroupName,
-        message:
-          "Group name must be between 3 and 30 characters long and not include consecutive '-' characters",
+        message: "Group name must be between 3 and 30 characters long and not include consecutive '-' characters",
       },
     },
     members: [
@@ -61,11 +60,10 @@ groupSchema.pre("save", async function (next) {
   if (this.isNew) {
     try {
       this.containerUrl = await createBlobStorageContainer(removeSpecialCharacters(this.name));
-
-      this.serialisedGroupName = this.containerUrl.slice(this.containerUrl.lastIndexOf("/") + 1);
+      const groupName = this.containerUrl.slice(this.containerUrl.lastIndexOf("/") + 1);
+      this.serialisedGroupName = groupName;
     } catch (err) {
       console.error(err);
-      // dbLogger.error(JSON.stringify(err, null, 2));
     }
   }
   next();
@@ -74,7 +72,6 @@ groupSchema.pre("save", async function (next) {
 groupSchema.pre("deleteOne", async function (next) {
   try {
   } catch (err) {
-    // dbLogger.error(JSON.stringify({ err }));x
     console.error(JSON.stringify(err, null, 2));
   }
 });

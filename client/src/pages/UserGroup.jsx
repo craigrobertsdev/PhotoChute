@@ -124,7 +124,8 @@ const Group = () => {
         formData.append("file", selectedFile);
         formData.append("containerName", serialisedGroupName);
 
-        const response = await fetch("/upload", {
+        // const response = await fetch("http://localhost:3001/api/upload", {
+        const response = await fetch("/api/upload", {
           method: "POST",
           headers: {
             authentication: auth.getToken(),

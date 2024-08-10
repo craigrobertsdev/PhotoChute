@@ -1,0 +1,5 @@
+{
+  "appService.zipIgnorePattern": ["node_modules{,/**}", ".vscode{,/**}"],
+  "appService.defaultWebAppToDeploy": "/subscriptions/65542554-5978-477e-bb98-13940c7a8eb9/resourceGroups/Photochute/providers/Microsoft.Web/sites/photochute",
+  "appService.deploySubpath": "."
+}

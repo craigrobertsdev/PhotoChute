@@ -79,8 +79,6 @@ async function getBlobSasUri(containerName, blobName, sharedKeyCredential, permi
     permissions: BlobSASPermissions.parse(permissions),
   };
 
-  const blobServiceClient = new BlobServiceClient(`https://${accountName}/blob.core.windows.net`, sharedKeyCredential);
-  const containerClient = blobServiceClient.getContainerClient(containerName);
   const sasToken = generateBlobSASQueryParameters(sasOptions, sharedKeyCredential).toString();
 
   return {

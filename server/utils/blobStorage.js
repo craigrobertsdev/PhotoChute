@@ -1,6 +1,7 @@
 const { BlobServiceClient, BlockBlobClient, StorageSharedKeyCredential } = require("@azure/storage-blob");
 const Jimp = require("jimp");
 const stream = require("stream");
+const { v1: uuidv1 } = require("uuid");
 // may need this in prod when server is running from my Azure details, rather than a SAS key
 // const { DefaultAzureCredential } = require("@azure/identity");
 
@@ -151,7 +152,7 @@ async function uploadThumbnail(fileBuffer, fileName) {
 
         return `https://photochute.blob.core.windows.net/thumbnails/${fileBuffer.name}`;
       } catch (err) {
-        context.log(err.message);
+        console.log(err);
       }
     });
   });

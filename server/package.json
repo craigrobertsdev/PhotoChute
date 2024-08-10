@@ -4,10 +4,10 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "heroku-postbuild": "cd client && npm install --only=dev && npm install && npm run build",
+    "heroku-postbuild": "cd ../client && npm install --only=dev && npm install && npm run build",
     "start": "node server.js",
     "watch": "nodemon server.js",
-    "develop": "concurrently \"npm run watch\" \"cd client && npm start\""
+    "develop": "concurrently \"npm run watch\" \"cd ../client && npm start\""
   },
   "engines": {
     "node": "20.11.0"
